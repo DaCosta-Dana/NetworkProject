@@ -24,7 +24,7 @@ class UnreliableReceiver:
         
         return True
 
-    def receive_data(self, client_id):
+    def receive_data(self):
         try:
             while True:
                 modified_message, server_address = self.socket.recvfrom(2048)
@@ -54,7 +54,7 @@ class UnreliableReceiver:
             
         except OSError as e:
             if not self.socket_close:
-                print(f"Error in recieved data for Client: {client_id}: {e}")
+                print(f"Error in recieved data form a Client: {e}")
                 self.close_socket()
 
             print(f"Total Bytes Received: {self.total_bytes_received}")
