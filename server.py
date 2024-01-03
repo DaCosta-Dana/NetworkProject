@@ -105,6 +105,11 @@ class FileSender:
                                     print(f"{time_taken:.4f} >> Timeout: Retransmission sent to client {clientid}, Packet ID: {packet_data1['id']}")
                                     self.total_bytes_sent += len(packet_data['packet'])
                                     self.retransmissions_sent += 1
+                    
+                    except ConnectionResetError:
+                        print(f"Connection reset by client {clientid}")
+                        self.client_socket.close()
+                        break
 
                 self.client_socket.settimeout(None)
 
