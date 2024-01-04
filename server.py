@@ -24,96 +24,108 @@ class FileSender:
         self.client_addresses = client_addresses
         self.ack_lock = threading.Lock()
         self.sent_packet_ids = []
+        self.list_ack = []
+        
+
+    def send_packet(self, packet_id, data, client_address, start_time):
+
+        packet_data = {
+            'id': packet_id,
+            'packet': f"{packet_id:04d}".encode() + data
+        }
+
+        time_taken = time.time() - start_time
+        self.client_socket.sendto(packet_data['packet'], client_address)
+        print(f"{time_taken:.4f} >> Data sent to client {client_address[1]}, Packet ID: {packet_data['id']}")
+        self.total_bytes_sent += len(packet_data['packet'])
+        
+        self.sent_packet_ids.append(int(packet_data['id']))
+        print(self.sent_packet_ids)
+        #print(packet_data)
+
+    def receive_acknowledgment(self, last_ack_received, start_time, window_size, data):
+        
+        while self.sent_packet_ids:
+            try:
+                ack_message, _ = self.client_socket.recvfrom(2048)
+                if ack_message:
+                    ack_id = int(ack_message.decode())
+
+
+                    self.list_ack.append(ack_id)
+                    print(self.list_ack)
+
+                    time_taken = time.time() - start_time
+                    print(f"{time_taken:.4f} >> Acknowledgment received for Packet ID: {ack_id}")
+                    time.sleep(1)
+                    with self.ack_lock:
+
+                        if ack_id in self.sent_packet_ids:
+                            self.sent_packet_ids.remove(ack_id)
+                            
+
+                            if self.list_ack.count(ack_id) == len(self.client_addresses):
+                            
+                                for ack_id in self.list_ack:
+                                    self.list_ack.remove(ack_id)
+
+                                print(data)
+                                
+                                for client_address in self.client_addresses:
+                                    self.send_packet(ack_id + self.size, data, client_address, start_time)
+
+                                print(f"MOVING WINDOW")
+                                if not data:
+                                    break
+            
+                                
+
+            except timeout:
+                with self.ack_lock:
+                    for id in self.sent_packet_ids:
+                        client_id1 = str(id)[:5]
+
+                        packet_data1 = {
+                            'id': str(id),
+                            'packet': f"{str(id)}".encode() + data
+                        }
+                        if client_id1 in str(client_address[1]):
+                            time_taken = time.time() - start_time
+                            self.client_socket.sendto(packet_data1['packet'], client_address)
+                            print(f"{time_taken:.4f} >> Timeout: Retransmission sent to client {client_id1}, Packet ID: {packet_data1['id']}")
+                            self.total_bytes_sent += len(packet_data1['packet'])
+                            self.retransmissions_sent += 1
+
+        self.client_socket.settimeout(None)
 
     def send_to_client(self, client_address):
-        clientid = str(client_address[1])
-        print(clientid)
-        print(f"Thread for client {clientid} started.")
+        client_id = str(client_address[1])
+        print(client_id)
+        print(f"Thread for client {client_id} started.")
         start_time = time.time()
+        timeout_duration = 1.5
 
         with open(self.file_name, 'rb') as file:
             last_ack_received = -1
             window_size = self.size
-            timeout_duration = 2.3
-            list_ack = []
 
             while True:
                 for packet_id in range(last_ack_received + 1, last_ack_received + 1 + window_size):
                     data = file.read(2048)
                     if not data:
                         return
-                    
-                   
-                    packet_data = {
-                        'id': clientid + str(packet_id),
-                        'packet': f"{clientid}".encode() + f"{str(packet_id)}".encode() + data
-                    }
-                    time_taken = time.time() - start_time
-                    self.client_socket.sendto(packet_data['packet'], client_address)
-                    print(f"{time_taken:.4f} >> Data sent to client {clientid}, Packet ID: {packet_data['id']}")
-                    self.total_bytes_sent += len(packet_data['packet'])
 
-                    with self.ack_lock:
-                        self.sent_packet_ids.append(int(packet_data['id']))
-                        print(self.sent_packet_ids)
-
-                    
-                    time.sleep(0.1)
+                    self.send_packet(packet_id, data, client_address, start_time)
+                    time.sleep(1)
 
                 if not data:
                     break
 
                 self.client_socket.settimeout(timeout_duration)
 
-                while self.sent_packet_ids:
-                    try:
-                        ack_message, _ = self.client_socket.recvfrom(2048)
-                        if ack_message:
-                            ack_id = int(ack_message.decode())
+                self.receive_acknowledgment(last_ack_received, start_time, window_size, data)
 
-                            list_ack.append(str(ack_id)[5:])
-                            print(list_ack)
-
-                            time_taken = time.time() - start_time
-                            print(f"{time_taken:.4f} >> Acknowledgment received for Packet ID: {ack_id}")
-
-                            
-                            with self.ack_lock:
-                                if ack_id in self.sent_packet_ids:
-                                    self.sent_packet_ids.remove(ack_id)
-                                    print(self.sent_packet_ids)
-                                    last_ack_received = max(last_ack_received, packet_id)
-
-                                    if not self.sent_packet_ids:
-                                        window_size = min(self.size - last_ack_received - 1, window_size) if last_ack_received < self.size - 1 else window_size
-                                        print(f"Moving window to next {window_size} packets")
-                                        
-
-                    except timeout:
-                        with self.ack_lock:
-                            for id in self.sent_packet_ids:
-                                client_id1 = str(id)[:5]
-                                
-                                packet_data1 = {
-                                    'id': str(id),
-                                    'packet': f"{str(id)}".encode() + data
-                                }
-                                if client_id1 in str(client_address[1]):
-
-                                    time_taken = time.time() - start_time
-                                    self.client_socket.sendto(packet_data1['packet'], client_address)
-                                    print(f"{time_taken:.4f} >> Timeout: Retransmission sent to client {clientid}, Packet ID: {packet_data1['id']}")
-                                    self.total_bytes_sent += len(packet_data['packet'])
-                                    self.retransmissions_sent += 1
-                    
-                    except ConnectionResetError:
-                        print(f"Connection reset by client {clientid}")
-                        self.client_socket.close()
-                        break
-
-                self.client_socket.settimeout(None)
-
-        print(f"Thread for client {clientid} finished.")
+        print(f"Thread for client {client_id} finished.")
 
     def send_file(self):
         threads = []
