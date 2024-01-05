@@ -1,6 +1,5 @@
 import random
 from socket import *
-import threading
 
 class UnreliableReceiver:
     def __init__(self, socket, ack_probability):
@@ -8,16 +7,22 @@ class UnreliableReceiver:
         self.ack_probability = ack_probability
         self.total_bytes_received = 0
         self.retransmissions_received = 0
+        self.test = True
+        
 
     def unreliable_send_ack(self, packet_id, server_address):
-        if random.uniform(0, 1) < self.ack_probability:
-            print(f"Packet with ID : {packet_id} lost")
-            return False
         
-        print(f"Acknowledgment for Packet ID {packet_id} sent successfully")
-        acknowledgment = packet_id
-        self.socket.sendto(acknowledgment, server_address)
-        return True
+        while self.test == True:
+            if random.uniform(0, 1) < self.ack_probability:
+                print(f"Packet with ID : {packet_id} lost")
+                self.test = False
+                return False
+            
+            print(f"Acknowledgment for Packet ID {packet_id} sent successfully")
+            acknowledgment = packet_id
+            print(acknowledgment)
+            self.socket.sendto(acknowledgment, server_address)
+            return True
 
     def receive_data(self):
         while True:
@@ -28,12 +33,10 @@ class UnreliableReceiver:
                 break
 
             modified_message.decode()
-
+            
             packet_id1 = modified_message[:4]
-            print("PACKET ID")
-            print(packet_id1)
-
-
+        
+            
             #data = modified_message[6:]
             print(f"Received packet with ID: {packet_id1}")
 
@@ -44,13 +47,14 @@ class UnreliableReceiver:
 
         print(f"Total Bytes Received: {self.total_bytes_received}")
         print(f"Total Retransmission Received: {self.retransmissions_received}")
+
         self.socket.close()
 
 
-def mainC():
+def main():
     server_name = "localhost"
     server_port = 12000
-    ack_probability = 0
+    ack_probability = 0.1
 
     client_socket = socket(AF_INET, SOCK_DGRAM)
 
@@ -61,4 +65,4 @@ def mainC():
     receiver.receive_data()
 
 if __name__ == "__main__":
-    mainC()
+    main()
