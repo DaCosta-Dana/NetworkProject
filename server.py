@@ -2,6 +2,7 @@ import random
 from socket import *
 import threading
 import time
+from client import *
 
 class UnreliableSender:
     def __init__(self, socket):
@@ -170,12 +171,16 @@ class Server:
     def close_socket(self):
         self.server_socket.close()
 
-def main():
-    client_number = 2
+def mainS():
+    client_number = 5
     server = Server(12000, client_number)  # Set the desired number of clients
     print('The server is ready to send')
 
+    mainC()
+    
     server.wait_for_connections()
+
+    
 
     size = 3
 
@@ -199,5 +204,6 @@ def main():
     server.close_socket()
 
 if __name__ == "__main__":
-    main()
+    mainS()
+    
     
