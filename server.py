@@ -2,12 +2,14 @@ import random
 from socket import *
 import threading
 import time
+
 class UnreliableSender:
     def __init__(self, socket):
         self.socket = socket
     def send(self, data, address):
         self.socket.sendto(data, address)
         return True
+    
 class FileSender:
     def __init__(self, file_name, client_socket, size, client_number, client_addresses):
         self.file_name = file_name
@@ -40,7 +42,6 @@ class FileSender:
         #print(packet_data)
 
     def receive_acknowledgment(self, last_ack_received, start_time, window_size, data):
-
         while self.sent_packet_ids:
             try:
                 ack_message, _ = self.client_socket.recvfrom(2048)
@@ -73,8 +74,6 @@ class FileSender:
                                 print(f"MOVING WINDOW")
                                 if not data:
                                     break
-
-
 
             except timeout:
                 with self.ack_lock:
@@ -141,6 +140,7 @@ class Server:
         self.server_socket.bind(('', self.server_port))
         self.sender = UnreliableSender(self.server_socket)
         self.client_addresses = []
+
     def wait_for_connections(self):
         while len(self.client_addresses) < self.client_number:
             message, client_address = self.server_socket.recvfrom(2048)
@@ -148,11 +148,14 @@ class Server:
                 print(f"Client connected: {client_address}")
                 self.client_addresses.append(client_address)
         print("All clients connected.")
+
     def send_finish_signal(self):
         for client_address in self.client_addresses:
             self.server_socket.sendto(b'finished', client_address)
+
     def close_socket(self):
         self.server_socket.close()
+
 def mainS():
     client_number = 2
     server = Server(12000, client_number)  # Set the desired number of clients
@@ -160,6 +163,7 @@ def mainS():
     server.wait_for_connections()
     size = 3
     threads = []
+
     file_sender = FileSender('filename.txt', server.server_socket, size, client_number, server.client_addresses)
     file_sender.sender = server.sender
     thread = threading.Thread(target=file_sender.send_file)
@@ -172,5 +176,6 @@ def mainS():
         thread.join()
     server.send_finish_signal()
     server.close_socket()
+    
 if __name__ == "__main__":
     mainS()
