@@ -7,22 +7,26 @@ class UnreliableReceiver:
         self.ack_probability = ack_probability
         self.total_bytes_received = 0
         self.retransmissions_received = 0
-        self.test = True
+        self.list_ack = []
         
 
     def unreliable_send_ack(self, packet_id, server_address):
         
-        while self.test == True:
+        #while self.test == True:
             if random.uniform(0, 1) < self.ack_probability:
                 print(f"Packet with ID : {packet_id} lost")
-                self.test = False
+                #self.test = False
                 return False
-            
-            print(f"Acknowledgment for Packet ID {packet_id} sent successfully")
-            acknowledgment = packet_id
-            print(acknowledgment)
-            self.socket.sendto(acknowledgment, server_address)
-            return True
+            if not packet_id in self.list_ack:
+                print(f"Acknowledgment for Packet ID {packet_id} sent successfully")
+                acknowledgment = packet_id
+                print(acknowledgment)
+                self.socket.sendto(acknowledgment, server_address)
+                self.list_ack.append(acknowledgment)
+                #print(self.list_ack)
+                return True
+            else:
+                return False
 
     def receive_data(self):
         while True:
@@ -54,7 +58,7 @@ class UnreliableReceiver:
 def main():
     server_name = "localhost"
     server_port = 12000
-    ack_probability = 0.1
+    ack_probability = 0.4
 
     client_socket = socket(AF_INET, SOCK_DGRAM)
 
