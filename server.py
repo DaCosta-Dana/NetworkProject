@@ -29,17 +29,22 @@ class FileSender:
         self.last_ack_received = -1
         self.end = False
         self.ack_received = 0
+        self.end_acks = []
         
 
     def send_packet(self, packet_id, data, client_address, start_time):
 
         packet_data = {
             'id': packet_id,
-            'packet': f"{packet_id:04d}".encode() + data
+            'packet': f"{packet_id:06d}".encode() + data
         }
 
         time_taken = time.time() - start_time
+
+       
         self.client_socket.sendto(packet_data['packet'], client_address)
+        
+
         print(f"{time_taken:.4f} >> Data sent to client {client_address[1]}, Packet ID: {packet_data['id']}")
         self.total_bytes_sent += len(packet_data['packet'])
         self.client_socket.settimeout(5)
@@ -65,7 +70,7 @@ class FileSender:
             
                 time.sleep(0.1)
                 ack_message, _ = self.client_socket.recvfrom(2048)
-                time.sleep(0.1)
+                time.sleep(0.05)
                 if ack_message:
                     ack_id = int(ack_message.decode())
             
@@ -74,60 +79,76 @@ class FileSender:
                    
                     #print(expected_id)
                     #print(self.sent_packet_ids)
-
-                    
+                    start = 0
 
                     time_taken = time.time() - start_time
                     print(f"{time_taken:.4f} >> Acknowledgment received for Packet ID: {ack_id}")
-                        
-                    self.list_ack.append(ack_id)
-                    print(self.list_ack)
-
-
-                    while len(self.list_ack) >= len(self.client_addresses):
-                      
-                            print(self.ack_received)
-                            print(self.list_ack)
-                            print(self.list_ack.count(self.ack_received))
                             
-                            if self.list_ack.count(self.ack_received) == len(self.client_addresses):
-                                        if self.end == False:
-                                            print(f"All acks received for the packet ID : {self.ack_received}")
-                                            print(f"MOVING WINDOW")
-                                            
-                                            while self.ack_received in self.list_ack:
-                                                self.list_ack.remove(self.ack_received)
+                    self.list_ack.append(ack_id)
+                    #print(self.list_ack)
+                    
 
-                                           
-                                            print("LIST ACK")
-                                            print(self.list_ack)
-                                            
-                                        
-                                            data = file.read(2048)
+                    if ack_id not in self.end_acks and time.time() - start >= 1:
 
-                                            data
-                                            for client_address in self.client_addresses:
-                                                self.send_packet(self.ack_received + self.size, data, client_address, start_time)
-
-                                            self.ack_received += 1
-
-                                        else:
-                                            break
-
-
-                            else: # RETRANSMISSION
-
-                                for packet_id2 in range(self.ack_received, self.ack_received + window_size):
-                                    
-                                    for client_address in self.client_addresses:
-                                        self.send_packet(packet_id2, data, client_address, start_time)
-                                        print("RETRANSMISSION")
-                                        self.retransmissions_sent += 1
-                                    
-                                break
+                        while len(self.list_ack) >= len(self.client_addresses):
                         
-                       
+                                #print(self.ack_received)
+                                #print(self.list_ack)
+                                #print(self.list_ack.count(self.ack_received))
                                 
+                                if self.list_ack.count(self.ack_received) == len(self.client_addresses) :
+                                            if self.end == False:
+                                                print(f"All acks received for the packet ID : {self.ack_received}")
+                                                self.end_acks.append(self.ack_received)
+
+                                                while self.ack_received in self.sent_packet_ids:
+                                                    self.sent_packet_ids.remove(self.ack_received)
+
+                                                #print(self.end_acks)
+                                                print(f"MOVING WINDOW")
+                                               
+                                                start = time.time()
+                                                while self.ack_received in self.list_ack:
+                                                    self.list_ack.remove(self.ack_received)
+
+                                            
+                                                #print("LIST ACK") 
+                                                print(self.list_ack)
+                                                
+                                                
+                                            
+                                                data = file.read(2048)
+
+                                                data
+                                                for client_address in self.client_addresses:
+                                                    self.send_packet(self.ack_received + self.size, data, client_address, start_time)
+                                                    
+
+                                                self.ack_received += 1
+                                                time.sleep(0.1)
+                                                
+
+                                            else:
+                                                break
+
+
+                                else: # RETRANSMISSION
+
+                                    for packet_id2 in range(self.ack_received, self.ack_received + window_size):
+                                        
+                                        for client_address in self.client_addresses:
+                                            self.send_packet(packet_id2, data, client_address, start_time)
+                                            print("RETRANSMISSION")
+                                            self.retransmissions_sent += 1
+                                    #time.sleep(0.1)  
+                                    break
+                      
+                    elif ack_id in self.end_acks: 
+                        print("Ack already received")
+                        #self.list_ack.clear()
+                        start = 0
+                        #print(self.sent_packet_ids)
+                             
 
                        
 
@@ -205,13 +226,13 @@ class Server:
         self.server_socket.close()
 
 def main():
-    client_number = 10
+    client_number = 2
     server = Server(12000, client_number)  # Set the desired number of clients
     print('The server is ready to send')
 
     server.wait_for_connections()
 
-    size = 3
+    size = 10
 
     threads = []
 
@@ -234,3 +255,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
