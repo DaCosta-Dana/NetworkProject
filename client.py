@@ -8,12 +8,12 @@ class UnreliableReceiver:
         self.total_bytes_received = 0
         self.retransmissions_received = 0
         self.list_ack = []
-        self.packet_received = []
+        
         
 
     def unreliable_send_ack(self, packet_id, server_address):
         
-        #while self.test == True:
+        if packet_id not in self.list_ack:
             if random.uniform(0, 1) < self.ack_probability:
                 print(f"Packet with ID : {packet_id} lost")
                 #self.test = False
@@ -23,11 +23,12 @@ class UnreliableReceiver:
             print(f"Acknowledgment for Packet ID {packet_id} sent successfully")
             acknowledgment = packet_id
             #print(acknowledgment)
-            self.packet_received.remove(self.packet_received[0])
+            
             self.socket.sendto(acknowledgment, server_address)
             self.list_ack.append(acknowledgment)
             #print(self.list_ack)
             return True
+        
             
 
     def receive_data(self):
@@ -42,7 +43,7 @@ class UnreliableReceiver:
             
             packet_id1 = modified_message[:6]
 
-            self.packet_received.append(packet_id1)
+            #self.packet_received.append(packet_id1)
             #print(self.packet_received)
             
         
