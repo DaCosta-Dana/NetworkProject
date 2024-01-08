@@ -58,7 +58,7 @@ class FileSender {
         }
     }
 
-    public void receiveAcknowledgment(long startTime, int windowSize, FileInputStream file) throws IOException {
+    public void receiveAck(long startTime, int windowSize, FileInputStream file) throws IOException {
         byte[] data = new byte[2048];
         double timeout = 0.1 * windowSize;
         long timeStart = System.currentTimeMillis();
@@ -146,7 +146,7 @@ class FileSender {
                 if (file.read(data) == -1) {
                     break;
                 }
-                receiveAcknowledgment(startTime, windowSize, file);
+                receiveAck(startTime, windowSize, file);
                 if (end) {
                     return;
                 }

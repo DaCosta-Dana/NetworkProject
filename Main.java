@@ -10,11 +10,13 @@ public class Main {
     public static void start_server(int port, int client_number, int size, String filename) throws SocketException {
         try {
             Server server = new Server(port, client_number);
-            System.out.println("The server is ready to send");
+            System.out.println("The server is waiting for clients to connect");
             server.wait_for_connections();
+
             List<Thread> threads = new ArrayList<>();
             FileSender fileSender = new FileSender(filename, server.serverSocket, size, client_number, server.clientAddresses);
             fileSender.sender = server.sender;
+
             Thread thread = new Thread(fileSender::send_file);
             threads.add(thread);
 
@@ -27,7 +29,9 @@ public class Main {
             }
             server.send_finish_signal();
             server.close_socket();
-        } catch (IOException e) {
+
+        } 
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -40,9 +44,11 @@ public class Main {
             InetAddress serverAddress = InetAddress.getByName(server_name);
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, server_port);
             clientSocket.send(sendPacket);
-            UnreliableReceiver receiver = new UnreliableReceiver(clientSocket, ack_probability);
+            UnreliableReceiver receiver = new Receiver(clientSocket, ack_probability);
             receiver.receive_data();
-        } catch (IOException e) {
+
+        } 
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -67,20 +73,24 @@ public class Main {
                     e.printStackTrace();
                 }
             });
+
             List<Thread> client_threads = new ArrayList<>();
             for (int i = 0; i < client_number; i++) {
                 Thread client_thread = new Thread(() -> start_client(server_name, server_port, ack_probability));
                 client_threads.add(client_thread);
             }
+
             server_thread.start();
             for (Thread t : client_threads) {
                 t.start();
             }
+
             server_thread.join();
             for (Thread t : client_threads) {
                 t.join();
             }
-        } catch (InterruptedException e) {
+        } 
+        catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

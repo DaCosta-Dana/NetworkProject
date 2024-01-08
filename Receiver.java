@@ -1,14 +1,14 @@
 import java.util.Random;
 import java.net.*;
 
-class UnreliableReceiver {
+class Receiver {
     private DatagramSocket socket;
     private double ack_probability;
     private int total_bytes_received;
     private int retransmissions_received;
     private List<Integer> list_ack;
     
-    public UnreliableReceiver(DatagramSocket socket, double ack_probability) {
+    public Receiver(DatagramSocket socket, double ack_probability) {
         this.socket = socket;
         this.ack_probability = ack_probability;
         this.total_bytes_received = 0;
@@ -16,7 +16,7 @@ class UnreliableReceiver {
         this.list_ack = new ArrayList<Integer>();
     }
     
-    public boolean unreliable_send_ack(int packet_id, InetAddress server_address) throws Exception {
+    public boolean send_ack(int packet_id, InetAddress server_address) throws Exception {
         if (Math.round(Math.random() * 1000) / 1000.0 < this.ack_probability) {
             System.out.println("Packet with ID : " + packet_id + " lost");
             return false;
@@ -47,7 +47,7 @@ class UnreliableReceiver {
             
             System.out.println("Received packet with ID: " + packet_id1);
             
-            if (!unreliable_send_ack(packet_id1, packet.getAddress())) {
+            if (!send_ack(packet_id1, packet.getAddress())) {
                 System.out.println("Retransmission received");
                 retransmissions_received++;
             }
