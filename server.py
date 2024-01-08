@@ -246,7 +246,7 @@ class Server:
     def close_socket(self):
         self.server_socket.close()
 
-def main():
+def mainS():
     client_number = 2
     server = Server(12000, client_number)  # Set the desired number of clients
     print('The server is ready to send')
@@ -275,4 +275,4 @@ def main():
     server.close_socket()
 
 if __name__ == "__main__":
-    main()
+    mainS()
