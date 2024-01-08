@@ -134,16 +134,16 @@ class FileSender {
         try (FileInputStream file = new FileInputStream(fileName)) {
             int windowSize = size;
             while (true) {
+                byte[] data = new byte[2048];
+                int bytesRead = file.read(data);
                 for (int packetId = lastAckReceived + 1; packetId < lastAckReceived + 1 + windowSize; packetId++) {
-                    byte[] data = new byte[2048];
-                    int bytesRead = file.read(data);
                     if (bytesRead == -1) {
                         return;
                     }
                     sendPacket(packetId, Arrays.copyOf(data, bytesRead), clientAddress, startTime);
                     Thread.sleep(50);
                 }
-                if (file.read(data) == -1) {
+                if (bytesRead == -1) {
                     break;
                 }
                 receiveAck(startTime, windowSize, file);

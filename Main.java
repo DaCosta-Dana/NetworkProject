@@ -7,17 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-    public static void start_server(int port, int client_number, int size, String filename) throws SocketException {
-        try {
+    public static void start_server(int port, int client_number, int size, String filename) throws InterruptedException, IOException {
+        
             Server server = new Server(port, client_number);
             System.out.println("The server is waiting for clients to connect");
-            server.wait_for_connections();
+            server.waitForConnections();
 
             List<Thread> threads = new ArrayList<>();
             FileSender fileSender = new FileSender(filename, server.serverSocket, size, client_number, server.clientAddresses);
-            fileSender.sender = server.sender;
 
-            Thread thread = new Thread(fileSender::send_file);
+            Thread thread = new Thread(() -> fileSender.sendFile());
+
+            
             threads.add(thread);
 
             for (Thread t : threads) {
@@ -27,16 +28,11 @@ public class Main {
             for (Thread t : threads) {
                 t.join();
             }
-            server.send_finish_signal();
-            server.close_socket();
-
-        } 
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+            server.sendFinishSignal();
+            server.closeSocket();
     }
 
-    public static void start_client(String server_name, int server_port, float ack_probability) {
+    public static void start_client(String server_name, int server_port, float ack_probability) throws Exception {
         try {
             DatagramSocket clientSocket = new DatagramSocket();
             String message = "1";
@@ -44,7 +40,7 @@ public class Main {
             InetAddress serverAddress = InetAddress.getByName(server_name);
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, server_port);
             clientSocket.send(sendPacket);
-            UnreliableReceiver receiver = new Receiver(clientSocket, ack_probability);
+            Receiver receiver = new Receiver(clientSocket, ack_probability);
             receiver.receive_data();
 
         } 
@@ -69,14 +65,21 @@ public class Main {
             Thread server_thread = new Thread(() -> {
                 try {
                     start_server(port, client_number, size, filename);
-                } catch (SocketException e) {
+                } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
                 }
             });
 
             List<Thread> client_threads = new ArrayList<>();
             for (int i = 0; i < client_number; i++) {
-                Thread client_thread = new Thread(() -> start_client(server_name, server_port, ack_probability));
+                Thread client_thread = new Thread(() -> {
+                    try {
+                        start_client(server_name, server_port, ack_probability);
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                });
                 client_threads.add(client_thread);
             }
 

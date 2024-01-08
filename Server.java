@@ -1,21 +1,20 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 class Server {
     private int serverPort;
     private int clientNumber;
-    private DatagramSocket serverSocket;
-    private List<InetSocketAddress> clientAddresses;
+    DatagramSocket serverSocket;
+    List<InetSocketAddress> clientAddresses;
+    private UnreliableSender sender;
 
     public Server(int serverPort, int clientNumber) throws SocketException {
         this.serverPort = serverPort;
         this.clientNumber = clientNumber;
         this.serverSocket = new DatagramSocket(serverPort);
         this.clientAddresses = new ArrayList<>();
-        this.sender = new DatagramSocket(serverSocket);
+        this.sender = new UnreliableSender(serverSocket);
     }
 
     private boolean send(byte[] data, InetAddress address, int port) throws IOException {
