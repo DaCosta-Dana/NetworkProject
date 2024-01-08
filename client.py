@@ -13,8 +13,8 @@ class UnreliableReceiver:
 
     def unreliable_send_ack(self, packet_id, server_address):
         
-        if packet_id not in self.list_ack:
-            if random.uniform(0, 1) < self.ack_probability:
+        #if packet_id not in self.list_ack:
+            if round(random.random(), 3) < self.ack_probability:
                 print(f"Packet with ID : {packet_id} lost")
                 #self.test = False
                 return False
@@ -66,6 +66,7 @@ def main():
     server_name = "localhost"
     server_port = 12000
     ack_probability = 0.1
+
 
     client_socket = socket(AF_INET, SOCK_DGRAM)
 
