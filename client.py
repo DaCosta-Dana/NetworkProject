@@ -17,6 +17,7 @@ class UnreliableReceiver:
             if round(random.random(), 3) < self.ack_probability:
                 print(f"Packet with ID : {packet_id} lost")
                 #self.test = False
+                #self.retransmissions_received += 1
                 return False
         
                 
@@ -62,19 +63,3 @@ class UnreliableReceiver:
         self.socket.close()
 
 
-def main():
-    server_name = "localhost"
-    server_port = 12000
-    ack_probability = 0.1
-
-
-    client_socket = socket(AF_INET, SOCK_DGRAM)
-
-    message = '1'  # Indicate to the server that the client is ready to receive
-    client_socket.sendto(message.encode(), (server_name, server_port))
-
-    receiver = UnreliableReceiver(client_socket, ack_probability)
-    receiver.receive_data()
-
-if __name__ == "__main__":
-    main()
