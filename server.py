@@ -136,9 +136,9 @@ class FileSender:
                                                 
 
                                             else:
-                                                break
+                                                return
 
-
+                                """
                                 if time.time() - time_start > time_out : # RETRANSMISSION
 
                                     for packet_id2 in range(self.ack_received, self.ack_received + window_size):
@@ -150,7 +150,7 @@ class FileSender:
                                             time_start = time.time()
                                             self.test = True
                                     #time.sleep(0.1) 
-                                
+                                """
                                  
                                     
                       
@@ -164,12 +164,15 @@ class FileSender:
 
                        
             except timeout:
-                for packet_id2 in range(self.ack_received, self.ack_received + window_size):
-                                        
-                    for client_address in self.client_addresses:
+                self.retransmissions_sent += 1
+                for client_address in self.client_addresses:
+
+                    
+                    for packet_id2 in range(self.ack_received, self.ack_received + window_size):
+                                    
                             self.send_packet(packet_id2, data, client_address, start_time)
                             print("RETRANSMISSION")
-                            self.retransmissions_sent += 1
+                            
                             time_start = time.time()
                
 
@@ -200,6 +203,9 @@ class FileSender:
                     break
 
                 self.receive_acknowledgment(start_time, window_size, file)
+
+                if self.end == True:
+                    return
 
         print(f"Thread for client {client_id} finished.")
 
@@ -246,33 +252,5 @@ class Server:
     def close_socket(self):
         self.server_socket.close()
 
-def mainS():
-    client_number = 2
-    server = Server(12000, client_number)  # Set the desired number of clients
-    print('The server is ready to send')
 
-    server.wait_for_connections()
-
-    size = 4
-
-    threads = []
-
-    file_sender = FileSender('filename.txt', server.server_socket, size, client_number, server.client_addresses)
-    file_sender.sender = server.sender
-
-    thread = threading.Thread(target=file_sender.send_file)
-    threads.append(thread)
-
-    # Start all threads outside the loop
-    for thread in threads:
-        thread.start()
-
-    # Wait for all threads to finish
-    for thread in threads:
-        thread.join()
-
-    server.send_finish_signal()
-    server.close_socket()
-
-if __name__ == "__main__":
-    mainS()
+    
