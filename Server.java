@@ -8,15 +8,20 @@ class Server {
     private int serverPort;
     private int clientNumber;
     private DatagramSocket serverSocket;
-    private UnreliableSender sender;
     private List<InetSocketAddress> clientAddresses;
 
     public Server(int serverPort, int clientNumber) throws SocketException {
         this.serverPort = serverPort;
         this.clientNumber = clientNumber;
         this.serverSocket = new DatagramSocket(serverPort);
-        this.sender = new UnreliableSender(serverSocket);
         this.clientAddresses = new ArrayList<>();
+        this.sender = new DatagramSocket(serverSocket);
+    }
+
+    private boolean send(byte[] data, InetAddress address, int port) throws IOException {
+        DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+        serverSocket.send(packet);
+        return true;
     }
 
     public void waitForConnections() throws IOException {
@@ -35,12 +40,12 @@ class Server {
     public void sendFinishSignal() throws IOException {
         for (InetSocketAddress clientAddress : clientAddresses) {
             byte[] finishSignal = "finished".getBytes();
-            DatagramPacket packet = new DatagramPacket(finishSignal, finishSignal.length, clientAddress.getAddress(), clientAddress.getPort());
-            serverSocket.send(packet);
+            send(finishSignal, clientAddress.getAddress(), clientAddress.getPort());
         }
     }
 
     public void closeSocket() {
         serverSocket.close();
     }
+
 }
