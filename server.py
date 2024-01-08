@@ -35,28 +35,25 @@ class FileSender:
 
     def send_packet(self, packet_id, data, client_address, start_time):
 
+
         packet_data = {
             'id': packet_id,
             'packet': f"{packet_id:06d}".encode() + data
         }
 
-        time_taken = time.time() - start_time
+       # {0, 000002aaaaaaaaaaaaaaaaaaaaaaaaaaaa}
 
-       
+
         self.client_socket.sendto(packet_data['packet'], client_address)
         
-
+        time_taken = time.time() - start_time
         print(f"{time_taken:.4f} >> Data sent to client {client_address[1]}, Packet ID: {packet_data['id']}")
+
         self.total_bytes_sent += len(packet_data['packet'])
 
-        self.client_socket.settimeout(0.5)
-
         self.sent_packet_ids.append(int(packet_data['id']))
-        #print(self.sent_packet_ids)
 
-        
-        #print(packet_data)
-        
+        self.client_socket.settimeout(0.5)
         
         if not data:
             print("No more datas to sent")
@@ -67,131 +64,97 @@ class FileSender:
     def receive_acknowledgment(self, start_time, window_size, file):
         
         data = file.read(2048)
-        time_out = 0.1 * window_size
-        time_start = time.time()
-
+        
         while self.sent_packet_ids:
+
             try:
+
                 time.sleep(0.1)
                 ack_message, _ = self.client_socket.recvfrom(2048)
                 time.sleep(0.05)
                 
                 if ack_message:
+
                     ack_id = int(ack_message.decode())
             
-                    
-                    #expected_id = self.sent_packet_ids.popleft()
-                   
-                    #print(expected_id)
-                    #print(self.sent_packet_ids)
-                    self.client_socket.settimeout(0.05)
 
                     time_taken = time.time() - start_time
                     print(f"{time_taken:.4f} >> Acknowledgment received for Packet ID: {ack_id}")
+
                     if self.test == True and ack_id == self.ack_received:       
                         self.list_ack.append(ack_id)
 
-                    print(self.list_ack)
-                    
-
                     if ack_id not in self.end_acks:
                         
-
                         if len(self.list_ack) >= len(self.client_addresses): 
-                                
-                        
-                                #print(self.ack_received)
-                                #print(self.list_ack)
-                                #print(self.list_ack.count(self.ack_received))
-                                
-                                while self.list_ack.count(self.ack_received) == len(self.client_addresses) :
-                                            if self.end == False:
-                                                print(f"All acks received for the packet ID : {self.ack_received}")
-                                                self.end_acks.append(self.ack_received)
+            
+                            while self.list_ack.count(self.ack_received) == len(self.client_addresses) :
 
-                                                while self.ack_received in self.sent_packet_ids:
-                                                    self.sent_packet_ids.remove(self.ack_received)
+                                if self.end == False:
 
-                                                #print(self.end_acks)
-                                                print(f"MOVING WINDOW")
-                                               
-                                               
-                                                while self.ack_received in self.list_ack:
-                                                    self.list_ack.remove(self.ack_received)
-                                           
-                                                print("LIST ACK")
-                                                print(self.list_ack)
-                                                
-                                                
-                                            
-                                                data = file.read(2048)
+                                    time_taken = time.time() - start_time
+                                    print(f"{time_taken:.4f} >> All acks received for the packet ID : {self.ack_received}")
+                                    self.end_acks.append(self.ack_received)
 
-                                                data
-                                                for client_address in self.client_addresses:
-                                                    self.send_packet(self.ack_received + self.size, data, client_address, start_time)
-                                                    
-                                                print("TEST")
-                                                self.ack_received += 1
-                                                time_start = time.time()
-                                                
+                                    while self.ack_received in self.sent_packet_ids:
+                                        self.sent_packet_ids.remove(self.ack_received)
 
-                                            else:
-                                                return
-
-                                """
-                                if time.time() - time_start > time_out : # RETRANSMISSION
-
-                                    for packet_id2 in range(self.ack_received, self.ack_received + window_size):
-                                        
-                                        for client_address in self.client_addresses:
-                                            self.send_packet(packet_id2, data, client_address, start_time)
-                                            print("RETRANSMISSION")
-                                            self.retransmissions_sent += 1
-                                            time_start = time.time()
-                                            self.test = True
-                                    #time.sleep(0.1) 
-                                """
-                                 
+                                    time_taken = time.time() - start_time
+                                    print(f"{time_taken:.4f} >> Moving window")
                                     
-                      
+                                    
+                                    while self.ack_received in self.list_ack:
+                                        self.list_ack.remove(self.ack_received)
+
+
+                                    data = file.read(2048)
+
+                                    for client_address in self.client_addresses:
+                                        self.send_packet(self.ack_received + self.size, data, client_address, start_time)
+                                        
+                                    self.ack_received += 1
+                                
+                                else:
+                                    return
+
                     elif ack_id in self.end_acks:
         
-                        #self.list_ack.remove(ack_id) 
-                        print("Ack already received")
+                        time_taken = time.time() - start_time
+                        print(f"{time_taken:.4f} >> Ack already received")
                         
-                        start = 0
-                        #print(self.sent_packet_ids)
+                       
 
                        
             except timeout:
+
                 self.retransmissions_sent += 1
                 for client_address in self.client_addresses:
-
                     
                     for packet_id2 in range(self.ack_received, self.ack_received + window_size):
                                     
                             self.send_packet(packet_id2, data, client_address, start_time)
-                            print("RETRANSMISSION")
-                            
-                            time_start = time.time()
-               
+
+                            time_taken = time.time() - start_time
+                            print(f"{time_taken:.4f} >> Retransmission sent")
 
                  
 
     def send_to_client(self, client_address):
+
         client_id = str(client_address[1])
-        print(client_id)
+      
         print(f"Thread for client {client_id} started.")
+
         start_time = time.time()
     
-
         with open(self.file_name, 'rb') as file:
             
             window_size = self.size
 
             while True:
-                for packet_id in range(self.last_ack_received + 1, self.last_ack_received + 1 + window_size):
+                for packet_id in range(self.last_ack_received + 1, self.last_ack_received + 1 + window_size): # A CHANGER
                     data = file.read(2048)
+
                     if not data:
                         return
 
@@ -253,4 +216,5 @@ class Server:
         self.server_socket.close()
 
 
+    
     
