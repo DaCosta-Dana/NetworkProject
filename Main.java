@@ -1,7 +1,6 @@
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,17 +33,18 @@ public class Main {
 
     public static void start_client(String server_name, int server_port, float ack_probability) throws Exception {
         try {
+            Thread.sleep(1000);
             DatagramSocket clientSocket = new DatagramSocket();
             String message = "1";
             byte[] sendData = message.getBytes();
-            InetAddress serverAddress = InetAddress.getByName(server_name);
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, server_port);
+            InetAddress serverAddress = InetAddress.getByName("localhost"); // Set to "localhost"
+            int port = 12000; // Set to 12000
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, port);
             clientSocket.send(sendPacket);
-            Receiver receiver = new Receiver(clientSocket, ack_probability);
+            Receiver receiver = new Receiver(clientSocket, ack_probability, server_port);
             receiver.receive_data();
-
-        } 
-        catch (IOException e) {
+            
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -52,6 +52,8 @@ public class Main {
     public static void main(String[] args) {
         if (args.length != 7) {
             System.out.println("Usage: java main.java <port> <client_number> <size> <server_name> <server_port> <ack_probability> <filename>");
+            // javac main.java
+            // java Main 12000 2 3 localhost 12000 0.1 filename1.txt
             
             System.exit(1);
         }
@@ -75,9 +77,8 @@ public class Main {
             for (int i = 0; i < client_number; i++) {
                 Thread client_thread = new Thread(() -> {
                     try {
-                        start_client(server_name, server_port, ack_probability);
+                        start_client(server_name, port, ack_probability);
                     } catch (Exception e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                 });
@@ -85,7 +86,7 @@ public class Main {
             }
 
             server_thread.start();
-            for (Thread t : client_threads) {
+            for (Thread t : client_threads) {               
                 t.start();
             }
 

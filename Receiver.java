@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.net.*;
 
 class Receiver {
@@ -9,13 +8,15 @@ class Receiver {
     private int total_bytes_received;
     private int retransmissions_received;
     private List<Integer> list_ack;
+    private int port;
     
-    public Receiver(DatagramSocket socket, double ack_probability) {
+    public Receiver(DatagramSocket socket, double ack_probability, int port) {
         this.socket = socket;
         this.ack_probability = ack_probability;
         this.total_bytes_received = 0;
         this.retransmissions_received = 0;
         this.list_ack = new ArrayList<Integer>();
+        this.port = port;
     }
     
     public boolean send_ack(int packet_id, InetAddress server_address) throws Exception {
@@ -26,7 +27,7 @@ class Receiver {
         
         System.out.println("Acknowledgment for Packet ID " + packet_id + " sent successfully");
         byte[] acknowledgment = Integer.toString(packet_id).getBytes();
-        DatagramPacket packet = new DatagramPacket(acknowledgment, acknowledgment.length, server_address, socket.getPort());
+        DatagramPacket packet = new DatagramPacket(acknowledgment, acknowledgment.length, server_address, 12000); //to change 
         socket.send(packet);
         list_ack.add(packet_id);
         

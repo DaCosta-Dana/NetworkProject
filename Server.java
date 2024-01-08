@@ -28,7 +28,18 @@ class Server {
             byte[] message = new byte[2048];
             DatagramPacket packet = new DatagramPacket(message, message.length);
             serverSocket.receive(packet);
-            if (Arrays.equals(message, "1".getBytes())) {
+    
+            // Récupérer la taille réelle des données
+            int dataSize = packet.getLength();
+    
+            // Créer un nouveau tableau pour contenir exactement les données reçues
+            byte[] actualData = new byte[dataSize];
+            System.arraycopy(message, 0, actualData, 0, dataSize);
+    
+            // Convertir les données en une chaîne si nécessaire
+            String messageString = new String(actualData);
+    
+            if (messageString.equals("1")) {
                 System.out.printf("Client connected: %s%n", packet.getSocketAddress());
                 clientAddresses.add((InetSocketAddress) packet.getSocketAddress());
             }
