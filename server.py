@@ -30,6 +30,7 @@ class FileSender:
         self.end = False
         self.ack_received = 0
         self.end_acks = []
+        self.test = True
         
 
     def send_packet(self, packet_id, data, client_address, start_time):
@@ -47,7 +48,8 @@ class FileSender:
 
         print(f"{time_taken:.4f} >> Data sent to client {client_address[1]}, Packet ID: {packet_data['id']}")
         self.total_bytes_sent += len(packet_data['packet'])
-        self.client_socket.settimeout(5)
+
+        self.client_socket.settimeout(0.5)
 
         self.sent_packet_ids.append(int(packet_data['id']))
         #print(self.sent_packet_ids)
@@ -69,10 +71,10 @@ class FileSender:
         time_start = time.time()
 
         while self.sent_packet_ids:
-            #try:
-                time.sleep(0.2)
-                ack_message, _ = self.client_socket.recvfrom(2048)
+            try:
                 time.sleep(0.1)
+                ack_message, _ = self.client_socket.recvfrom(2048)
+                time.sleep(0.05)
                 
                 if ack_message:
                     ack_id = int(ack_message.decode())
@@ -82,12 +84,13 @@ class FileSender:
                    
                     #print(expected_id)
                     #print(self.sent_packet_ids)
-                    self.client_socket.settimeout(2)
+                    self.client_socket.settimeout(0.05)
 
                     time_taken = time.time() - start_time
                     print(f"{time_taken:.4f} >> Acknowledgment received for Packet ID: {ack_id}")
-                            
-                    self.list_ack.append(ack_id)
+                    if self.test == True and ack_id == self.ack_received:       
+                        self.list_ack.append(ack_id)
+
                     print(self.list_ack)
                     
 
@@ -112,11 +115,10 @@ class FileSender:
                                                 #print(self.end_acks)
                                                 print(f"MOVING WINDOW")
                                                
-                                                
+                                               
                                                 while self.ack_received in self.list_ack:
                                                     self.list_ack.remove(self.ack_received)
-
-                                            
+                                           
                                                 print("LIST ACK")
                                                 print(self.list_ack)
                                                 
@@ -146,6 +148,7 @@ class FileSender:
                                             print("RETRANSMISSION")
                                             self.retransmissions_sent += 1
                                             time_start = time.time()
+                                            self.test = True
                                     #time.sleep(0.1) 
                                 
                                  
@@ -153,13 +156,13 @@ class FileSender:
                       
                     elif ack_id in self.end_acks:
         
-                        self.list_ack.remove(ack_id) 
+                        #self.list_ack.remove(ack_id) 
                         print("Ack already received")
-                        #self.list_ack.clear()
+                        
                         start = 0
                         #print(self.sent_packet_ids)
 
-        """                
+                       
             except timeout:
                 for packet_id2 in range(self.ack_received, self.ack_received + window_size):
                                         
@@ -168,7 +171,7 @@ class FileSender:
                             print("RETRANSMISSION")
                             self.retransmissions_sent += 1
                             time_start = time.time()
-            """         
+               
 
                  
 
@@ -191,7 +194,7 @@ class FileSender:
 
                     self.send_packet(packet_id, data, client_address, start_time)
                     
-                    time.sleep(0.2)
+                    time.sleep(0.05)
 
                 if not data:
                     break
@@ -250,7 +253,7 @@ def main():
 
     server.wait_for_connections()
 
-    size = 5
+    size = 4
 
     threads = []
 
@@ -273,4 +276,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
