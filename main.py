@@ -1,8 +1,8 @@
 import sys
 import threading
-from test_server import Server  # Assuming you have a module named server_module with Server class
-from test_client import UnreliableReceiver  # Assuming you have a module named client_module with UnreliableReceiver class
-from test_server import FileSender  # Assuming you have a module named file_sender_module with FileSender class
+from server import Server  # Assuming you have a module named server_module with Server class
+from client import UnreliableReceiver  # Assuming you have a module named client_module with UnreliableReceiver class
+from server import FileSender  # Assuming you have a module named file_sender_module with FileSender class
 from socket import socket, AF_INET, SOCK_DGRAM
 
 def start_server(port, client_number, size, filename):
