@@ -20,6 +20,7 @@ class FileSender {
     private int ackReceived;
     private List<Integer> endAcks;
     private boolean test;
+    private FileInputStream file;
 
     public FileSender(String fileName, DatagramSocket clientSocket, int size, int clientNumber, List<InetSocketAddress> clientAddresses) {
         this.fileName = fileName;
@@ -37,25 +38,40 @@ class FileSender {
         this.ackReceived = 0;
         this.endAcks = new ArrayList<>();
         this.test = true;
+        try {
+            this.file = new FileInputStream(fileName);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
     }
 
-    public void sendPacket(int packetId, byte[] data, InetSocketAddress clientAddress, long startTime) throws IOException {
-        byte[] packetData = new byte[data.length + 6];
-        System.arraycopy(String.format("%06d", packetId).getBytes(), 0, packetData, 0, 6);
-        System.arraycopy(data, 0, packetData, 6, data.length);
-        DatagramPacket packet = new DatagramPacket(packetData, packetData.length, clientAddress.getAddress(), clientAddress.getPort());
-        long timeTaken = System.currentTimeMillis() - startTime;
-        clientSocket.send(packet);
-        System.out.printf("%.4f >> Data sent to client %d, Packet ID: %d%n", timeTaken / 1000.0, clientAddress.getPort(), packetId);
-        totalBytesSent += packetData.length;
-        clientSocket.setSoTimeout(500);
-        sentPacketIds.add(packetId);
-
-        if (data.length == 0) {
+    public void sendPacket(int packetId, byte[] data, InetSocketAddress clientAddress, long startTime) throws IOException {       
+        // checks if there is no more data left
+        int bytesRead = file.read(data);
+        if (bytesRead == -1) {
             System.out.println("No more data to send");
             end = true;
             return;
         }
+        
+        if (bytesRead > 0 ) {
+            byte[] packetData = new byte[data.length + 6];
+
+            System.arraycopy(String.format("%06d", packetId).getBytes(), 0, packetData, 0, 6);
+            System.arraycopy(data, 0, packetData, 6, data.length);
+
+            DatagramPacket packet = new DatagramPacket(packetData, packetData.length, clientAddress.getAddress(), clientAddress.getPort());
+            long timeTaken = System.currentTimeMillis() - startTime;
+            clientSocket.send(packet);
+
+            System.out.printf("%.4f >> Data sent to client %d, Packet ID: %d%n", timeTaken / 1000.0, clientAddress.getPort(), packetId);
+            
+            totalBytesSent += packetData.length;
+            clientSocket.setSoTimeout(500);
+            sentPacketIds.add(packetId);
+        }
+ 
     }
 
     public void receiveAck(long startTime, int windowSize, FileInputStream file) throws IOException {
@@ -146,7 +162,7 @@ class FileSender {
                 // Print the content of the data being sent
                 System.out.printf("Sending data to client %d: %s%n", clientAddress.getPort(), new String(data, 0, bytesRead));
     
-                for (int packetId = lastAckReceived + 1; packetId <= lastAckReceived + windowSize; packetId++) {
+                for (int packetId =  0; packetId <= windowSize - 1; packetId++) {
                     sendPacket(packetId, Arrays.copyOf(data, bytesRead), clientAddress, startTime);
                     Thread.sleep(50);
                 }
@@ -155,9 +171,10 @@ class FileSender {
     
                 if (end) {
                     // Send a final acknowledgment to confirm that the end has been reached
-                    for (int packetId = lastAckReceived + 1; packetId <= lastAckReceived + windowSize; packetId++) {
+                    for (int packetId =  0 ; packetId <= windowSize - 1; packetId++) {
                         sendPacket(packetId, new byte[0], clientAddress, startTime);
                     }
+                    break;  // Break the loop after sending the end signal
                 }
             }
         } catch (IOException | InterruptedException e) {
@@ -182,8 +199,15 @@ class FileSender {
                 e.printStackTrace();
             }
         }
-        System.out.println("All packets sent and acknowledged. Transfer finished.");
-        System.out.printf("Total Bytes Sent: %d%n", totalBytesSent);
-        System.out.printf("Total Retransmissions Sent: %d%n", retransmissionsSent);
+
+        if (end) {
+            System.out.println("No more data to send.");
+            System.out.println("All packets sent and acknowledged. Transfer finished.");
+            System.out.printf("Total Bytes Sent: %d%n", totalBytesSent);
+            System.out.printf("Total Retransmissions Sent: %d%n", retransmissionsSent);
+            return;
+        }
+
+        
     }
 }
