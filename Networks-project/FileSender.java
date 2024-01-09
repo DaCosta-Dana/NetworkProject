@@ -1,11 +1,13 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.CountDownLatch;
 
 class FileSender {
     private String fileName;
@@ -28,6 +30,7 @@ class FileSender {
     private int nextSeqNum;  // Next sequence number to be sent
     private boolean[] ackReceivedArray;  // To keep track of received acks
     private boolean[] sendPackets;
+    private CountDownLatch synchronizationLatch;
 
 
     public FileSender(String fileName, DatagramSocket clientSocket, int size, int clientNumber, List<InetSocketAddress> clientAddresses) {
@@ -50,6 +53,8 @@ class FileSender {
         this.ackReceivedArray = new boolean[windowSize]; 
         this.sendPackets = new boolean[windowSize];
         Arrays.fill(sendPackets, false);
+        // Initialize the latch with the number of clients
+        this.synchronizationLatch = new CountDownLatch(clientAddresses.size());
 
     }
     
@@ -77,6 +82,10 @@ class FileSender {
                 clientSocket.setSoTimeout(500);
                 sentPacketIds.add(packetId);
             }
+            else{
+                end=true;
+                return;
+            }
         }
     }
     
@@ -91,7 +100,7 @@ class FileSender {
     public void sendToClient(InetSocketAddress clientAddress) {
         int clientId = clientAddress.getPort();
         System.out.println(clientId);
-        System.out.printf("Thread for client %d started.%n", clientId);
+        System.out.printf("Server: Thread for client %d started.%n", clientId);
     
         try {
             File file = new File(fileName);
@@ -126,13 +135,11 @@ class FileSender {
             e.printStackTrace();
         }
     
-        System.out.printf("Thread for client %d finished.%n", clientId);
+        System.out.printf("Server: Thread for client %d finished.%n", clientId);
+
+        // Count down the latch when the thread finishes
+        synchronizationLatch.countDown();
     }
-        
-    
-    
-    
-    
     
     // Modified processAck method
     private void processAck(int ackId, long startTime) {
@@ -140,7 +147,7 @@ class FileSender {
         if (!ackReceivedArray[index]) {
             ackReceivedArray[index] = true;
             long timeTaken = System.currentTimeMillis() - startTime;
-            System.out.printf("%.4f >> Acknowledgment received for Packet ID: %d%n", timeTaken / 1000.0, ackId);
+            System.out.printf("%.4f >> Server: Acknowledgment received for Packet ID: %d%n", timeTaken / 1000.0, ackId);
         }
     }
 
@@ -185,9 +192,7 @@ class FileSender {
         
                         if (allPacketsAcked) {
                             // Slide the window
-                            System.out.println("Before sliding window: base = " + base + ", nextSeqNum = " + nextSeqNum);
                             slideWindow();
-                            System.out.println("After sliding window: base = " + base + ", nextSeqNum = " + nextSeqNum);
                         }
                     }
                 }
@@ -210,16 +215,17 @@ class FileSender {
         executorService.shutdown();
 
         try {
-            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+            // Wait for all threads to finish
+            synchronizationLatch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
         if (end) {
-            System.out.println("No more data to send.");
-            System.out.println("All packets sent and acknowledged. Transfer finished.");
-            System.out.printf("Total Bytes Sent: %d%n", totalBytesSent);
-            System.out.printf("Total Retransmissions Sent: %d%n", retransmissionsSent);
+            System.out.println("Server: No more data to send.");
+            System.out.println("Server: All packets sent and acknowledged. Transfer finished.");
+            System.out.printf("Server: Total Bytes Sent: %d%n", totalBytesSent);
+            System.out.printf("Server: Total Retransmissions Sent: %d%n", retransmissionsSent);
         }
     }
 }

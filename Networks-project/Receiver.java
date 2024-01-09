@@ -36,6 +36,8 @@ class Receiver {
     
     public void receive_data() throws Exception {
         while (true) {
+            Thread.sleep(5);
+            // Create buffer to store incoming data packets
             byte[] buffer = new byte[2048];
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
             socket.receive(packet);
