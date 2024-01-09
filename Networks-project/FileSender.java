@@ -143,6 +143,9 @@ class FileSender {
                     return;
                 }
     
+                // Print the content of the data being sent
+                System.out.printf("Sending data to client %d: %s%n", clientAddress.getPort(), new String(data, 0, bytesRead));
+    
                 for (int packetId = lastAckReceived + 1; packetId <= lastAckReceived + windowSize; packetId++) {
                     sendPacket(packetId, Arrays.copyOf(data, bytesRead), clientAddress, startTime);
                     Thread.sleep(50);
