@@ -70,7 +70,7 @@ class FileSender {
                 long timeTaken = System.currentTimeMillis() - startTime;
     
                 // Print data being sent by the packets
-                //System.out.printf("%.4f >> Data sent to client %d, Packet ID: %d, Data: %s%n", timeTaken / 1000.0, clientAddress.getPort(), packetId, new String(data));
+                System.out.printf("%.4f >> Data sent to client %d, Packet ID: %d, Data: %s%n", timeTaken / 1000.0, clientAddress.getPort(), packetId);
     
                 clientSocket.send(packet);
                 totalBytesSent += packetData.length;
