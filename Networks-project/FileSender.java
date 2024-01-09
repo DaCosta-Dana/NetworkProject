@@ -45,33 +45,20 @@ class FileSender {
         }
 
     }
-
-    public void sendPacket(int packetId, byte[] data, InetSocketAddress clientAddress, long startTime) throws IOException {       
-        // checks if there is no more data left
-        int bytesRead = file.read(data);
-        if (bytesRead == -1) {
-            System.out.println("No more data to send");
-            end = true;
-            return;
-        }
-        
-        if (bytesRead > 0 ) {
-            byte[] packetData = new byte[data.length + 6];
-
-            System.arraycopy(String.format("%06d", packetId).getBytes(), 0, packetData, 0, 6);
-            System.arraycopy(data, 0, packetData, 6, data.length);
-
-            DatagramPacket packet = new DatagramPacket(packetData, packetData.length, clientAddress.getAddress(), clientAddress.getPort());
-            long timeTaken = System.currentTimeMillis() - startTime;
-            clientSocket.send(packet);
-
-            System.out.printf("%.4f >> Data sent to client %d, Packet ID: %d%n", timeTaken / 1000.0, clientAddress.getPort(), packetId);
-            
-            totalBytesSent += packetData.length;
-            clientSocket.setSoTimeout(500);
-            sentPacketIds.add(packetId);
-        }
- 
+    public void sendPacket(int packetId, byte[] data, InetSocketAddress clientAddress, long startTime) throws IOException {
+        byte[] packetData = new byte[data.length + 6];
+        System.arraycopy(String.format("%06d", packetId).getBytes(), 0, packetData, 0, 6);
+        System.arraycopy(data, 0, packetData, 6, data.length);
+    
+        DatagramPacket packet = new DatagramPacket(packetData, packetData.length, clientAddress.getAddress(), clientAddress.getPort());
+        long timeTaken = System.currentTimeMillis() - startTime;
+        clientSocket.send(packet);
+    
+        System.out.printf("%.4f >> Data sent to client %d, Packet ID: %d%n", timeTaken / 1000.0, clientAddress.getPort(), packetId);
+    
+        totalBytesSent += packetData.length;
+        clientSocket.setSoTimeout(500);
+        sentPacketIds.add(packetId);
     }
 
     public void receiveAck(long startTime, int windowSize, FileInputStream file) throws IOException {
@@ -141,7 +128,6 @@ class FileSender {
             }
         }
     }
-
     public void sendToClient(InetSocketAddress clientAddress) {
         int clientId = clientAddress.getPort();
         System.out.println(clientId);
@@ -153,29 +139,30 @@ class FileSender {
             byte[] data = new byte[2048];
             int bytesRead;
     
-            do {
-                bytesRead = file.read(data);
+            while (!end) {
+                for (int packetId = lastAckReceived + 1; packetId <= lastAckReceived + windowSize; packetId++) {
+                    bytesRead = file.read(data);
     
-                if (bytesRead > 0) {
-                    // Print the content of the data being sent
-                    System.out.printf("Sending data to client %d: %s%n", clientAddress.getPort(), new String(data, 0, bytesRead));
-    
-                    for (int packetId = lastAckReceived + 1; packetId <= lastAckReceived + windowSize; packetId++) {
-                        sendPacket(packetId, Arrays.copyOf(data, bytesRead), clientAddress, startTime);
-                        Thread.sleep(50);
+                    if (bytesRead == -1) {
+                        end = true;
+                        break;  // Break the loop if end of file is reached
                     }
     
-                    receiveAck(startTime, windowSize, file);
-                } else {
-                    System.out.println("No more data to send");
-                    end = true;  // Set end to true if no more data
+                    sendPacket(packetId, Arrays.copyOf(data, bytesRead), clientAddress, startTime);
+                    Thread.sleep(50);
                 }
-            } while (!end);
     
-            // Send a final acknowledgment to confirm that the end has been reached
-            for (int packetId = lastAckReceived + 1; packetId <= lastAckReceived + windowSize; packetId++) {
-                sendPacket(packetId, new byte[0], clientAddress, startTime);
+                receiveAck(startTime, windowSize, file);
+    
+                if (end) {
+                    // Send a final acknowledgment to confirm that the end has been reached
+                    for (int packetId = lastAckReceived + 1; packetId <= lastAckReceived + windowSize; packetId++) {
+                        sendPacket(packetId, new byte[0], clientAddress, startTime);
+                    }
+                    break;  // Break the loop after sending the end signal
+                }
             }
+    
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
