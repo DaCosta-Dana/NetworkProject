@@ -108,7 +108,7 @@ class FileSender {
                         }
                     } else if (endAcks.contains(ackId)) {
                         System.out.println("Ack already received");
-                        int start = 0;
+                        //int start = 0;
                     }
                 }
             } catch (SocketTimeoutException e) {
@@ -140,7 +140,7 @@ class FileSender {
     
                 if (bytesRead == -1) {
                     end = true;
-                    return;
+                    break;  // Break the loop if end of file is reached
                 }
     
                 // Print the content of the data being sent
@@ -158,7 +158,6 @@ class FileSender {
                     for (int packetId = lastAckReceived + 1; packetId <= lastAckReceived + windowSize; packetId++) {
                         sendPacket(packetId, new byte[0], clientAddress, startTime);
                     }
-                    return;
                 }
             }
         } catch (IOException | InterruptedException e) {
@@ -167,7 +166,7 @@ class FileSender {
     
         System.out.printf("Thread for client %d finished.%n", clientId);
     }
-    
+
     public void sendFile() {
         List<Thread> threads = new ArrayList<>();
         for (InetSocketAddress clientAddress : clientAddresses) {
