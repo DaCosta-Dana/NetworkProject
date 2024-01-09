@@ -111,7 +111,9 @@ class FileSender {
             while (true) {
                 // Send packets within the window
                 while (nextSeqNum < base + windowSize) {
-                    sendPacket(nextSeqNum, clientAddress, startTime);
+                    for (InetSocketAddress currentClientAddress : clientAddresses) {
+                        sendPacket(nextSeqNum, currentClientAddress, startTime);
+                    }
                     nextSeqNum++;
     
                     // Check if the end of the file is reached
@@ -166,34 +168,24 @@ class FileSender {
     public void receiveAck(long startTime) throws IOException {
         byte[] ackMessage = new byte[2048];
         DatagramPacket ackPacket = new DatagramPacket(ackMessage, ackMessage.length);
-        
+    
         while (base < nextSeqNum) {
             try {
                 // Set a timeout for receiving acknowledgments
                 clientSocket.setSoTimeout(50);
                 clientSocket.receive(ackPacket);
-        
+    
                 if (ackPacket.getLength() > 0) {
                     int ackId = Integer.parseInt(new String(ackPacket.getData(), 0, ackPacket.getLength()));
-        
+    
                     // Process acknowledgment
                     processAck(ackId, startTime);
-        
+    
                     // Move the window if the acknowledgment is for the base packet
                     if (ackId == base) {
-                        // Check if all packets within the window have been acknowledged
-                        boolean allPacketsAcked = true;
-                        for (int i = base; i < nextSeqNum; i++) {
-                            if (!ackReceivedArray[i % windowSize]) {
-                                allPacketsAcked = false;
-                                break;
-                            }
-                        }
-        
-                        if (allPacketsAcked) {
-                            // Slide the window
-                            slideWindow();
-                        }
+                        // Slide the window if the acknowledgment is for the base packet
+                        System.out.println("Server: Moving the window");
+                        slideWindow();
                     }
                 }
             } catch (SocketTimeoutException e) {
@@ -202,6 +194,7 @@ class FileSender {
             }
         }
     }
+    
     
     
     
