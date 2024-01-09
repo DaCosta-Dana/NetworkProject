@@ -53,7 +53,7 @@ public class Main {
         if (args.length != 7) {
             System.out.println("Usage: java main.java <port> <client_number> <size> <server_name> <server_port> <ack_probability> <filename>");
             // javac main.java
-            // java Main 12000 2 3 localhost 12000 0.1 filename1.txt
+            // java Main 12000 2 3 localhost 12000 0.1 file.txt
             
             System.exit(1);
         }

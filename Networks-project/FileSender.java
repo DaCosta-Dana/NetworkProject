@@ -75,7 +75,7 @@ class FileSender {
                     clientSocket.setSoTimeout(50);
                     long timeTaken = System.currentTimeMillis() - startTime;
                     System.out.printf("%.4f >> Acknowledgment received for Packet ID: %d%n", timeTaken / 1000.0, ackId);
-                    if (test && ackId == ackReceived) {
+                    if (ackId == ackReceived) {
                         listAck.add(ackId);
                     }
                     System.out.println(listAck);
@@ -133,31 +133,38 @@ class FileSender {
         long startTime = System.currentTimeMillis();
         try (FileInputStream file = new FileInputStream(fileName)) {
             int windowSize = size;
-            while (true) {
+    
+            while (!end) {
                 byte[] data = new byte[2048];
                 int bytesRead = file.read(data);
-                for (int packetId = lastAckReceived + 1; packetId < lastAckReceived + 1 + windowSize; packetId++) {
-                    if (bytesRead == -1) {
-                        return;
-                    }
+    
+                if (bytesRead == -1) {
+                    end = true;
+                    return;
+                }
+    
+                for (int packetId = lastAckReceived + 1; packetId <= lastAckReceived + windowSize; packetId++) {
                     sendPacket(packetId, Arrays.copyOf(data, bytesRead), clientAddress, startTime);
                     Thread.sleep(50);
                 }
-                if (bytesRead == -1) {
-                    break;
-                }
+    
                 receiveAck(startTime, windowSize, file);
+    
                 if (end) {
+                    // Send a final acknowledgment to confirm that the end has been reached
+                    for (int packetId = lastAckReceived + 1; packetId <= lastAckReceived + windowSize; packetId++) {
+                        sendPacket(packetId, new byte[0], clientAddress, startTime);
+                    }
                     return;
                 }
             }
-            
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+    
         System.out.printf("Thread for client %d finished.%n", clientId);
     }
-
+    
     public void sendFile() {
         List<Thread> threads = new ArrayList<>();
         for (InetSocketAddress clientAddress : clientAddresses) {
