@@ -43,13 +43,10 @@ class FileSender {
         this.endAcks = new ArrayList<>();
         this.test = true;
         this.base = 0;
-        this.nextSeqNum = 0;
+  
         this.ackReceivedArray = new boolean[windowSize];
-        try {
-            this.file = new FileInputStream(fileName);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+  
+        
 
     }
     
@@ -83,30 +80,34 @@ class FileSender {
         int clientId = clientAddress.getPort();
         System.out.println(clientId);
         System.out.printf("Thread for client %d started.%n", clientId);
-        long startTime = System.currentTimeMillis();
-
+    
         try {
-            while (nextSeqNum < windowSize) {
-                sendPacket(nextSeqNum, clientAddress, startTime);
-                nextSeqNum++;
-            }
-
-            while (!end || base < nextSeqNum) {
-                // Check for received acknowledgments
-                receiveAck(startTime);
-
+            long startTime = System.currentTimeMillis();
+            int base = 0;
+            int nextSeqNum = 0;
+    
+            while (base < windowSize) {
                 // Send packets within the window
                 while (nextSeqNum < base + windowSize && nextSeqNum < windowSize) {
                     sendPacket(nextSeqNum, clientAddress, startTime);
                     nextSeqNum++;
                 }
+    
+                // Check for received acknowledgments
+                receiveAck(startTime);
+    
+                // Move the base of the window
+                base = nextSeqNum;
             }
-        } catch (IOException e) {
+        } catch (IOException  e) {
             e.printStackTrace();
         }
-
+    
         System.out.printf("Thread for client %d finished.%n", clientId);
     }
+    
+
+
 
     // Modified processAck method
     private void processAck(int ackId, long startTime) {
