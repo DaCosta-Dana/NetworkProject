@@ -69,8 +69,8 @@ class FileSender {
                 DatagramPacket packet = new DatagramPacket(packetData, packetData.length, clientAddress.getAddress(), clientAddress.getPort());
                 long timeTaken = System.currentTimeMillis() - startTime;
     
-                // Print data being sent by the packets
-                System.out.printf("%.4f >> Data sent to client %d, Packet ID: %d, Data: %s%n", timeTaken / 1000.0, clientAddress.getPort(), packetId);
+                // Print data being sent by the packets (size and packet ID)
+                System.out.printf("Server: %.4f >> Data sent to client %d, Packet ID: %d, Data Size: %d bytes%n", timeTaken / 1000.0, clientAddress.getPort(), packetId, bytesRead);
     
                 clientSocket.send(packet);
                 totalBytesSent += packetData.length;
@@ -80,8 +80,6 @@ class FileSender {
         }
     }
     
-    
-
     private void retransmitPackets(int base, int nextSeqNum, InetSocketAddress clientAddress, long startTime) throws IOException {
         for (int i = base; i < nextSeqNum; i++) {
             if (!listAck.contains(i)) {
