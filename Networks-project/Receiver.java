@@ -4,25 +4,18 @@ import java.net.*;
 
 class Receiver {
     private DatagramSocket socket;
-    private double ack_probability;
     private int total_bytes_received;
     private int retransmissions_received;
     private List<Integer> list_ack;
     
-    public Receiver(DatagramSocket socket, double ack_probability, int port) {
+    public Receiver(DatagramSocket socket, int port) {
         this.socket = socket;
-        this.ack_probability = ack_probability;
         this.total_bytes_received = 0;
         this.retransmissions_received = 0;
         this.list_ack = new ArrayList<>();
     }
     
     public boolean send_ack(int packet_id, InetAddress server_address) throws Exception {
-        if (Math.round(Math.random() * 1000) / 1000.0 < this.ack_probability) {
-            System.out.println("Client: Packet with ID : " + packet_id + " lost");
-            return false;
-        }
-
         System.out.println("Client: Acknowledgment for Packet ID " + packet_id + " sent successfully");
         byte[] acknowledgment = Integer.toString(packet_id).getBytes();
         DatagramPacket packet = new DatagramPacket(acknowledgment, acknowledgment.length, server_address, 12000);
