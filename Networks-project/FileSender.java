@@ -24,6 +24,8 @@ class FileSender {
     //private static final int MAX_RETRANSMISSIONS = 5; // Maximum number of retransmissions
     private final Lock listAckLock;
     private CopyOnWriteArrayList<Integer> ListAck;
+    private Map<InetSocketAddress, Integer> baseMap;
+    private Map<InetSocketAddress, Integer> nextSeqNumMap;
 
     public FileSender(String fileName, DatagramSocket clientSocket, int size, int clientNumber, List<InetSocketAddress> clientAddresses) {
         this.fileName = fileName;
@@ -44,7 +46,13 @@ class FileSender {
         this.ackReceivedArray = new boolean[windowSize];
         this.sentTimes = new HashMap<>();
         this.listAck = new CopyOnWriteArrayList<>();
-        this.listAckLock = new ReentrantLock();        
+        this.listAckLock = new ReentrantLock(); 
+        baseMap = new HashMap<>();
+        nextSeqNumMap = new HashMap<>();
+        for (InetSocketAddress clientAddress : clientAddresses) {
+            baseMap.put(clientAddress, 0);
+            nextSeqNumMap.put(clientAddress, 0);
+        }
     }
 
     private void sendPacket(int packetId, InetSocketAddress clientAddress, long startTime) throws IOException {
@@ -82,63 +90,66 @@ class FileSender {
         }
     }
     
-    public void sendToClient(InetSocketAddress clientAddress) throws InterruptedException {
+    private void sendToClient(InetSocketAddress clientAddress) throws InterruptedException {
         int clientId = clientAddress.getPort();
         System.out.println(clientId);
         System.out.printf("Server: Thread for client %d started.%n", clientId);
-    
+
         try {
             long startTime = System.currentTimeMillis();
             int lastAckedPacketId = -1;
             int nextPacketId = 0;
-    
+
             clientSocket.setSoTimeout(ACK_TIMEOUT);
-    
+
             while (nextPacketId < fileSize / 2048) {
                 int packetsSentInWindow = 0;
-    
+
+                // Send packets in batches, up to the window size
                 while (packetsSentInWindow < windowSize && nextPacketId < fileSize / 2048) {
                     int packetId = nextPacketId;
-    
+
                     // Only send the packet if it hasn't been acknowledged
                     if (packetId > lastAckedPacketId) {
                         sendPacket(packetId, clientAddress, startTime);
-    
-                        // Wait for acknowledgment for the current packet
-                        try {
-                            lastAckedPacketId = receiveAck(startTime, clientAddress, packetId);
-                        } catch (SocketTimeoutException e) {
-                            System.out.println("Acknowledgment timeout. Retransmitting packet...");
-                            continue;  // Retry sending the current packet on timeout
-                        }
-    
                         packetsSentInWindow++;
                     }
-    
+
                     nextPacketId++;
                 }
+
+                // Wait for acknowledgments for the entire batch
+                for (int i = 0; i < packetsSentInWindow; i++) {
+                    int packetId = lastAckedPacketId + i + 1;
+
+                    // Wait for acknowledgment for the current packet
+                    try {
+                        lastAckedPacketId = receiveAck(startTime, clientAddress, packetId);
+                    } catch (SocketTimeoutException e) {
+                        System.out.println("Acknowledgment timeout. Retransmitting packet " + packetId + "...");
+                        // Retry sending the same packet on timeout
+                        nextPacketId = packetId;
+                        break;
+                    }
+                }
+
             }
-    
+
             end = true;
         } catch (IOException e) {
             e.printStackTrace();
         }
-    
+
         System.out.printf("Server: Thread for client %d finished.%n", clientId);
     }
-    
-    
-    
-    
-    
-    
-
-    
     
 
     private void slideWindow(long startTime, InetSocketAddress clientAddress) {
         listAckLock.lock();
         try {
+            int base = baseMap.get(clientAddress);
+            int nextSeqNum = nextSeqNumMap.get(clientAddress);
+
             for (int i = base; i < nextSeqNum; i++) {
                 if (!ackReceivedArray[i - base]) {
                     try {
@@ -148,19 +159,17 @@ class FileSender {
                     }
                 }
             }
-            base = nextSeqNum;
+            baseMap.put(clientAddress, nextSeqNum);
         } finally {
             listAckLock.unlock();
         }
     }
-    
+
     private void sendPackets(int startPacketId, int endPacketId, InetSocketAddress clientAddress, long startTime) throws IOException {
         for (int packetId = startPacketId; packetId <= endPacketId; packetId++) {
             sendPacket(packetId, clientAddress, startTime);
         }
     }
-    
-    
 
     private int receiveAck(long startTime, InetSocketAddress clientAddress, int lastAckedPacketId) throws IOException {
         byte[] ackMessage = new byte[2048];
@@ -179,8 +188,8 @@ class FileSender {
                 // Find the client that sent the acknowledgment
                 InetSocketAddress clientAddr = findClientAddress(clientAddresses, ackPacket.getSocketAddress());
     
-                // Process acknowledgment
-                //lastAckedPacketId = processAck(ackId, clientAddr, startTime);
+                // Update acknowledgment state for the specific client
+                processAck(ackId, clientAddress, startTime);
     
                 long timeTaken = System.currentTimeMillis() - startTime;
                 System.out.printf("Server: %.4f >> Acknowledgment received from client %d for Packet ID: %d%n", timeTaken / 1000.0, clientAddr.getPort(), ackId);
@@ -225,22 +234,22 @@ class FileSender {
             // Mark acknowledgment from the specific client
             listAckLock.lock();
             try {
-                int index = ackId - base;
-                if (index >= 0 && index < windowSize) {
-                    ackReceivedArray[index] = true;
+                boolean baseAckedByAll = true;
+                if (sentPacketIds.contains(ackId)) {
+                    // ... (existing code)
     
-                    // Check if the base packet has been acknowledged by all clients
-                    boolean baseAckedByAll = true;
-                    for (int i = 0; i < windowSize; i++) {
-                        if (!ackReceivedArray[i]) {
-                            baseAckedByAll = false;
-                            break;
+                    // Update acknowledgment state for the specific client
+                    int base = baseMap.get(clientAddress);
+                    int index = ackId - base;
+                    if (index >= 0 && index < windowSize) {
+                        ackReceivedArray[index] = true;
+    
+                        // ... (existing code)
+    
+                        if (baseAckedByAll) {
+                            // Slide the window for the specific client
+                            slideWindow(startTime, clientAddress);
                         }
-                    }
-    
-                    if (baseAckedByAll) {
-                        // Slide the window
-                        slideWindow(startTime, clientAddress);
                     }
                 }
             } finally {
