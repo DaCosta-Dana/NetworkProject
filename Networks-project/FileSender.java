@@ -1,13 +1,8 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.CountDownLatch;
 
 class FileSender {
     private String fileName;
@@ -29,8 +24,6 @@ class FileSender {
     private int base;  // Base of the window
     private int nextSeqNum;  // Next sequence number to be sent
     private boolean[] ackReceivedArray;  // To keep track of received acks
-    private boolean[] sendPackets;
-    private CountDownLatch synchronizationLatch;
 
 
     public FileSender(String fileName, DatagramSocket clientSocket, int size, int clientNumber, List<InetSocketAddress> clientAddresses) {
@@ -50,49 +43,34 @@ class FileSender {
         this.endAcks = new ArrayList<>();
         this.test = true;
         this.base = 0;
-        this.ackReceivedArray = new boolean[windowSize]; 
-        this.sendPackets = new boolean[windowSize];
-        Arrays.fill(sendPackets, false);
-        // Initialize the latch with the number of clients
-        this.synchronizationLatch = new CountDownLatch(clientAddresses.size());
+  
+        this.ackReceivedArray = new boolean[windowSize];
+  
+        
 
     }
-    
     private void sendPacket(int packetId, InetSocketAddress clientAddress, long startTime) throws IOException {
         byte[] data = new byte[2048];
         int bytesRead;
-    
+
         try (FileInputStream file = new FileInputStream(fileName)) {
             file.skip(packetId * 2048);  // Move the file pointer to the correct position
             bytesRead = file.read(data);
-    
+
             if (bytesRead > 0) {
                 byte[] packetData = new byte[bytesRead + 6];
                 System.arraycopy(String.format("%06d", packetId).getBytes(), 0, packetData, 0, 6);
                 System.arraycopy(data, 0, packetData, 6, bytesRead);
-    
+
                 DatagramPacket packet = new DatagramPacket(packetData, packetData.length, clientAddress.getAddress(), clientAddress.getPort());
                 long timeTaken = System.currentTimeMillis() - startTime;
-    
-                // Print data being sent by the packets (size and packet ID)
-                System.out.printf("Server: %.4f >> Data sent to client %d, Packet ID: %d, Data Size: %d bytes%n", timeTaken / 1000.0, clientAddress.getPort(), packetId, bytesRead);
-    
                 clientSocket.send(packet);
+
+                System.out.printf("%.4f >> Data sent to client %d, Packet ID: %d%n", timeTaken / 1000.0, clientAddress.getPort(), packetId);
+
                 totalBytesSent += packetData.length;
                 clientSocket.setSoTimeout(500);
                 sentPacketIds.add(packetId);
-            }
-            else{
-                end=true;
-                return;
-            }
-        }
-    }
-    
-    private void retransmitPackets(int base, int nextSeqNum, InetSocketAddress clientAddress, long startTime) throws IOException {
-        for (int i = base; i < nextSeqNum; i++) {
-            if (!listAck.contains(i)) {
-                sendPacket(i, clientAddress, startTime);
             }
         }
     }
@@ -100,125 +78,96 @@ class FileSender {
     public void sendToClient(InetSocketAddress clientAddress) {
         int clientId = clientAddress.getPort();
         System.out.println(clientId);
-        System.out.printf("Server: Thread for client %d started.%n", clientId);
+        System.out.printf("Thread for client %d started.%n", clientId);
     
         try {
-            File file = new File(fileName);
-            long fileSize = file.length();
-    
             long startTime = System.currentTimeMillis();
+            int base = 0;
+            int nextSeqNum = 0;
     
-            while (true) {
+            while (base < windowSize) {
                 // Send packets within the window
-                while (nextSeqNum < base + windowSize) {
-                    for (InetSocketAddress currentClientAddress : clientAddresses) {
-                        sendPacket(nextSeqNum, currentClientAddress, startTime);
-                    }
+                while (nextSeqNum < base + windowSize && nextSeqNum < windowSize) {
+                    sendPacket(nextSeqNum, clientAddress, startTime);
                     nextSeqNum++;
-    
-                    // Check if the end of the file is reached
-                    if (nextSeqNum * 2048 >= fileSize) {
-                        break;
-                    }
                 }
     
                 // Check for received acknowledgments
                 receiveAck(startTime);
     
                 // Move the base of the window
-                slideWindow();
-    
-                // Check if the end of the file is reached
-                if (base * 2048 >= fileSize) {
-                    break;
-                }
+                base = nextSeqNum;
             }
-        } catch (IOException e) {
+        } catch (IOException  e) {
             e.printStackTrace();
         }
     
-        System.out.printf("Server: Thread for client %d finished.%n", clientId);
-
-        // Count down the latch when the thread finishes
-        synchronizationLatch.countDown();
+        System.out.printf("Thread for client %d finished.%n", clientId);
     }
     
+
+
+
     // Modified processAck method
     private void processAck(int ackId, long startTime) {
         int index = ackId % windowSize;
         if (!ackReceivedArray[index]) {
             ackReceivedArray[index] = true;
             long timeTaken = System.currentTimeMillis() - startTime;
-            System.out.printf("%.4f >> Server: Acknowledgment received for Packet ID: %d%n", timeTaken / 1000.0, ackId);
+            System.out.printf("%.4f >> Acknowledgment received for Packet ID: %d%n", timeTaken / 1000.0, ackId);
         }
     }
 
-    private void slideWindow() {
-        while (base < nextSeqNum) {
-            // Move the window if all acknowledgments are received
-            if (ackReceivedArray[base % windowSize]) {
-                ackReceivedArray[base % windowSize] = false;
-                base++;
-            } else {
-                break; // If an acknowledgment is missing, stop sliding
-            }
-        }
-    }
-    
+    // Modified receiveAck method
     public void receiveAck(long startTime) throws IOException {
-        byte[] ackMessage = new byte[2048];
-        DatagramPacket ackPacket = new DatagramPacket(ackMessage, ackMessage.length);
-    
         while (base < nextSeqNum) {
-            try {
-                // Set a timeout for receiving acknowledgments
-                clientSocket.setSoTimeout(50);
-                clientSocket.receive(ackPacket);
-    
-                if (ackPacket.getLength() > 0) {
-                    int ackId = Integer.parseInt(new String(ackPacket.getData(), 0, ackPacket.getLength()));
-    
-                    // Process acknowledgment
-                    processAck(ackId, startTime);
-    
-                    // Move the window if the acknowledgment is for the base packet
-                    if (ackId == base) {
-                        // Slide the window if the acknowledgment is for the base packet
-                        System.out.println("Server: Moving the window");
-                        slideWindow();
+            byte[] ackMessage = new byte[2048];
+            DatagramPacket ackPacket = new DatagramPacket(ackMessage, ackMessage.length);
+            clientSocket.receive(ackPacket);
+
+            if (ackPacket.getLength() > 0) {
+                int ackId = Integer.parseInt(new String(ackPacket.getData(), 0, ackPacket.getLength()));
+
+                // Process acknowledgment
+                processAck(ackId, startTime);
+
+                // Move the window if all acknowledgments are received
+                if (ackId == base) {
+                    while (ackReceivedArray[base % windowSize]) {
+                        ackReceivedArray[base % windowSize] = false;
+                        base++;
                     }
                 }
-            } catch (SocketTimeoutException e) {
-                // Handle timeout for receiving acknowledgments
-                retransmitPackets(base, nextSeqNum, clientAddresses.get(0), startTime);
             }
         }
     }
+
     
-    
-    
-    
+
     public void sendFile() {
-        ExecutorService executorService = Executors.newFixedThreadPool(clientAddresses.size());
-        
+        List<Thread> threads = new ArrayList<>();
         for (InetSocketAddress clientAddress : clientAddresses) {
-            executorService.submit(() -> sendToClient(clientAddress));
+            Thread thread = new Thread(() -> sendToClient(clientAddress));
+            threads.add(thread);
+            thread.start();
         }
 
-        executorService.shutdown();
-
-        try {
-            // Wait for all threads to finish
-            synchronizationLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         if (end) {
-            System.out.println("Server: No more data to send.");
-            System.out.println("Server: All packets sent and acknowledged. Transfer finished.");
-            System.out.printf("Server: Total Bytes Sent: %d%n", totalBytesSent);
-            System.out.printf("Server: Total Retransmissions Sent: %d%n", retransmissionsSent);
+            System.out.println("No more data to send.");
+            System.out.println("All packets sent and acknowledged. Transfer finished.");
+            System.out.printf("Total Bytes Sent: %d%n", totalBytesSent);
+            System.out.printf("Total Retransmissions Sent: %d%n", retransmissionsSent);
+            return;
         }
+
+        
     }
 }
