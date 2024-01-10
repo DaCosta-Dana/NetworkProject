@@ -82,8 +82,6 @@ class FileSender {
         }
     }
     
-    
-
     public void sendToClient(InetSocketAddress clientAddress) throws InterruptedException {
         int clientId = clientAddress.getPort();
         System.out.println(clientId);
@@ -92,19 +90,23 @@ class FileSender {
         try {
             long startTime = System.currentTimeMillis();
             int lastAckedPacketId = -1;
+            int nextPacketId = 0;
+    
             clientSocket.setSoTimeout(ACK_TIMEOUT);
     
-            while (base < fileSize / 2048) {
+            while (nextPacketId < fileSize / 2048) {
                 int packetsSentInWindow = 0;
     
-                while (packetsSentInWindow < windowSize && base + packetsSentInWindow < fileSize / 2048) {
-                    int packetId = base + packetsSentInWindow;
+                while (packetsSentInWindow < windowSize && nextPacketId < fileSize / 2048) {
+                    int packetId = nextPacketId;
     
                     // Only send the packet if it hasn't been acknowledged
                     if (packetId > lastAckedPacketId) {
                         sendPacket(packetId, clientAddress, startTime);
                         packetsSentInWindow++;
                     }
+    
+                    nextPacketId++;
                 }
     
                 // Wait for a short duration before checking for acknowledgments
@@ -112,10 +114,8 @@ class FileSender {
     
                 // Check for received acknowledgments
                 lastAckedPacketId = receiveAck(startTime, clientAddress, lastAckedPacketId);
-    
-                // Slide the window if acknowledgments are received from all clients
-                slideWindow(startTime, clientAddress);
             }
+    
             end = true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -123,6 +123,7 @@ class FileSender {
     
         System.out.printf("Server: Thread for client %d finished.%n", clientId);
     }
+    
     
 
     
