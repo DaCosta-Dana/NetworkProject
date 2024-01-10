@@ -40,11 +40,11 @@ class Server {
             String messageString = new String(actualData);
     
             if (messageString.equals("1")) {
-                System.out.printf("Client connected: %s%n", packet.getSocketAddress());
+                System.out.printf("Server: Client connected: %s%n", packet.getSocketAddress());
                 clientAddresses.add((InetSocketAddress) packet.getSocketAddress());
             }
         }
-        System.out.println("All clients connected.");
+        System.out.println("Server: All clients connected.");
     }
 
     public void sendFinishSignal() throws IOException {

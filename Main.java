@@ -6,14 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-    public static void start_server(int port, int client_number, int size, String filename) throws InterruptedException, IOException {
+    public static void start_server(int port, int client_number, int size, String filename, float ack_probability) throws InterruptedException, IOException {
         
             Server server = new Server(port, client_number);
             System.out.println("The server is waiting for clients to connect");
             server.waitForConnections();
 
             List<Thread> threads = new ArrayList<>();
-            FileSender fileSender = new FileSender(filename, server.serverSocket, size, client_number, server.clientAddresses);
+            FileSender fileSender = new FileSender(filename, server.serverSocket, size, client_number, server.clientAddresses, ack_probability);
 
             Thread thread = new Thread(() -> fileSender.sendFile());
 
@@ -31,7 +31,7 @@ public class Main {
             server.closeSocket();
     }
 
-    public static void start_client(String server_name, int server_port, float ack_probability) throws Exception {
+    public static void start_client(String server_name, int server_port) throws Exception {
         try {
             Thread.sleep(1000);
             DatagramSocket clientSocket = new DatagramSocket();
@@ -41,7 +41,7 @@ public class Main {
             int port = 12000; // Set to 12000
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, port);
             clientSocket.send(sendPacket);
-            Receiver receiver = new Receiver(clientSocket, ack_probability, server_port);
+            Receiver receiver = new Receiver(clientSocket, server_port);
             receiver.receive_data();
             
         } catch (IOException e) {
@@ -52,9 +52,12 @@ public class Main {
     public static void main(String[] args) {
         if (args.length != 7) {
             System.out.println("Usage: java main.java <port> <client_number> <size> <server_name> <server_port> <ack_probability> <filename>");
-            // javac main.java
-            // java Main 12000 2 3 localhost 12000 0.1 filename1.txt
             
+            /*  COPY TO TERMINAL
+                javac main.java
+                java Main 12000 2 3 localhost 12000 0.1 file.txt
+             */
+
             System.exit(1);
         }
         int port = Integer.parseInt(args[0]);
@@ -67,7 +70,7 @@ public class Main {
         try {
             Thread server_thread = new Thread(() -> {
                 try {
-                    start_server(port, client_number, size, filename);
+                    start_server(port, client_number, size, filename, ack_probability);
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
                 }
@@ -77,7 +80,7 @@ public class Main {
             for (int i = 0; i < client_number; i++) {
                 Thread client_thread = new Thread(() -> {
                     try {
-                        start_client(server_name, port, ack_probability);
+                        start_client(server_name, port);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

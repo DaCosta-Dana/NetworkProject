@@ -7,160 +7,283 @@ import java.util.concurrent.locks.ReentrantLock;
 class FileSender {
     private String fileName;
     private DatagramSocket clientSocket;
-    private int size;
+    private int windowSize;
     private int totalBytesSent;
     private int retransmissionsSent;
-    private int clientNumber;
     private List<InetSocketAddress> clientAddresses;
-    private Lock ackLock;
     private Deque<Integer> sentPacketIds;
-    private List<Integer> listAck;
-    private int lastAckReceived;
     private boolean end;
-    private int ackReceived;
-    private List<Integer> endAcks;
-    private boolean test;
+    private boolean[] ackReceivedArray = new boolean[windowSize];  // To keep track of received acks
+    private long fileSize;
+    private static final int ACK_TIMEOUT = 500;
+    private Map<Integer, Long> sentTimes;
+    private final Lock listAckLock;
+    private Map<InetSocketAddress, Integer> baseMap;
+    private Map<InetSocketAddress, Integer> nextSeqNumMap;
+    private float ack_probability;
+    private Set<Integer> acknowledgedPackets;  // To keep track of acknowledged packets
+    private long totalTimeSpent;
 
-    public FileSender(String fileName, DatagramSocket clientSocket, int size, int clientNumber, List<InetSocketAddress> clientAddresses) {
+    public FileSender(String fileName, DatagramSocket clientSocket, int size, int clientNumber, List<InetSocketAddress> clientAddresses, float ack_probability) {
         this.fileName = fileName;
         this.clientSocket = clientSocket;
-        this.size = size;
+        this.windowSize = size;
         this.totalBytesSent = 0;
         this.retransmissionsSent = 0;
-        this.clientNumber = clientNumber;
         this.clientAddresses = clientAddresses;
-        this.ackLock = new ReentrantLock();
         this.sentPacketIds = new ArrayDeque<>();
-        this.listAck = new ArrayList<>();
-        this.lastAckReceived = -1;
+        this.totalTimeSpent = 0;
         this.end = false;
-        this.ackReceived = 0;
-        this.endAcks = new ArrayList<>();
-        this.test = true;
-    }
-
-    public void sendPacket(int packetId, byte[] data, InetSocketAddress clientAddress, long startTime) throws IOException {
-        byte[] packetData = new byte[data.length + 6];
-        System.arraycopy(String.format("%06d", packetId).getBytes(), 0, packetData, 0, 6);
-        System.arraycopy(data, 0, packetData, 6, data.length);
-        DatagramPacket packet = new DatagramPacket(packetData, packetData.length, clientAddress.getAddress(), clientAddress.getPort());
-        long timeTaken = System.currentTimeMillis() - startTime;
-        clientSocket.send(packet);
-        System.out.printf("%.4f >> Data sent to client %d, Packet ID: %d%n", timeTaken / 1000.0, clientAddress.getPort(), packetId);
-        totalBytesSent += packetData.length;
-        clientSocket.setSoTimeout(500);
-        sentPacketIds.add(packetId);
-
-        if (data.length == 0) {
-            System.out.println("No more data to send");
-            end = true;
-            return;
-        }
-    }
-
-    public void receiveAck(long startTime, int windowSize, FileInputStream file) throws IOException {
-        byte[] data = new byte[2048];
-        double timeout = 0.1 * windowSize;
-        long timeStart = System.currentTimeMillis();
-        while (!sentPacketIds.isEmpty()) {
-            try {
-                Thread.sleep(100);
-                byte[] ackMessage = new byte[2048];
-                DatagramPacket ackPacket = new DatagramPacket(ackMessage, ackMessage.length);
-                clientSocket.receive(ackPacket);
-                Thread.sleep(50);
-                if (ackPacket.getLength() > 0) {
-                    int ackId = Integer.parseInt(new String(ackPacket.getData(), 0, ackPacket.getLength()));
-
-                    clientSocket.setSoTimeout(50);
-                    long timeTaken = System.currentTimeMillis() - startTime;
-                    System.out.printf("%.4f >> Acknowledgment received for Packet ID: %d%n", timeTaken / 1000.0, ackId);
-                    if (test && ackId == ackReceived) {
-                        listAck.add(ackId);
-                    }
-                    System.out.println(listAck);
-                    if (!endAcks.contains(ackId)) {
-                        if (listAck.size() >= clientAddresses.size()) {
-                            while (listAck.stream().filter(a -> a == ackReceived).count() == clientAddresses.size()) {
-                                if (!end) {
-                                    System.out.printf("All acks received for the packet ID: %d%n", ackReceived);
-                                    endAcks.add(ackReceived);
-                                    while (sentPacketIds.contains(ackReceived)) {
-                                        sentPacketIds.remove(ackReceived);
-                                    }
-                                    System.out.println("MOVING WINDOW");
-                                    while (listAck.contains(ackReceived)) {
-                                        listAck.remove(Integer.valueOf(ackReceived));
-                                    }
-                                    System.out.println("LIST ACK");
-                                    System.out.println(listAck);
-                                    file.read(data);
-                                    for (InetSocketAddress clientAddress : clientAddresses) {
-                                        sendPacket(ackReceived + size, data, clientAddress, startTime);
-                                    }
-                                    System.out.println("TEST");
-                                    ackReceived++;
-                                    timeStart = System.currentTimeMillis();
-                                } else {
-                                    return;
-                                }
-                            }
-                        }
-                    } else if (endAcks.contains(ackId)) {
-                        System.out.println("Ack already received");
-                        int start = 0;
-                    }
-                }
-            } catch (SocketTimeoutException e) {
-                retransmissionsSent++;
-                for (InetSocketAddress clientAddress : clientAddresses) {
-                    for (int packetId2 = ackReceived; packetId2 < ackReceived + windowSize; packetId2++) {
-                        sendPacket(packetId2, data, clientAddress, startTime);
-                        System.out.println("RETRANSMISSION");
-                        timeStart = System.currentTimeMillis();
-                    }
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void sendToClient(InetSocketAddress clientAddress) {
-        int clientId = clientAddress.getPort();
-        System.out.println(clientId);
-        System.out.printf("Thread for client %d started.%n", clientId);
-        long startTime = System.currentTimeMillis();
-        try (FileInputStream file = new FileInputStream(fileName)) {
-            int windowSize = size;
-            while (true) {
-                byte[] data = new byte[2048];
-                int bytesRead = file.read(data);
-                for (int packetId = lastAckReceived + 1; packetId < lastAckReceived + 1 + windowSize; packetId++) {
-                    if (bytesRead == -1) {
-                        return;
-                    }
-                    sendPacket(packetId, Arrays.copyOf(data, bytesRead), clientAddress, startTime);
-                    Thread.sleep(50);
-                }
-                if (bytesRead == -1) {
-                    break;
-                }
-                receiveAck(startTime, windowSize, file);
-                if (end) {
-                    return;
-                }
-            }
-        } catch (IOException | InterruptedException e) {
+        try (FileInputStream fileInputStream = new FileInputStream(fileName)) {
+            this.fileSize = fileInputStream.available();
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.printf("Thread for client %d finished.%n", clientId);
+        this.ackReceivedArray = new boolean[windowSize];
+        this.sentTimes = new HashMap<>();
+        this.listAckLock = new ReentrantLock(); 
+        baseMap = new HashMap<>();
+        nextSeqNumMap = new HashMap<>();
+        for (InetSocketAddress clientAddress : clientAddresses) {
+            baseMap.put(clientAddress, 0);
+            nextSeqNumMap.put(clientAddress, 0);
+        }
+        this.ack_probability = ack_probability;
     }
 
-    public void sendFile() {
-        List<Thread> threads = new ArrayList<>();
+    private void sendPacket(int packetId, InetSocketAddress clientAddress, long startTime) throws IOException {
+        byte[] data = new byte[2048];
+        int bytesRead;
+    
+        try (FileInputStream file = new FileInputStream(fileName)) {
+            long skipBytes = packetId * 2048;
+            while (skipBytes > 0) {
+                long skipped = file.skip(skipBytes);
+                if (skipped <= 0) {
+                    System.err.println("Error skipping bytes in the file.");
+                    return;
+                }
+                skipBytes -= skipped;
+            }
+    
+            bytesRead = file.read(data);
+    
+            if (bytesRead > 0) {
+                byte[] packetData = new byte[bytesRead + 6];
+                System.arraycopy(String.format("%06d", packetId).getBytes(), 0, packetData, 0, 6);
+                System.arraycopy(data, 0, packetData, 6, bytesRead);
+    
+                DatagramPacket packet = new DatagramPacket(packetData, packetData.length, clientAddress.getAddress(), clientAddress.getPort());
+                long timeTaken = System.currentTimeMillis() - startTime;
+                clientSocket.send(packet);
+                sentTimes.put(packetId, System.currentTimeMillis());
+    
+                System.out.printf("Server: %.4f >> Data sent to client %d, Packet ID: %d%n", timeTaken / 1000.0, clientAddress.getPort(), packetId);
+    
+                totalBytesSent += packetData.length;
+                sentPacketIds.add(packetId);
+
+                // Register the sent packet for acknowledgment tracking
+                acknowledgedPackets.add(packetId);
+            }
+        }
+    }
+    
+    
+    private void sendToClient(InetSocketAddress clientAddress, double ack_probability) throws SocketTimeoutException {
+        int clientId = clientAddress.getPort();
+        System.out.printf("Server: Thread for client %d started.%n", clientId);
+
+        try {
+            long startTime = System.currentTimeMillis();
+            int nextPacketId = 0;
+
+            clientSocket.setSoTimeout(ACK_TIMEOUT);
+
+            while (nextPacketId < fileSize / 2048) {
+                int packetId = nextPacketId;
+
+                // Send the packet and handle IOException
+                try {
+                    if (Math.round(Math.random() * 1000) / 1000.0 < this.ack_probability) {
+                        System.out.println("Server: Packet with ID : " + packetId + " lost");
+                        retransmitPacketsAndWait(startTime, clientAddress, packetId);
+                    } else {
+                        sendPacket(packetId, clientAddress, startTime);
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    // Handle the exception, e.g., log or retry
+                    continue;
+                }
+
+                // Wait for acknowledgment for the current packet
+                int lastAckedPacketId;
+                lastAckedPacketId = receiveAck(startTime, clientAddress, packetId);
+
+                nextPacketId = lastAckedPacketId + 1;
+            }
+
+            long endTime = System.currentTimeMillis();
+            totalTimeSpent += (endTime - startTime);
+            end = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.printf("Server: Thread for client %d finished.%n", clientId);
+    }
+    
+
+    // In the slideWindow method, update the acknowledgment state after sliding the window
+    private void slideWindow(long startTime, InetSocketAddress clientAddress, int base) {
+        for (int i = base; i < nextSeqNumMap.get(clientAddress); i++) {
+            int index = i - base;
+            if (!ackReceivedArray[index]) {
+                try {
+                    sendPacket(i, clientAddress, startTime);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        baseMap.put(clientAddress, nextSeqNumMap.get(clientAddress));
+    }
+
+    private int receiveAck(long startTime, InetSocketAddress clientAddress, int lastAckedPacketId) throws SocketException {
+        byte[] ackMessage = new byte[2048];
+        DatagramPacket ackPacket = new DatagramPacket(ackMessage, ackMessage.length);
+    
+        listAckLock.lock();
+        try {
+            // Set a timeout for acknowledgment reception
+            clientSocket.setSoTimeout(ACK_TIMEOUT);
+    
+            try {
+                clientSocket.receive(ackPacket);
+            } catch (SocketTimeoutException e) {
+                // Handle timeout - retransmit the packets if needed
+                System.out.println("Server: Acknowledgment timeout. Retransmitting packets...");
+                retransmitPacketsAndWait(startTime, clientAddress, lastAckedPacketId);
+                return lastAckedPacketId;
+            } catch (IOException e) {
+                // Handle other IOException, e.g., log or retry
+                e.printStackTrace();
+                return lastAckedPacketId;
+            }
+    
+            if (ackPacket.getLength() > 0) {
+                int ackId = Integer.parseInt(new String(ackPacket.getData(), 0, ackPacket.getLength()));
+    
+                // Find the client that sent the acknowledgment
+                InetSocketAddress clientAddr = findClientAddress(clientAddresses, ackPacket.getSocketAddress());
+    
+                // Update acknowledgment state for the specific client
+                processAck(ackId, clientAddress, startTime, clientAddr);
+    
+                //System.out.printf("Server: %.4f >> Acknowledgment received from client %d for Packet ID: %d%n", timeTaken / 1000.0, clientAddr.getPort(), ackId);
+            }
+        } finally {
+            listAckLock.unlock();
+        }
+    
+        return lastAckedPacketId;
+    }
+    
+    
+    private InetSocketAddress findClientAddress(List<InetSocketAddress> clientAddresses, SocketAddress address) {
         for (InetSocketAddress clientAddress : clientAddresses) {
-            Thread thread = new Thread(() -> sendToClient(clientAddress));
+            if (clientAddress.equals(address)) {
+                return clientAddress;
+            }
+        }
+        return null;
+    }
+    
+    private void retransmitPacketsAndWait(long startTime, InetSocketAddress clientAddress, int lastAckedPacketId) {
+        listAckLock.lock();
+        try {
+                try {
+                    System.out.println("Server: Retransmission for packet " + lastAckedPacketId + " has been sent");
+                    sendPacket(lastAckedPacketId, clientAddress, startTime);
+                    retransmissionsSent++;
+                    
+    
+                    // Wait for acknowledgment for this retransmitted packet with timeout
+                    long timeout = System.currentTimeMillis() + ACK_TIMEOUT;
+                    while (!acknowledgedPackets.contains(lastAckedPacketId) && System.currentTimeMillis() < timeout) {
+                        try {
+                            // Sleep and wait for acknowledgment
+                            Thread.sleep(10); // Adjust the sleep time if needed
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+    
+                    if (!acknowledgedPackets.contains(lastAckedPacketId)) {
+                        // Handle acknowledgment timeout, e.g., log or take appropriate action
+                        System.out.println("Server: Acknowledgment timeout for packet " + lastAckedPacketId);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        } finally {
+            listAckLock.unlock();
+        }
+    }
+    
+    private void processAck(int ackId, InetSocketAddress clientAddress, long startTime, InetSocketAddress actualClientAddress) {
+        // Check if acknowledgment is from the expected client
+        if (sentPacketIds.contains(ackId)) {
+            // Mark acknowledgment from the specific client
+            listAckLock.lock();
+            try {
+                boolean baseAckedByAll = true;
+                if (sentPacketIds.contains(ackId)) {
+                    // Update acknowledgment state for the specific client
+                    int base = baseMap.get(actualClientAddress);
+                    int index = ackId - base;
+                    if (index >= 0 && index < windowSize) {
+                        ackReceivedArray[index] = true;
+    
+                        // Check if all packets in the window are acknowledged
+                        for (int i = 0; i < windowSize; i++) {
+                            if (!ackReceivedArray[i]) {
+                                baseAckedByAll = false;
+                                break;
+                            }
+                        }
+    
+                        if (baseAckedByAll) {
+                            // Slide the window for the specific client
+                            slideWindow(startTime, actualClientAddress, base);
+                        }
+                    }
+                }
+            } finally {
+                listAckLock.unlock();
+            }
+    
+            long timeTaken = System.currentTimeMillis() - startTime;
+            System.out.printf("Server: %.4f >> Acknowledgment received from client %d for Packet ID: %d%n", timeTaken / 1000.0, actualClientAddress.getPort(), ackId);
+        }
+    }
+    
+    
+
+    public void sendFile() {
+        acknowledgedPackets = new HashSet<>();  // Initialize the set for each file transfer
+        List<Thread> threads = new ArrayList<>();
+        long startTime = System.currentTimeMillis();
+        for (InetSocketAddress clientAddress : clientAddresses) {
+            Thread thread = new Thread(() -> {
+                try {
+                    sendToClient(clientAddress, ack_probability);
+                } catch (SocketTimeoutException e) {
+                    e.printStackTrace();
+                }
+            });
             threads.add(thread);
             thread.start();
         }
@@ -172,8 +295,17 @@ class FileSender {
                 e.printStackTrace();
             }
         }
-        System.out.println("All packets sent and acknowledged. Transfer finished.");
-        System.out.printf("Total Bytes Sent: %d%n", totalBytesSent);
-        System.out.printf("Total Retransmissions Sent: %d%n", retransmissionsSent);
+
+        long endTime = System.currentTimeMillis();
+        totalTimeSpent = endTime - startTime;
+
+        if (end) {
+            System.out.println("Server: No more data to send.");
+            System.out.println("Server: All packets sent and acknowledged. Transfer finished.");
+            System.out.printf("Server: Total Bytes Sent: %d%n", totalBytesSent);
+            System.out.printf("Server: Total Retransmissions Sent: %d%n", retransmissionsSent);
+            System.out.printf("Server: Total Time Spent: %.4f seconds%n", totalTimeSpent / 1000.0);
+            return;
+        }
     }
 }
