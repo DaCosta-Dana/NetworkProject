@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -13,22 +12,17 @@ class FileSender {
     private int retransmissionsSent;
     private List<InetSocketAddress> clientAddresses;
     private Deque<Integer> sentPacketIds;
-    private List<Integer> listAck;
     private boolean end;
-    private int base;  // Base of the window
-    private int nextSeqNum;  // Next sequence number to be sent
     private boolean[] ackReceivedArray = new boolean[windowSize];  // To keep track of received acks
     private long fileSize;
     private static final int ACK_TIMEOUT = 500;
     private Map<Integer, Long> sentTimes;
-    //private static final int MAX_RETRANSMISSIONS = 5; // Maximum number of retransmissions
     private final Lock listAckLock;
-    private CopyOnWriteArrayList<Integer> ListAck;
     private Map<InetSocketAddress, Integer> baseMap;
     private Map<InetSocketAddress, Integer> nextSeqNumMap;
     private float ack_probability;
     private Set<Integer> acknowledgedPackets;  // To keep track of acknowledged packets
-
+    private long totalTimeSpent;
 
     public FileSender(String fileName, DatagramSocket clientSocket, int size, int clientNumber, List<InetSocketAddress> clientAddresses, float ack_probability) {
         this.fileName = fileName;
@@ -38,9 +32,8 @@ class FileSender {
         this.retransmissionsSent = 0;
         this.clientAddresses = clientAddresses;
         this.sentPacketIds = new ArrayDeque<>();
-        this.listAck = new ArrayList<>();
+        this.totalTimeSpent = 0;
         this.end = false;
-        this.base = 0;
         try (FileInputStream fileInputStream = new FileInputStream(fileName)) {
             this.fileSize = fileInputStream.available();
         } catch (IOException e) {
@@ -48,7 +41,6 @@ class FileSender {
         }
         this.ackReceivedArray = new boolean[windowSize];
         this.sentTimes = new HashMap<>();
-        this.listAck = new CopyOnWriteArrayList<>();
         this.listAckLock = new ReentrantLock(); 
         baseMap = new HashMap<>();
         nextSeqNumMap = new HashMap<>();
@@ -133,6 +125,8 @@ class FileSender {
                 nextPacketId = lastAckedPacketId + 1;
             }
 
+            long endTime = System.currentTimeMillis();
+            totalTimeSpent += (endTime - startTime);
             end = true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -188,7 +182,6 @@ class FileSender {
                 // Update acknowledgment state for the specific client
                 processAck(ackId, clientAddress, startTime, clientAddr);
     
-                long timeTaken = System.currentTimeMillis() - startTime;
                 //System.out.printf("Server: %.4f >> Acknowledgment received from client %d for Packet ID: %d%n", timeTaken / 1000.0, clientAddr.getPort(), ackId);
             }
         } finally {
@@ -211,11 +204,11 @@ class FileSender {
     private void retransmitPacketsAndWait(long startTime, InetSocketAddress clientAddress, int lastAckedPacketId) {
         listAckLock.lock();
         try {
-            int base = baseMap.get(clientAddress);
                 try {
+                    System.out.println("Server: Retransmission for packet " + lastAckedPacketId + " has been sent");
                     sendPacket(lastAckedPacketId, clientAddress, startTime);
                     retransmissionsSent++;
-                    System.out.println("Server: Retransmission for packet " + lastAckedPacketId + " has been sent");
+                    
     
                     // Wait for acknowledgment for this retransmitted packet with timeout
                     long timeout = System.currentTimeMillis() + ACK_TIMEOUT;
@@ -238,16 +231,6 @@ class FileSender {
         } finally {
             listAckLock.unlock();
         }
-    }
-    
-    
-    private boolean areAllPacketsAcked(int base, int lastAckedPacketId, InetSocketAddress clientAddress) {
-        for (int i = base; i <= lastAckedPacketId; i++) {
-            if (!acknowledgedPackets.contains(i)) {
-                return false;
-            }
-        }
-        return true;
     }
     
     private void processAck(int ackId, InetSocketAddress clientAddress, long startTime, InetSocketAddress actualClientAddress) {
@@ -292,6 +275,7 @@ class FileSender {
     public void sendFile() {
         acknowledgedPackets = new HashSet<>();  // Initialize the set for each file transfer
         List<Thread> threads = new ArrayList<>();
+        long startTime = System.currentTimeMillis();
         for (InetSocketAddress clientAddress : clientAddresses) {
             Thread thread = new Thread(() -> {
                 try {
@@ -312,11 +296,15 @@ class FileSender {
             }
         }
 
+        long endTime = System.currentTimeMillis();
+        totalTimeSpent = endTime - startTime;
+
         if (end) {
             System.out.println("Server: No more data to send.");
             System.out.println("Server: All packets sent and acknowledged. Transfer finished.");
             System.out.printf("Server: Total Bytes Sent: %d%n", totalBytesSent);
             System.out.printf("Server: Total Retransmissions Sent: %d%n", retransmissionsSent);
+            System.out.printf("Server: Total Time Spent: %.4f seconds%n", totalTimeSpent / 1000.0);
             return;
         }
     }
