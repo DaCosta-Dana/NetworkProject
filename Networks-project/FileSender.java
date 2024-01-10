@@ -96,23 +96,21 @@ class FileSender {
     private void sendToClient(InetSocketAddress clientAddress, double ack_probability) throws SocketTimeoutException {
         int clientId = clientAddress.getPort();
         System.out.printf("Server: Thread for client %d started.%n", clientId);
-    
+
         try {
             long startTime = System.currentTimeMillis();
             int nextPacketId = 0;
-    
+
             clientSocket.setSoTimeout(ACK_TIMEOUT);
-    
+
             while (nextPacketId < fileSize / 2048) {
                 int packetId = nextPacketId;
 
-
-                
                 // Send the packet and handle IOException
                 try {
                     if (Math.round(Math.random() * 1000) / 1000.0 < this.ack_probability) {
                         System.out.println("Server: Packet with ID : " + packetId + " lost");
-                        retransmitPackets(startTime, clientAddress, packetId);
+                        retransmitPacketsAndWait(startTime, clientAddress, packetId);
                     } else {
                         sendPacket(packetId, clientAddress, startTime);
                     }
@@ -122,19 +120,19 @@ class FileSender {
                     // Handle the exception, e.g., log or retry
                     continue;
                 }
-    
+
                 // Wait for acknowledgment for the current packet
                 int lastAckedPacketId;
                 lastAckedPacketId = receiveAck(startTime, clientAddress, packetId);
-    
+
                 nextPacketId = lastAckedPacketId + 1;
             }
-    
+
             end = true;
         } catch (IOException e) {
             e.printStackTrace();
         }
-    
+
         System.out.printf("Server: Thread for client %d finished.%n", clientId);
     }
     
@@ -168,7 +166,7 @@ class FileSender {
             } catch (SocketTimeoutException e) {
                 // Handle timeout - retransmit the packets if needed
                 System.out.println("Server: Acknowledgment timeout. Retransmitting packets...");
-                retransmitPackets(startTime, clientAddress, lastAckedPacketId);
+                retransmitPacketsAndWait(startTime, clientAddress, lastAckedPacketId);
                 return lastAckedPacketId;
             } catch (IOException e) {
                 // Handle other IOException, e.g., log or retry
@@ -186,7 +184,7 @@ class FileSender {
                 processAck(ackId, clientAddress, startTime, clientAddr);
     
                 long timeTaken = System.currentTimeMillis() - startTime;
-                System.out.printf("Server: %.4f >> Acknowledgment received from client %d for Packet ID: %d%n", timeTaken / 1000.0, clientAddr.getPort(), ackId);
+                //System.out.printf("Server: %.4f >> Acknowledgment received from client %d for Packet ID: %d%n", timeTaken / 1000.0, clientAddr.getPort(), ackId);
             }
         } finally {
             listAckLock.unlock();
@@ -205,7 +203,7 @@ class FileSender {
         return null;
     }
     
-    private void retransmitPackets(long startTime, InetSocketAddress clientAddress, int lastAckedPacketId) {
+    private void retransmitPacketsAndWait(long startTime, InetSocketAddress clientAddress, int lastAckedPacketId) {
         listAckLock.lock();
         try {
             int base = baseMap.get(clientAddress);
@@ -222,11 +220,30 @@ class FileSender {
                     }
                 }
             }
+    
+            // Wait for acknowledgments for the retransmitted packets
+            while (!areAllPacketsAcked(base, nextSeqNum - 1, clientAddress)) {
+                try {
+                    // Sleep and wait for acknowledgments
+                    Thread.sleep(ACK_TIMEOUT);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         } finally {
             listAckLock.unlock();
         }
     }
     
+    
+    private boolean areAllPacketsAcked(int base, int lastAckedPacketId, InetSocketAddress clientAddress) {
+        for (int i = base; i <= lastAckedPacketId; i++) {
+            if (!listAck.contains(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
     
     
     private void processAck(int ackId, InetSocketAddress clientAddress, long startTime, InetSocketAddress actualClientAddress) {
@@ -237,12 +254,19 @@ class FileSender {
             try {
                 boolean baseAckedByAll = true;
                 if (sentPacketIds.contains(ackId)) {
-    
                     // Update acknowledgment state for the specific client
                     int base = baseMap.get(actualClientAddress);
                     int index = ackId - base;
                     if (index >= 0 && index < windowSize) {
                         ackReceivedArray[index] = true;
+    
+                        // Check if all packets in the window are acknowledged
+                        for (int i = 0; i < windowSize; i++) {
+                            if (!ackReceivedArray[i]) {
+                                baseAckedByAll = false;
+                                break;
+                            }
+                        }
     
                         if (baseAckedByAll) {
                             // Slide the window for the specific client
@@ -258,6 +282,8 @@ class FileSender {
             System.out.printf("Server: %.4f >> Acknowledgment received from client %d for Packet ID: %d%n", timeTaken / 1000.0, actualClientAddress.getPort(), ackId);
         }
     }
+    
+    
 
     public void sendFile() {
         List<Thread> threads = new ArrayList<>();
