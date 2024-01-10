@@ -103,17 +103,20 @@ class FileSender {
                     // Only send the packet if it hasn't been acknowledged
                     if (packetId > lastAckedPacketId) {
                         sendPacket(packetId, clientAddress, startTime);
+    
+                        // Wait for acknowledgment for the current packet
+                        try {
+                            lastAckedPacketId = receiveAck(startTime, clientAddress, packetId);
+                        } catch (SocketTimeoutException e) {
+                            System.out.println("Acknowledgment timeout. Retransmitting packet...");
+                            continue;  // Retry sending the current packet on timeout
+                        }
+    
                         packetsSentInWindow++;
                     }
     
                     nextPacketId++;
                 }
-    
-                // Wait for a short duration before checking for acknowledgments
-                Thread.sleep(50);
-    
-                // Check for received acknowledgments
-                lastAckedPacketId = receiveAck(startTime, clientAddress, lastAckedPacketId);
             }
     
             end = true;
@@ -123,6 +126,10 @@ class FileSender {
     
         System.out.printf("Server: Thread for client %d finished.%n", clientId);
     }
+    
+    
+    
+    
     
     
 
