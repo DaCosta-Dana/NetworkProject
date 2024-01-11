@@ -26,8 +26,8 @@ class Server {
     }
 
     // Private method to send a DatagramPacket to a specified address and port
-    private boolean send(byte[] data, InetAddress address, int port) throws IOException {
-        DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+    private boolean send(byte[] data, InetAddress address, int assignedPort) throws IOException {
+        DatagramPacket packet = new DatagramPacket(data, data.length, address, assignedPort);
         serverSocket.send(packet);
         return true;
     }

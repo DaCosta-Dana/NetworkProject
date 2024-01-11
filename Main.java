@@ -148,16 +148,16 @@ public class Main {
             InetAddress serverAddress = InetAddress.getByName(server_id);
             
             // Access the assigned port from the shared variable
-            int port = assignedPort.get();
+            int getAssignedPort = assignedPort.get();
 
             // Create a DatagramPacket to send the data to the server
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, port);
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, getAssignedPort);
             
             // Send the packet to the server
             clientSocket.send(sendPacket);
 
             // Create a client instance to receive data from the server
-            Client receiver = new Client(clientSocket, port);
+            Client receiver = new Client(clientSocket, getAssignedPort);
 
             // Receive data from the server
             receiver.receive_data();

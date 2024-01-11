@@ -11,8 +11,8 @@ class Client {
     private List<Integer> list_ack;
     
     // Constructor to initialize the Client
-    public Client(DatagramSocket socket, int serverConnectionPort) {
-        this.socket = socket;
+    public Client(DatagramSocket clientSocket, int getAssignedPort) {
+        this.socket = clientSocket;
         this.total_bytes_received = 0;
         this.retransmissions_received = 0;
         this.list_ack = new ArrayList<>();
