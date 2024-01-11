@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-    public static void start_server(int port, int client_number, int size, String filename, float ack_probability) throws InterruptedException, IOException {
+    public static void start_server(int serverListeningPort, int client_number, int size, String filename, float ack_probability) throws InterruptedException, IOException {
         
-            Server server = new Server(port, client_number);
+            Server server = new Server(serverListeningPort, client_number);
             System.out.println("The server is waiting for clients to connect");
             server.waitForConnections();
 
@@ -31,17 +31,17 @@ public class Main {
             server.closeSocket();
     }
 
-    public static void start_client(String server_name, int server_port) throws Exception {
+    public static void start_client(String server_name, int serverConnectionPort) throws Exception {
         try {
             Thread.sleep(1000);
             DatagramSocket clientSocket = new DatagramSocket();
             String message = "1";
             byte[] sendData = message.getBytes();
-            InetAddress serverAddress = InetAddress.getByName("localhost"); // Set to "localhost"
-            int port = 12000; // Set to 12000
+            InetAddress serverAddress = InetAddress.getByName(server_name); // Set to "localhost"
+            int port = serverConnectionPort; // Set to 12000
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, port);
             clientSocket.send(sendPacket);
-            Client receiver = new Client(clientSocket, server_port);
+            Client receiver = new Client(clientSocket, serverConnectionPort);
             receiver.receive_data();
             
         } catch (IOException e) {
@@ -50,8 +50,9 @@ public class Main {
     }
 
     public static void main(String[] args) {
+
         if (args.length != 7) {
-            System.out.println("Usage: java main.java <port> <client_number> <size> <server_name> <server_port> <ack_probability> <filename>");
+            System.out.println("Usage: java Main <serverListeningPort> <numberOfClients> <window_size> <server_name> <serverConnectionPort> <ack_probability> <filename>");
             
             /*  COPY TO TERMINAL
                 javac main.java
@@ -60,27 +61,31 @@ public class Main {
 
             System.exit(1);
         }
-        int port = Integer.parseInt(args[0]);
-        int client_number = Integer.parseInt(args[1]);
-        int size = Integer.parseInt(args[2]);
-        String server_name = args[3];
-        int server_port = Integer.parseInt(args[4]);
+
+
+        int serverListeningPort = Integer.parseInt(args[0]);
+        int numberOfClients = Integer.parseInt(args[1]);
+        int window_size = Integer.parseInt(args[2]);
+        String server_name = args[3];                           // id_process
+        int serverConnectionPort = Integer.parseInt(args[4]);
         float ack_probability = Float.parseFloat(args[5]);
         String filename = args[6];
+        
+        
         try {
             Thread server_thread = new Thread(() -> {
                 try {
-                    start_server(port, client_number, size, filename, ack_probability);
+                    start_server(serverListeningPort, numberOfClients, window_size, filename, ack_probability);
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
                 }
             });
 
             List<Thread> client_threads = new ArrayList<>();
-            for (int i = 0; i < client_number; i++) {
+            for (int i = 0; i < numberOfClients; i++) {
                 Thread client_thread = new Thread(() -> {
                     try {
-                        start_client(server_name, port);
+                        start_client(server_name, serverConnectionPort);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
