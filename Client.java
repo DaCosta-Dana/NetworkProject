@@ -10,6 +10,7 @@ class Client {
     private int retransmissions_received;
     private List<Integer> list_ack;
     
+    // Constructor to initialize the Client
     public Client(DatagramSocket socket, int serverConnectionPort) {
         this.socket = socket;
         this.total_bytes_received = 0;
@@ -17,6 +18,14 @@ class Client {
         this.list_ack = new ArrayList<>();
     }
     
+    /**
+     * Sends acknowledgment for a specific packet to the server.
+     *
+     * @param packet_id       The ID of the received packet.
+     * @param server_address  The InetAddress of the server.
+     * @return                True if the acknowledgment is sent successfully.
+     * @throws Exception      If an exception occurs during acknowledgment sending.
+     */
     public boolean send_ack(int packet_id, InetAddress server_address) throws Exception {
         System.out.println("Client: Acknowledgment for Packet ID " + packet_id + " sent successfully");
         byte[] acknowledgment = Integer.toString(packet_id).getBytes();
@@ -27,6 +36,11 @@ class Client {
         return true;
     }
 
+    /**
+     * Receives data packets from the server until the "finished" signal is received.
+     *
+     * @throws Exception  If an exception occurs during data packet reception.
+     */
     public void receive_data() throws Exception {
         while (true) {
             // Create buffer to store incoming data packets
@@ -50,6 +64,7 @@ class Client {
             total_bytes_received += modified_message.length();
         }
 
+        // Close the socket after the transfer is finished
         socket.close();
     }
 }

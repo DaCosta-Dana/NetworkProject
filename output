@@ -1,0 +1,389 @@
+# to check 
+The assigned port is 52335
+The server is waiting for clients to connect...
+Server: Client connected: /127.0.0.1:65117
+Server: Client connected: /127.0.0.1:64004
+Server: All clients connected.
+Server: Thread for client 65117 started.
+Server: Thread for client 64004 started.
+Server: 0.0000 >> Data sent to client 64004, Packet ID: 0
+Server: 0.0010 >> Data sent to client 65117, Packet ID: 0
+Client: Received packet with ID: 0
+Client: Received packet with ID: 0
+Client: Acknowledgment for Packet ID 0 sent successfully
+Client: Acknowledgment for Packet ID 0 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 0 has been sent
+Server: 0.5040 >> Data sent to client 64004, Packet ID: 0
+Client: Received packet with ID: 0
+Client: Acknowledgment for Packet ID 0 sent successfully
+Server: 0.5050 >> Data sent to client 64004, Packet ID: 1
+Client: Received packet with ID: 1
+Client: Acknowledgment for Packet ID 1 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 0 has been sent
+Server: 1.0070 >> Data sent to client 65117, Packet ID: 0
+Client: Received packet with ID: 0
+Client: Acknowledgment for Packet ID 0 sent successfully
+Server: Packet with ID : 1 lost
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 1 has been sent
+Server: 1.5070 >> Data sent to client 64004, Packet ID: 1
+Client: Received packet with ID: 1
+Client: Acknowledgment for Packet ID 1 sent successfully
+Server: 1.5080 >> Data sent to client 64004, Packet ID: 2
+Server: Retransmission for packet 1 has been sent
+Server: 1.5100 >> Data sent to client 65117, Packet ID: 1
+Client: Received packet with ID: 2
+Client: Acknowledgment for Packet ID 2 sent successfully
+Client: Received packet with ID: 1
+Client: Acknowledgment for Packet ID 1 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 1 has been sent
+Server: 2.0120 >> Data sent to client 65117, Packet ID: 1
+Client: Received packet with ID: 1
+Client: Acknowledgment for Packet ID 1 sent successfully
+Server: 2.0140 >> Data sent to client 65117, Packet ID: 2
+Client: Received packet with ID: 2
+Client: Acknowledgment for Packet ID 2 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 2 has been sent
+Server: 2.5140 >> Data sent to client 64004, Packet ID: 2
+Server: 2.5160 >> Data sent to client 64004, Packet ID: 3
+Client: Received packet with ID: 2
+Client: Acknowledgment for Packet ID 2 sent successfully
+Client: Received packet with ID: 3
+Client: Acknowledgment for Packet ID 3 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 2 has been sent
+Server: 3.0190 >> Data sent to client 65117, Packet ID: 2
+Client: Received packet with ID: 2
+Client: Acknowledgment for Packet ID 2 sent successfully
+Server: 3.0200 >> Data sent to client 65117, Packet ID: 3
+Client: Received packet with ID: 3
+Client: Acknowledgment for Packet ID 3 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 3 has been sent
+Server: 3.5200 >> Data sent to client 64004, Packet ID: 3
+Client: Received packet with ID: 3
+Client: Acknowledgment for Packet ID 3 sent successfully
+Server: 3.5210 >> Data sent to client 64004, Packet ID: 4
+Client: Received packet with ID: 4
+Client: Acknowledgment for Packet ID 4 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 3 has been sent
+Server: 4.0230 >> Data sent to client 65117, Packet ID: 3
+Client: Received packet with ID: 3
+Client: Acknowledgment for Packet ID 3 sent successfully
+Server: 4.0240 >> Data sent to client 65117, Packet ID: 4
+Client: Received packet with ID: 4
+Client: Acknowledgment for Packet ID 4 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 4 has been sent
+Server: 4.5250 >> Data sent to client 64004, Packet ID: 4
+Server: 4.5260 >> Data sent to client 64004, Packet ID: 5
+Client: Received packet with ID: 4
+Client: Acknowledgment for Packet ID 4 sent successfully
+Client: Received packet with ID: 5
+Client: Acknowledgment for Packet ID 5 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 4 has been sent
+Server: 5.0290 >> Data sent to client 65117, Packet ID: 4
+Client: Received packet with ID: 4
+Client: Acknowledgment for Packet ID 4 sent successfully
+Server: 5.0300 >> Data sent to client 65117, Packet ID: 5
+Client: Received packet with ID: 5
+Client: Acknowledgment for Packet ID 5 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 5 has been sent
+Server: 5.5300 >> Data sent to client 64004, Packet ID: 5
+Server: 5.5320 >> Data sent to client 64004, Packet ID: 6
+Client: Received packet with ID: 5
+Client: Acknowledgment for Packet ID 5 sent successfully
+Client: Received packet with ID: 6
+Client: Acknowledgment for Packet ID 6 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 6 has been sent
+Server: 6.0330 >> Data sent to client 64004, Packet ID: 6
+Client: Received packet with ID: 6
+Client: Acknowledgment for Packet ID 6 sent successfully
+Server: 6.0340 >> Data sent to client 64004, Packet ID: 7
+Client: Received packet with ID: 7
+Client: Acknowledgment for Packet ID 7 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 5 has been sent
+Server: 6.5350 >> Data sent to client 65117, Packet ID: 5
+Client: Received packet with ID: 5
+Client: Acknowledgment for Packet ID 5 sent successfully
+Server: 6.5360 >> Data sent to client 65117, Packet ID: 6
+Client: Received packet with ID: 6
+Client: Acknowledgment for Packet ID 6 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 7 has been sent
+Server: 7.0360 >> Data sent to client 64004, Packet ID: 7
+Client: Received packet with ID: 7
+Client: Acknowledgment for Packet ID 7 sent successfully
+Server: 7.0380 >> Data sent to client 64004, Packet ID: 8
+Client: Received packet with ID: 8
+Client: Acknowledgment for Packet ID 8 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 6 has been sent
+Server: 7.5390 >> Data sent to client 65117, Packet ID: 6
+Client: Received packet with ID: 6
+Client: Acknowledgment for Packet ID 6 sent successfully
+Server: 7.5390 >> Data sent to client 65117, Packet ID: 7
+Client: Received packet with ID: 7
+Client: Acknowledgment for Packet ID 7 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 8 has been sent
+Server: 8.0390 >> Data sent to client 64004, Packet ID: 8
+Client: Received packet with ID: 8
+Client: Acknowledgment for Packet ID 8 sent successfully
+Server: 8.0390 >> Data sent to client 64004, Packet ID: 9
+Client: Received packet with ID: 9
+Client: Acknowledgment for Packet ID 9 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 7 has been sent
+Server: 8.5410 >> Data sent to client 65117, Packet ID: 7
+Client: Received packet with ID: 7
+Client: Acknowledgment for Packet ID 7 sent successfully
+Server: 8.5410 >> Data sent to client 65117, Packet ID: 8
+Client: Received packet with ID: 8
+Client: Acknowledgment for Packet ID 8 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 9 has been sent
+Server: 9.0410 >> Data sent to client 64004, Packet ID: 9
+Client: Received packet with ID: 9
+Client: Acknowledgment for Packet ID 9 sent successfully
+Server: 9.0430 >> Data sent to client 64004, Packet ID: 10
+Client: Received packet with ID: 10
+Client: Acknowledgment for Packet ID 10 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 10 has been sent
+Server: 9.5440 >> Data sent to client 64004, Packet ID: 10
+Client: Received packet with ID: 10
+Client: Acknowledgment for Packet ID 10 sent successfully
+Server: 9.5450 >> Data sent to client 64004, Packet ID: 11
+Client: Received packet with ID: 11
+Client: Acknowledgment for Packet ID 11 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 8 has been sent
+Server: 10.0470 >> Data sent to client 65117, Packet ID: 8
+Server: 10.0480 >> Data sent to client 65117, Packet ID: 9
+Client: Received packet with ID: 8
+Client: Acknowledgment for Packet ID 8 sent successfully
+Client: Received packet with ID: 9
+Client: Acknowledgment for Packet ID 9 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 9 has been sent
+Server: 10.5490 >> Data sent to client 65117, Packet ID: 9
+Client: Received packet with ID: 9
+Client: Acknowledgment for Packet ID 9 sent successfully
+Server: 10.5490 >> Data sent to client 65117, Packet ID: 10
+Client: Received packet with ID: 10
+Client: Acknowledgment for Packet ID 10 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 11 has been sent
+Server: 11.0490 >> Data sent to client 64004, Packet ID: 11
+Client: Received packet with ID: 11
+Client: Acknowledgment for Packet ID 11 sent successfully
+Server: 11.0490 >> Data sent to client 64004, Packet ID: 12
+Client: Received packet with ID: 12
+Client: Acknowledgment for Packet ID 12 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 10 has been sent
+Server: 11.5510 >> Data sent to client 65117, Packet ID: 10
+Client: Received packet with ID: 10
+Client: Acknowledgment for Packet ID 10 sent successfully
+Server: 11.5520 >> Data sent to client 65117, Packet ID: 11
+Client: Received packet with ID: 11
+Client: Acknowledgment for Packet ID 11 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 12 has been sent
+Server: 12.0510 >> Data sent to client 64004, Packet ID: 12
+Client: Received packet with ID: 12
+Client: Acknowledgment for Packet ID 12 sent successfully
+Server: 12.0520 >> Data sent to client 64004, Packet ID: 13
+Client: Received packet with ID: 13
+Client: Acknowledgment for Packet ID 13 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 11 has been sent
+Server: 12.5540 >> Data sent to client 65117, Packet ID: 11
+Client: Received packet with ID: 11
+Client: Acknowledgment for Packet ID 11 sent successfully
+Server: 12.5550 >> Data sent to client 65117, Packet ID: 12
+Client: Received packet with ID: 12
+Client: Acknowledgment for Packet ID 12 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 13 has been sent
+Server: 13.0550 >> Data sent to client 64004, Packet ID: 13
+Client: Received packet with ID: 13
+Client: Acknowledgment for Packet ID 13 sent successfully
+Server: 13.0560 >> Data sent to client 64004, Packet ID: 14
+Client: Received packet with ID: 14
+Client: Acknowledgment for Packet ID 14 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 12 has been sent
+Server: 13.5580 >> Data sent to client 65117, Packet ID: 12
+Client: Received packet with ID: 12
+Client: Acknowledgment for Packet ID 12 sent successfully
+Server: 13.5590 >> Data sent to client 65117, Packet ID: 13
+Client: Received packet with ID: 13
+Client: Acknowledgment for Packet ID 13 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 14 has been sent
+Server: 14.0590 >> Data sent to client 64004, Packet ID: 14
+Client: Received packet with ID: 14
+Client: Acknowledgment for Packet ID 14 sent successfully
+Server: 14.0600 >> Data sent to client 64004, Packet ID: 15
+Client: Received packet with ID: 15
+Client: Acknowledgment for Packet ID 15 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 13 has been sent
+Server: 14.5620 >> Data sent to client 65117, Packet ID: 13
+Client: Received packet with ID: 13
+Client: Acknowledgment for Packet ID 13 sent successfully
+Server: 14.5630 >> Data sent to client 65117, Packet ID: 14
+Client: Received packet with ID: 14
+Client: Acknowledgment for Packet ID 14 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 15 has been sent
+Server: 15.0620 >> Data sent to client 64004, Packet ID: 15
+Client: Received packet with ID: 15
+Client: Acknowledgment for Packet ID 15 sent successfully
+Server: 15.0640 >> Data sent to client 64004, Packet ID: 16
+Client: Received packet with ID: 16
+Client: Acknowledgment for Packet ID 16 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 16 has been sent
+Server: 15.5640 >> Data sent to client 64004, Packet ID: 16
+Client: Received packet with ID: 16
+Client: Acknowledgment for Packet ID 16 sent successfully
+Server: 15.5650 >> Data sent to client 64004, Packet ID: 17
+Client: Received packet with ID: 17
+Client: Acknowledgment for Packet ID 17 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 14 has been sent
+Server: 16.0660 >> Data sent to client 65117, Packet ID: 14
+Server: 16.0670 >> Data sent to client 65117, Packet ID: 15
+Client: Received packet with ID: 14
+Client: Acknowledgment for Packet ID 14 sent successfully
+Client: Received packet with ID: 15
+Client: Acknowledgment for Packet ID 15 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 17 has been sent
+Server: 16.5660 >> Data sent to client 64004, Packet ID: 17
+Client: Received packet with ID: 17
+Client: Acknowledgment for Packet ID 17 sent successfully
+Server: 16.5660 >> Data sent to client 64004, Packet ID: 18
+Client: Received packet with ID: 18
+Client: Acknowledgment for Packet ID 18 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 15 has been sent
+Server: 17.0680 >> Data sent to client 65117, Packet ID: 15
+Client: Received packet with ID: 15
+Client: Acknowledgment for Packet ID 15 sent successfully
+Server: 17.0680 >> Data sent to client 65117, Packet ID: 16
+Client: Received packet with ID: 16
+Client: Acknowledgment for Packet ID 16 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 18 has been sent
+Server: 17.5690 >> Data sent to client 64004, Packet ID: 18
+Client: Received packet with ID: 18
+Client: Acknowledgment for Packet ID 18 sent successfully
+Server: Packet with ID : 19 lost
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 16 has been sent
+Server: 18.0710 >> Data sent to client 65117, Packet ID: 16
+Client: Received packet with ID: 16
+Client: Acknowledgment for Packet ID 16 sent successfully
+Server: Retransmission for packet 19 has been sent
+Server: 18.0720 >> Data sent to client 65117, Packet ID: 17
+Server: 18.0710 >> Data sent to client 64004, Packet ID: 19
+Client: Received packet with ID: 17
+Client: Acknowledgment for Packet ID 17 sent successfully
+Client: Received packet with ID: 19
+Client: Acknowledgment for Packet ID 19 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 19 has been sent
+Server: 18.5730 >> Data sent to client 64004, Packet ID: 19
+Client: Received packet with ID: 19
+Client: Acknowledgment for Packet ID 19 sent successfully
+Server: 18.5740 >> Data sent to client 64004, Packet ID: 20
+Client: Received packet with ID: 20
+Client: Acknowledgment for Packet ID 20 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 17 has been sent
+Server: 19.0760 >> Data sent to client 65117, Packet ID: 17
+Client: Received packet with ID: 17
+Client: Acknowledgment for Packet ID 17 sent successfully
+Server: 19.0770 >> Data sent to client 65117, Packet ID: 18
+Client: Received packet with ID: 18
+Client: Acknowledgment for Packet ID 18 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 20 has been sent
+Server: 19.5770 >> Data sent to client 64004, Packet ID: 20
+Client: Received packet with ID: 20
+Client: Acknowledgment for Packet ID 20 sent successfully
+Server: 19.5780 >> Data sent to client 64004, Packet ID: 21
+Client: Received packet with ID: 21
+Client: Acknowledgment for Packet ID 21 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 18 has been sent
+Server: 20.0800 >> Data sent to client 65117, Packet ID: 18
+Client: Received packet with ID: 18
+Client: Acknowledgment for Packet ID 18 sent successfully
+Server: 20.0810 >> Data sent to client 65117, Packet ID: 19
+Client: Received packet with ID: 19
+Client: Acknowledgment for Packet ID 19 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 21 has been sent
+Server: 20.5800 >> Data sent to client 64004, Packet ID: 21
+Client: Received packet with ID: 21
+Client: Acknowledgment for Packet ID 21 sent successfully
+Server: 20.5810 >> Data sent to client 64004, Packet ID: 22
+Client: Received packet with ID: 22
+Client: Acknowledgment for Packet ID 22 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 19 has been sent
+Server: 21.0820 >> Data sent to client 65117, Packet ID: 19
+Client: Received packet with ID: 19
+Client: Acknowledgment for Packet ID 19 sent successfully
+Server: 21.0830 >> Data sent to client 65117, Packet ID: 20
+Client: Received packet with ID: 20
+Client: Acknowledgment for Packet ID 20 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 22 has been sent
+Server: 21.5820 >> Data sent to client 64004, Packet ID: 22
+Client: Received packet with ID: 22
+Client: Acknowledgment for Packet ID 22 sent successfully
+Server: Thread for client 64004 finished.
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 20 has been sent
+Server: 22.0850 >> Data sent to client 65117, Packet ID: 20
+Client: Received packet with ID: 20
+Client: Acknowledgment for Packet ID 20 sent successfully
+Server: 22.0860 >> Data sent to client 65117, Packet ID: 21
+Client: Received packet with ID: 21
+Client: Acknowledgment for Packet ID 21 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 21 has been sent
+Server: 22.5880 >> Data sent to client 65117, Packet ID: 21
+Client: Received packet with ID: 21
+Client: Acknowledgment for Packet ID 21 sent successfully
+Server: 22.5890 >> Data sent to client 65117, Packet ID: 22
+Client: Received packet with ID: 22
+Client: Acknowledgment for Packet ID 22 sent successfully
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 22 has been sent
+Server: 23.0900 >> Data sent to client 65117, Packet ID: 22
+Client: Received packet with ID: 22
+Server: Thread for client 65117 finished.
+Client: Acknowledgment for Packet ID 22 sent successfully
+Server: No more data to send.
+Server: All packets sent and acknowledged. Transfer finished.
+Server: Total Bytes Sent: 188968
+Server: Total Retransmissions Sent: 48
+Server: Total Time Spent: 23.1030 seconds
+Client: Transfer finished
+Client: Transfer finished

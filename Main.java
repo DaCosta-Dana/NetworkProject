@@ -101,7 +101,7 @@ public class Main {
         System.out.println("The assigned port is " + assignedPort);
 
         // Wait for clients to connect
-        System.out.println("The server is waiting for clients to connect");
+        System.out.println("The server is waiting for clients to connect...");
         server.waitForConnections();
 
         // Initialize a list to store threads
