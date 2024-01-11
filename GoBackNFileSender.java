@@ -99,8 +99,6 @@ class GoBackNFileSender {
     }
     
     // Private method to handle sending data to a specific client
-// Private method to handle sending data to a specific client
-// Modify the sendToClient method
     private void sendToClient(InetSocketAddress clientAddress, double ack_probability) throws SocketTimeoutException {
         int clientId = clientAddress.getPort();
         System.out.printf("Server: Thread for client %d started.%n", clientId);
@@ -108,8 +106,6 @@ class GoBackNFileSender {
         try {
             long startTime = System.currentTimeMillis();
             int base = 0;
-
-            clientSocket.setSoTimeout(ACK_TIMEOUT);
 
             while (base < fileSize / 2048) {
                 int windowEnd = (int) Math.min(base + windowSize, fileSize / 2048);
@@ -124,7 +120,6 @@ class GoBackNFileSender {
 
                             // Handle packet loss by retransmitting and waiting for acknowledgment
                             retransmitPacketsAndWait(startTime, clientAddress, packetId);
-                            //packetId--;  // Retry the same packet in the next iteration
                         } else {
                             // Send the packet to the client
                             sendPacket(packetId, clientAddress, startTime);
@@ -137,7 +132,10 @@ class GoBackNFileSender {
                     }
                 }
 
-                // Wait for acknowledgment for all packets from all clients in the current window
+                // Set a timeout for acknowledgment reception
+                clientSocket.setSoTimeout(ACK_TIMEOUT);
+
+                // Wait for acknowledgment for all packets from the current window
                 for (int packetId = base; packetId < windowEnd; packetId++) {
                     for (InetSocketAddress addr : clientAddresses) {
                         receiveAck(startTime, addr, packetId);
@@ -147,8 +145,8 @@ class GoBackNFileSender {
                 // Move to the next window
                 base = windowEnd;
 
-                // Reset acknowledged packets for the next window
-                acknowledgedPackets.clear();
+                // Reset socket timeout to 0 (infinite)
+                clientSocket.setSoTimeout(0);
             }
 
             long endTime = System.currentTimeMillis();
@@ -161,6 +159,7 @@ class GoBackNFileSender {
 
         System.out.printf("Server: Thread for client %d finished.%n", clientId);
     }
+
 
     // Private method to slide the window after receiving acknowledgments
         //TODO: In the slideWindow method, update the acknowledgment state after sliding the window
@@ -179,45 +178,54 @@ class GoBackNFileSender {
     }
 
     // Private method to receive acknowledgment from the client
+    // Private method to receive acknowledgment from the client
     private int receiveAck(long startTime, InetSocketAddress clientAddress, int lastAckedPacketId) throws SocketException {
         byte[] ackMessage = new byte[2048];
         DatagramPacket ackPacket = new DatagramPacket(ackMessage, ackMessage.length);
-    
+
         listAckLock.lock();
         try {
             // Set a timeout for acknowledgment reception
             clientSocket.setSoTimeout(ACK_TIMEOUT);
-    
+
+            // Check if the socket is still open
+            if (clientSocket.isClosed()) {
+                return lastAckedPacketId;
+            }
+
             try {
                 clientSocket.receive(ackPacket);
-            } catch (SocketTimeoutException e) {
-                // Handle timeout - retransmit the packets if needed
-                System.out.println("Server: Acknowledgment timeout. Retransmitting packets...");
-                retransmitPacketsAndWait(startTime, clientAddress, lastAckedPacketId);
-                return lastAckedPacketId;
             } catch (IOException e) {
                 // Handle other IOException, e.g., log or retry
                 e.printStackTrace();
                 return lastAckedPacketId;
             }
-    
+
             if (ackPacket.getLength() > 0) {
-                int ackId = Integer.parseInt(new String(ackPacket.getData(), 0, ackPacket.getLength()));
-    
-                // Find the client that sent the acknowledgment
-                InetSocketAddress clientAddr = findClientAddress(clientAddresses, ackPacket.getSocketAddress());
-    
-                // Update acknowledgment state for the specific client
-                processAck(ackId, clientAddress, startTime, clientAddr);
-    
-                //System.out.printf("Server: %.4f >> Acknowledgment received from client %d for Packet ID: %d%n", timeTaken / 1000.0, clientAddr.getPort(), ackId);
+                // Simulate acknowledgment loss based on acknowledgment probability
+                if (Math.random() >= ack_probability) {
+                    int ackId = Integer.parseInt(new String(ackPacket.getData(), 0, ackPacket.getLength()));
+        
+                    // Find the client that sent the acknowledgment
+                    InetSocketAddress clientAddr = findClientAddress(clientAddresses, ackPacket.getSocketAddress());
+        
+                    // Update acknowledgment state for the specific client
+                    processAck(ackId, clientAddress, startTime, clientAddr);
+        
+                    //System.out.printf("Server: %.4f >> Acknowledgment received from client %d for Packet ID: %d%n", timeTaken / 1000.0, clientAddr.getPort(), ackId);
+                } else {
+                    System.out.println("Server: Acknowledgment lost");
+                    // Handle acknowledgment loss, e.g., log or take appropriate action
+                    // You might choose to retransmit the packets or perform other actions
+                }
             }
         } finally {
             listAckLock.unlock();
         }
-    
+
         return lastAckedPacketId;
     }
+
     
     // Private method to find the client address in the list of client addresses
     private InetSocketAddress findClientAddress(List<InetSocketAddress> clientAddresses, SocketAddress address) {
