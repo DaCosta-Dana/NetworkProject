@@ -334,7 +334,7 @@ class GoBackNFileSender {
                 } catch (SocketTimeoutException e) {
                     e.printStackTrace();
                 } catch (SocketException e) {
-                    // TODO Auto-generated catch block
+                    
                     e.printStackTrace();
                 }
             });
