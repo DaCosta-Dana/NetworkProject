@@ -99,9 +99,11 @@ class GoBackNFileSender {
     }
     
     // Private method to handle sending data to a specific client
-    private void sendToClient(InetSocketAddress clientAddress, double ack_probability) throws SocketTimeoutException {
+    private void sendToClient(InetSocketAddress clientAddress, double ack_probability) throws SocketTimeoutException, SocketException {
         int clientId = clientAddress.getPort();
         System.out.printf("Server: Thread for client %d started.%n", clientId);
+
+        clientSocket.setSoTimeout(ACK_TIMEOUT);
 
         try {
             long startTime = System.currentTimeMillis();
@@ -135,12 +137,15 @@ class GoBackNFileSender {
                 // Set a timeout for acknowledgment reception
                 clientSocket.setSoTimeout(ACK_TIMEOUT);
 
-                // Wait for acknowledgment for all packets from the current window
+               // Wait for acknowledgment for all packets from the current window
                 for (int packetId = base; packetId < windowEnd; packetId++) {
                     for (InetSocketAddress addr : clientAddresses) {
                         receiveAck(startTime, addr, packetId);
                     }
                 }
+
+                // Reset socket timeout to 0 (infinite)
+                clientSocket.setSoTimeout(0);
 
                 // Move to the next window
                 base = windowEnd;
@@ -177,22 +182,20 @@ class GoBackNFileSender {
         baseMap.put(clientAddress, nextSeqNumMap.get(clientAddress));
     }
 
-    // Private method to receive acknowledgment from the client
-    // Private method to receive acknowledgment from the client
-    private int receiveAck(long startTime, InetSocketAddress clientAddress, int lastAckedPacketId) throws SocketException {
+    private int receiveAck(long startTime, InetSocketAddress clientAddress, int lastAckedPacketId) throws SocketException, SocketTimeoutException {
         byte[] ackMessage = new byte[2048];
         DatagramPacket ackPacket = new DatagramPacket(ackMessage, ackMessage.length);
-
+    
         listAckLock.lock();
         try {
             // Set a timeout for acknowledgment reception
             clientSocket.setSoTimeout(ACK_TIMEOUT);
-
+    
             // Check if the socket is still open
             if (clientSocket.isClosed()) {
                 return lastAckedPacketId;
             }
-
+    
             try {
                 clientSocket.receive(ackPacket);
             } catch (IOException e) {
@@ -200,32 +203,32 @@ class GoBackNFileSender {
                 e.printStackTrace();
                 return lastAckedPacketId;
             }
-
+    
             if (ackPacket.getLength() > 0) {
                 // Simulate acknowledgment loss based on acknowledgment probability
                 if (Math.random() >= ack_probability) {
                     int ackId = Integer.parseInt(new String(ackPacket.getData(), 0, ackPacket.getLength()));
-        
+    
                     // Find the client that sent the acknowledgment
                     InetSocketAddress clientAddr = findClientAddress(clientAddresses, ackPacket.getSocketAddress());
-        
+    
                     // Update acknowledgment state for the specific client
                     processAck(ackId, clientAddress, startTime, clientAddr);
-        
-                    //System.out.printf("Server: %.4f >> Acknowledgment received from client %d for Packet ID: %d%n", timeTaken / 1000.0, clientAddr.getPort(), ackId);
                 } else {
                     System.out.println("Server: Acknowledgment lost");
                     // Handle acknowledgment loss, e.g., log or take appropriate action
                     // You might choose to retransmit the packets or perform other actions
                 }
+            } else {
+                System.out.println("Server: Received an empty acknowledgment packet");
             }
+            
         } finally {
             listAckLock.unlock();
         }
-
+    
         return lastAckedPacketId;
     }
-
     
     // Private method to find the client address in the list of client addresses
     private InetSocketAddress findClientAddress(List<InetSocketAddress> clientAddresses, SocketAddress address) {
@@ -307,6 +310,13 @@ class GoBackNFileSender {
             System.out.printf("Server: %.4f >> Acknowledgment received from client %d for Packet ID: %d%n", timeTaken / 1000.0, actualClientAddress.getPort(), ackId);
         }
     }
+
+    // Add a close method to close the DatagramSocket
+    public void close() {
+        if (clientSocket != null && !clientSocket.isClosed()) {
+            clientSocket.close();
+        }
+    }
     
     // Public method to initiate the file transfer to all clients
     // Update the sendFile method
@@ -322,6 +332,9 @@ class GoBackNFileSender {
                 try {
                     sendToClient(clientAddress, ack_probability);
                 } catch (SocketTimeoutException e) {
+                    e.printStackTrace();
+                } catch (SocketException e) {
+                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             });
@@ -343,6 +356,7 @@ class GoBackNFileSender {
         totalTimeSpent = endTime - startTime;
     
         if (end) {
+            close();
             System.out.println("Server: No more data to send.");
             System.out.println("Server: All packets sent and acknowledged. Transfer finished.");
             System.out.printf("Server: Total Bytes Sent: %d%n", totalBytesSent);
