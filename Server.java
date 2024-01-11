@@ -40,15 +40,15 @@ class Server {
 
             // Byte array with a lenght of 2048 bytes 
             byte[] receivedData = new byte[2048];       //to store the data that will be received from the 'receivedPacket'.
-            DatagramPacket receivedPacket = new DatagramPacket(receivedData, receivedData.length); 
+            DatagramPacket receivePacket = new DatagramPacket(receivedData, receivedData.length); 
                 //first parameter = where the received data will be stored
                 //second parameter = maximum amount of data that the packet can hold
             
             // Wait for and receive incoming connection requests
-            serverSocket.receive(receivedPacket);       //= blocking call, meaning it will wait until a packet is received.
+            serverSocket.receive(receivePacket);       //= blocking call, meaning it will wait until a packet is received.
     
             // Retrieve the actual size of the data
-            int dataSize = receivedPacket.getLength();
+            int dataSize = receivePacket.getLength();
     
             // Create a new array to hold exactly the received data
             byte[] actualData = new byte[dataSize];
@@ -62,11 +62,11 @@ class Server {
             // Check if the received message is a connection request (e.g., "1")
             if (messageString.equals("1")) {
                 // Print information about the connected client
-                System.out.printf("Server: Client connected - IP: %s, Port: %d%n", receivedPacket.getAddress().getHostAddress(), receivedPacket.getPort());   
+                System.out.printf("Server: Client connected - IP: %s, Port: %d%n", receivePacket.getAddress().getHostAddress(), receivePacket.getPort());   
                        //e.g., Server: Client connected - IP: 127.0.0.1, Port: 56463 -> client with IP address "127.0.0.1" has connected to the server using port "56463"
                 
                 // Add the client's address to the list of connected clients
-                clientAddresses.add((InetSocketAddress) receivedPacket.getSocketAddress());
+                clientAddresses.add((InetSocketAddress) receivePacket.getSocketAddress());
 
             }
         }

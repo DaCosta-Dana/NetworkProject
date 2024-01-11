@@ -65,6 +65,7 @@ public class Main {
 
             // Start threads for each client
             for (int i = 0; i < numberOfClients; i++) {
+                // Start a client in a separate thread
                 Thread client_thread = new Thread(() -> {
                     try {
                         start_client(server_id);
@@ -73,6 +74,7 @@ public class Main {
                         e.printStackTrace();
                     }
                 });
+
                 client_threads.add(client_thread);
             }
 
@@ -136,33 +138,27 @@ public class Main {
 
     public static void start_client(String server_id) throws Exception {
         try {
-            // Pause for 1 second to allow the server to start
-            Thread.sleep(1000);
-
             // Create a DatagramSocket for the client
             DatagramSocket clientSocket = new DatagramSocket();
 
+            // Get the server IP Address using the server_id (e.g. localhost)
+            InetAddress serverIPAddress = InetAddress.getByName(server_id);
+            
             // Prepare the message to send and connect to the server
             String connectionRequestMessage = "1";
             byte[] sendData = connectionRequestMessage.getBytes();
 
-            // Get the InetAddress for the server using the server_id (e.g. localhost)
-            InetAddress serverAddress = InetAddress.getByName(server_id);
-            
-            // Access the assigned port from the shared variable
-            int getAssignedPort = assignedPort.get();
-
             // Create a DatagramPacket to send the data to the server
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, getAssignedPort);
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverIPAddress, assignedPort.get());
             
             // Send the packet to the server
             clientSocket.send(sendPacket);
 
             // Create a client instance to receive data from the server
-            Client receiver = new Client(clientSocket, getAssignedPort);
+            Client client = new Client(clientSocket, assignedPort.get());
 
             // Receive data from the server
-            receiver.receive_data();
+            client.receive_data();
             
         } catch (IOException e) {
             e.printStackTrace();
