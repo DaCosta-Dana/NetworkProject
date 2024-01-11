@@ -38,11 +38,12 @@ class Server {
         // Loop used to continuously wait for connections from cliens until the desired numberOfClients
         while (clientAddresses.size() < numberOfClients) {
 
-            // Byte array with a lenght of 2048 bytes 
-            byte[] receivedData = new byte[2048];       //to store the data that will be received from the 'receivedPacket'.
-            DatagramPacket receivePacket = new DatagramPacket(receivedData, receivedData.length); 
-                //first parameter = where the received data will be stored
-                //second parameter = maximum amount of data that the packet can hold
+            // Create buffer to store incoming data packets
+            byte[] buffer = new byte[2048];        // length of 2048 bytes (TODO: can be changed)
+            
+            // Create a DatagramPacket to receive data packet from the client
+            DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length); 
+                //second parameter "buffer.length" = maximum amount of data that the packet can hold
             
             // Wait for and receive incoming connection requests
             serverSocket.receive(receivePacket);       //= blocking call, meaning it will wait until a packet is received.
@@ -54,7 +55,7 @@ class Server {
             byte[] actualData = new byte[dataSize];
 
             // Copy data from 'receivedData' to 'actualData' to ensure that only the actual received data is considered
-            System.arraycopy(receivedData, 0, actualData, 0, dataSize);
+            System.arraycopy(buffer, 0, actualData, 0, dataSize);
     
             // Convert the data into a string if necessary
             String messageString = new String(actualData);
