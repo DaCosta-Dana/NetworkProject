@@ -63,12 +63,19 @@ public class Main {
 
     public static void main(String[] args) {
 
-        if (args.length != 7) {
-            System.out.println("Usage: java Main <server_id> <serverListeningPort> <numberOfClients> <serverConnectionPort> <filename> <probability> <window_size>");
+        if (args.length != 5) {
+            System.out.println("""
+                Usage: java Main <id_process> <number_of_processes> <filename> <probability> <window_size>
+                \n<id_process>            = server ID/name 
+                \n<number_of_processes>   = number of clients
+                \n<filename>              = file to be send to each client
+                \n<probability>           = probability of an UDP send not to be successful
+                \n<window_size>           = size of the window for Go-back-N
+                """);
             
             /*  COPY TO TERMINAL
                 javac Main.java
-                java Main localhost 12000 2 12000 file.txt 0.1 3
+                java Main localhost 2 file.txt 0.1 3
              */
 
              /* TODO: do we need the port? */
@@ -79,14 +86,10 @@ public class Main {
 
 
         String server_id = args[0];                             // id_process = localhost
-        // int serverListeningPort = Integer.parseInt(args[1]);
-        
-        int numberOfClients = Integer.parseInt(args[2]);
-        // int serverConnectionPort = Integer.parseInt(args[3]);
-
-        String filename = args[4];
-        float probability = Float.parseFloat(args[5]);          // probability of an UDP send not to be successful to simulate network errors
-        int window_size = Integer.parseInt(args[6]);
+        int numberOfClients = Integer.parseInt(args[1]);
+        String filename = args[2];
+        float probability = Float.parseFloat(args[3]);          // 
+        int window_size = Integer.parseInt(args[4]);
        
         // // for debugging
         // String server_id = "localhost";
