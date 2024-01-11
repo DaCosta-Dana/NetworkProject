@@ -3,18 +3,22 @@ import java.net.*;
 import java.util.*;
 
 class Server {
-    private int serverListeningPort;
+    
     private UnreliableSender sender;
     private int clientNumber;
     DatagramSocket serverSocket;
     List<InetSocketAddress> clientAddresses;
     
-    public Server(int serverListeningPort, int clientNumber) throws SocketException {
-        this.serverListeningPort = serverListeningPort;
+    public Server(int clientNumber) throws SocketException {
         this.clientNumber = clientNumber;
-        this.serverSocket = new DatagramSocket(serverListeningPort);
+        this.serverSocket = new DatagramSocket(); //initialise serverSocket without specifying a port
         this.clientAddresses = new ArrayList<>();
         this.sender = new UnreliableSender(serverSocket);
+    }
+
+    // method to retrieve the dynamically assigned port
+    public int getAssignedPort() {
+        return serverSocket.getLocalPort();
     }
 
     private boolean send(byte[] data, InetAddress address, int port) throws IOException {
