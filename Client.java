@@ -8,7 +8,7 @@ class Client {
     private int retransmissions_received;
     private List<Integer> list_ack;
     
-    public Client(DatagramSocket socket, int port) {
+    public Client(DatagramSocket socket, int serverConnectionPort) {
         this.socket = socket;
         this.total_bytes_received = 0;
         this.retransmissions_received = 0;
@@ -18,7 +18,7 @@ class Client {
     public boolean send_ack(int packet_id, InetAddress server_address) throws Exception {
         System.out.println("Client: Acknowledgment for Packet ID " + packet_id + " sent successfully");
         byte[] acknowledgment = Integer.toString(packet_id).getBytes();
-        DatagramPacket packet = new DatagramPacket(acknowledgment, acknowledgment.length, server_address, 12000);
+        DatagramPacket packet = new DatagramPacket(acknowledgment, acknowledgment.length, server_address, 12000); //need change
         socket.send(packet);
         list_ack.add(packet_id);
 
