@@ -59,6 +59,9 @@ public class Main {
                 java Main 12000 2 3 localhost 12000 0.1 file.txt
              */
 
+             /* TODO: do we need the port? */
+             /* TODO: include protocol (UDP) to the command line??? */
+
             System.exit(1);
         }
 
