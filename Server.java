@@ -3,12 +3,12 @@ import java.net.*;
 import java.util.*;
 
 class Server {
-    private int clientNumber;
+    private int numberOfClients;
     DatagramSocket serverSocket;
     List<InetSocketAddress> clientAddresses;
     
     public Server(int numberOfClients) throws SocketException {
-        this.clientNumber = numberOfClients;
+        this.numberOfClients = numberOfClients;
         this.serverSocket = new DatagramSocket(); //initialise serverSocket without specifying a port
         this.clientAddresses = new ArrayList<>();
     }
@@ -25,7 +25,7 @@ class Server {
     }
 
     public void waitForConnections() throws IOException {
-        while (clientAddresses.size() < clientNumber) {
+        while (clientAddresses.size() < numberOfClients) {
             byte[] message = new byte[2048];
             DatagramPacket packet = new DatagramPacket(message, message.length);
             serverSocket.receive(packet);
