@@ -1,206 +1,215 @@
 # this version's output 
-The assigned port is 62793
+The assigned port of the server socket is 56957
 The server is waiting for clients to connect...
-Server: Client connected: /127.0.0.1:51073
-Server: Client connected: /127.0.0.1:55247
+Server: Client connected - IP: 127.0.0.1, Port: 60962
+Server: Client connected - IP: 127.0.0.1, Port: 49695
 Server: All clients connected.
-Server: Thread for client 51073 started.
-Server: Thread for client 55247 started.
-Server: 0.0010 >> Data sent to client 55247, Packet ID: 0
+Server: Thread for client 60962 started.
+Server: Thread for client 49695 started.
+Server: 0.0000 >> Data sent to client 60962, Packet ID: 0
+Server: 0.0000 >> Data sent to client 49695, Packet ID: 0
 Client: Received packet with ID: 0
 Client: Acknowledgment for Packet ID 0 sent successfully
-Server: 0.0040 >> Acknowledgment received from client 55247 for Packet ID: 0
-Server: Packet with ID : 0 lost
-Server: Retransmission for packet 0 has been sent
-Server: 0.0050 >> Data sent to client 51073, Packet ID: 0
-Client: Received packet with ID: 1
-Client: Acknowledgment for Packet ID 1 sent successfully
-Server: 0.0050 >> Data sent to client 55247, Packet ID: 1
 Client: Received packet with ID: 0
 Client: Acknowledgment for Packet ID 0 sent successfully
-Server: 0.0060 >> Data sent to client 51073, Packet ID: 1
-Server: 0.0060 >> Acknowledgment received from client 51073 for Packet ID: 0
+Server: 0.0050 >> Acknowledgment received from client 49695 for Packet ID: 0
+Server: 0.0070 >> Data sent to client 60962, Packet ID: 1
+Server: 0.0070 >> Acknowledgment received from client 60962 for Packet ID: 0
 Client: Received packet with ID: 1
 Client: Acknowledgment for Packet ID 1 sent successfully
-Server: 0.0070 >> Data sent to client 55247, Packet ID: 2
+Server: 0.0080 >> Data sent to client 49695, Packet ID: 1
+Server: 0.0080 >> Acknowledgment received from client 60962 for Packet ID: 1
+Client: Received packet with ID: 1
+Client: Acknowledgment for Packet ID 1 sent successfully
+Server: 0.0080 >> Data sent to client 60962, Packet ID: 2
+Server: 0.0080 >> Acknowledgment received from client 49695 for Packet ID: 1
+Server: Packet with ID : 3 lost
+Server: Retransmission for packet 3 has been sent
 Client: Received packet with ID: 2
-Server: 0.0080 >> Acknowledgment received from client 51073 for Packet ID: 1
 Client: Acknowledgment for Packet ID 2 sent successfully
-Server: 0.0090 >> Data sent to client 51073, Packet ID: 2
-Server: 0.0090 >> Acknowledgment received from client 55247 for Packet ID: 2
-Client: Received packet with ID: 2
-Client: Acknowledgment for Packet ID 2 sent successfully
-Server: 0.0100 >> Data sent to client 55247, Packet ID: 3
-Server: 0.0100 >> Acknowledgment received from client 51073 for Packet ID: 2
+Server: 0.0090 >> Data sent to client 60962, Packet ID: 3
+Server: 0.0100 >> Acknowledgment received from client 60962 for Packet ID: 2
 Client: Received packet with ID: 3
+Server: 0.0100 >> Data sent to client 60962, Packet ID: 4
 Client: Acknowledgment for Packet ID 3 sent successfully
-Server: 0.0110 >> Data sent to client 51073, Packet ID: 3
-Server: 0.0110 >> Acknowledgment received from client 55247 for Packet ID: 3
-Client: Received packet with ID: 3
-Client: Acknowledgment for Packet ID 3 sent successfully
-Server: 0.0120 >> Data sent to client 55247, Packet ID: 4
-Server: 0.0120 >> Acknowledgment received from client 51073 for Packet ID: 3
 Client: Received packet with ID: 4
 Client: Acknowledgment for Packet ID 4 sent successfully
-Server: 0.0120 >> Acknowledgment received from client 55247 for Packet ID: 4
-Server: 0.0120 >> Data sent to client 51073, Packet ID: 4
+Server: 0.0110 >> Acknowledgment received from client 60962 for Packet ID: 3
+Server: 0.0110 >> Data sent to client 60962, Packet ID: 5
+Server: 0.0110 >> Acknowledgment received from client 60962 for Packet ID: 4
+Client: Received packet with ID: 5
+Client: Acknowledgment for Packet ID 5 sent successfully
+Server: 0.0110 >> Data sent to client 49695, Packet ID: 2
+Client: Received packet with ID: 2
+Client: Acknowledgment for Packet ID 2 sent successfully
+Server: 0.0110 >> Acknowledgment received from client 60962 for Packet ID: 5
+Server: 0.0120 >> Acknowledgment received from client 49695 for Packet ID: 2
+Server: 0.0120 >> Data sent to client 49695, Packet ID: 3
+Client: Received packet with ID: 6
+Client: Acknowledgment for Packet ID 6 sent successfully
+Server: 0.0120 >> Data sent to client 60962, Packet ID: 6
+Client: Received packet with ID: 3
+Client: Acknowledgment for Packet ID 3 sent successfully
+Server: 0.0120 >> Acknowledgment received from client 60962 for Packet ID: 6
+Server: 0.0130 >> Data sent to client 49695, Packet ID: 4
+Server: 0.0130 >> Acknowledgment received from client 49695 for Packet ID: 3
+Server: 0.0130 >> Data sent to client 49695, Packet ID: 5
 Client: Received packet with ID: 4
 Client: Acknowledgment for Packet ID 4 sent successfully
 Client: Received packet with ID: 5
 Client: Acknowledgment for Packet ID 5 sent successfully
-Server: 0.0130 >> Data sent to client 55247, Packet ID: 5
-Server: 0.0130 >> Acknowledgment received from client 51073 for Packet ID: 4
-Server: 0.0140 >> Acknowledgment received from client 55247 for Packet ID: 5
-Server: 0.0140 >> Data sent to client 51073, Packet ID: 5
-Client: Received packet with ID: 5
-Client: Acknowledgment for Packet ID 5 sent successfully
-Server: 0.0140 >> Data sent to client 55247, Packet ID: 6
+Server: 0.0130 >> Acknowledgment received from client 49695 for Packet ID: 4
+Server: 0.0130 >> Data sent to client 49695, Packet ID: 6
+Server: 0.0140 >> Acknowledgment received from client 49695 for Packet ID: 5
+Server: 0.0140 >> Data sent to client 49695, Packet ID: 7
 Client: Received packet with ID: 6
 Client: Acknowledgment for Packet ID 6 sent successfully
-Server: 0.0150 >> Acknowledgment received from client 51073 for Packet ID: 5
-Server: 0.0150 >> Acknowledgment received from client 55247 for Packet ID: 6
-Server: 0.0150 >> Data sent to client 51073, Packet ID: 6
-Client: Received packet with ID: 6
-Client: Acknowledgment for Packet ID 6 sent successfully
-Server: 0.0160 >> Data sent to client 55247, Packet ID: 7
-Client: Received packet with ID: 7
-Server: 0.0160 >> Acknowledgment received from client 51073 for Packet ID: 6
-Client: Acknowledgment for Packet ID 7 sent successfully
-Server: 0.0160 >> Data sent to client 51073, Packet ID: 7
-Server: 0.0160 >> Acknowledgment received from client 55247 for Packet ID: 7
 Client: Received packet with ID: 7
 Client: Acknowledgment for Packet ID 7 sent successfully
-Server: 0.0170 >> Acknowledgment received from client 51073 for Packet ID: 7
-Server: 0.0170 >> Data sent to client 55247, Packet ID: 8
-Server: 0.0170 >> Data sent to client 51073, Packet ID: 8
+Server: 0.0140 >> Acknowledgment received from client 49695 for Packet ID: 6
+Server: 0.0140 >> Acknowledgment received from client 49695 for Packet ID: 7
+Server: 0.0150 >> Data sent to client 49695, Packet ID: 8
 Client: Received packet with ID: 8
 Client: Acknowledgment for Packet ID 8 sent successfully
+Server: 0.0150 >> Data sent to client 60962, Packet ID: 7
+Server: 0.0150 >> Acknowledgment received from client 49695 for Packet ID: 8
+Client: Received packet with ID: 7
+Client: Acknowledgment for Packet ID 7 sent successfully
+Server: 0.0150 >> Data sent to client 49695, Packet ID: 9
+Server: 0.0150 >> Acknowledgment received from client 60962 for Packet ID: 7
+Client: Received packet with ID: 9
+Client: Acknowledgment for Packet ID 9 sent successfully
+Server: 0.0150 >> Data sent to client 60962, Packet ID: 8
+Server: 0.0150 >> Acknowledgment received from client 49695 for Packet ID: 9
 Client: Received packet with ID: 8
 Client: Acknowledgment for Packet ID 8 sent successfully
-Server: 0.0180 >> Acknowledgment received from client 55247 for Packet ID: 8
-Server: 0.0180 >> Acknowledgment received from client 51073 for Packet ID: 8
-Server: 0.0180 >> Data sent to client 55247, Packet ID: 9
-Client: Received packet with ID: 9
-Client: Acknowledgment for Packet ID 9 sent successfully
-Server: 0.0180 >> Data sent to client 51073, Packet ID: 9
-Client: Received packet with ID: 9
-Client: Acknowledgment for Packet ID 9 sent successfully
-Server: 0.0180 >> Acknowledgment received from client 55247 for Packet ID: 9
-Server: 0.0190 >> Acknowledgment received from client 51073 for Packet ID: 9
-Server: 0.0190 >> Data sent to client 55247, Packet ID: 10
+Server: 0.0150 >> Data sent to client 49695, Packet ID: 10
 Client: Received packet with ID: 10
 Client: Acknowledgment for Packet ID 10 sent successfully
-Server: 0.0190 >> Data sent to client 51073, Packet ID: 10
+Server: 0.0160 >> Acknowledgment received from client 60962 for Packet ID: 8
+Server: 0.0160 >> Acknowledgment received from client 49695 for Packet ID: 10
+Server: Packet with ID : 11 lost
+Server: Retransmission for packet 11 has been sent
+Client: Received packet with ID: 9
+Server: 0.0160 >> Data sent to client 60962, Packet ID: 9
+Client: Acknowledgment for Packet ID 9 sent successfully
+Server: 0.0160 >> Data sent to client 49695, Packet ID: 11
+Client: Received packet with ID: 11
+Client: Acknowledgment for Packet ID 11 sent successfully
+Server: 0.0160 >> Acknowledgment received from client 60962 for Packet ID: 9
+Server: 0.0160 >> Acknowledgment received from client 49695 for Packet ID: 11
+Server: 0.0160 >> Data sent to client 49695, Packet ID: 12
+Client: Received packet with ID: 12
+Client: Acknowledgment for Packet ID 12 sent successfully
+Server: 0.0160 >> Data sent to client 60962, Packet ID: 10
 Client: Received packet with ID: 10
-Server: 0.0190 >> Acknowledgment received from client 55247 for Packet ID: 10
 Client: Acknowledgment for Packet ID 10 sent successfully
-Server: 0.0200 >> Data sent to client 55247, Packet ID: 11
-Server: 0.0200 >> Acknowledgment received from client 51073 for Packet ID: 10
-Client: Received packet with ID: 11
-Client: Acknowledgment for Packet ID 11 sent successfully
-Server: 0.0200 >> Data sent to client 51073, Packet ID: 11
-Server: 0.0210 >> Acknowledgment received from client 55247 for Packet ID: 11
-Client: Received packet with ID: 11
-Client: Acknowledgment for Packet ID 11 sent successfully
-Server: 0.0210 >> Data sent to client 55247, Packet ID: 12
-Server: 0.0210 >> Acknowledgment received from client 51073 for Packet ID: 11
-Client: Received packet with ID: 12
-Client: Acknowledgment for Packet ID 12 sent successfully
-Server: 0.0210 >> Data sent to client 51073, Packet ID: 12
-Server: 0.0210 >> Acknowledgment received from client 55247 for Packet ID: 12
-Client: Received packet with ID: 12
-Server: Packet with ID : 13 lost
-Client: Acknowledgment for Packet ID 12 sent successfully
-Server: 0.0220 >> Acknowledgment received from client 51073 for Packet ID: 12
-Server: Retransmission for packet 13 has been sent
-Server: 0.0220 >> Data sent to client 51073, Packet ID: 13
+Server: 0.0170 >> Acknowledgment received from client 49695 for Packet ID: 12
+Server: 0.0170 >> Acknowledgment received from client 60962 for Packet ID: 10
+Server: 0.0170 >> Data sent to client 49695, Packet ID: 13
 Client: Received packet with ID: 13
 Client: Acknowledgment for Packet ID 13 sent successfully
-Server: 0.0220 >> Data sent to client 55247, Packet ID: 13
+Server: 0.0170 >> Data sent to client 60962, Packet ID: 11
+Client: Received packet with ID: 11
+Client: Acknowledgment for Packet ID 11 sent successfully
+Server: 0.0170 >> Acknowledgment received from client 49695 for Packet ID: 13
+Server: 0.0170 >> Acknowledgment received from client 60962 for Packet ID: 11
+Server: 0.0170 >> Data sent to client 49695, Packet ID: 14
+Client: Received packet with ID: 14
+Client: Acknowledgment for Packet ID 14 sent successfully
+Server: 0.0170 >> Data sent to client 60962, Packet ID: 12
+Client: Received packet with ID: 12
+Client: Acknowledgment for Packet ID 12 sent successfully
+Server: 0.0170 >> Acknowledgment received from client 49695 for Packet ID: 14
+Server: 0.0180 >> Acknowledgment received from client 60962 for Packet ID: 12
+Server: 0.0180 >> Data sent to client 49695, Packet ID: 15
+Server: 0.0180 >> Data sent to client 60962, Packet ID: 13
+Client: Received packet with ID: 15
 Client: Received packet with ID: 13
 Client: Acknowledgment for Packet ID 13 sent successfully
-Server: 0.0220 >> Acknowledgment received from client 51073 for Packet ID: 13
-Server: 0.0230 >> Acknowledgment received from client 55247 for Packet ID: 13
-Server: 0.0230 >> Data sent to client 55247, Packet ID: 14
-Client: Received packet with ID: 14
-Server: 0.0230 >> Data sent to client 51073, Packet ID: 14
-Client: Acknowledgment for Packet ID 14 sent successfully
-Client: Received packet with ID: 14
-Client: Acknowledgment for Packet ID 14 sent successfully
-Server: 0.0230 >> Acknowledgment received from client 55247 for Packet ID: 14
-Server: 0.0230 >> Acknowledgment received from client 51073 for Packet ID: 14
-Server: 0.0230 >> Data sent to client 55247, Packet ID: 15
-Client: Received packet with ID: 15
 Client: Acknowledgment for Packet ID 15 sent successfully
-Server: 0.0240 >> Data sent to client 51073, Packet ID: 15
-Client: Received packet with ID: 15
-Client: Acknowledgment for Packet ID 15 sent successfully
-Server: 0.0240 >> Acknowledgment received from client 55247 for Packet ID: 15
-Server: 0.0250 >> Acknowledgment received from client 51073 for Packet ID: 15
+Server: 0.0180 >> Acknowledgment received from client 60962 for Packet ID: 13
+Server: Packet with ID : 16 lost
+Server: 0.0180 >> Acknowledgment received from client 49695 for Packet ID: 15
+Server: Retransmission for packet 16 has been sent
+Server: 0.0180 >> Data sent to client 60962, Packet ID: 14
 Client: Received packet with ID: 16
-Server: 0.0250 >> Data sent to client 51073, Packet ID: 16
-Server: 0.0250 >> Data sent to client 55247, Packet ID: 16
+Server: 0.0180 >> Data sent to client 49695, Packet ID: 16
+Client: Received packet with ID: 14
+Client: Acknowledgment for Packet ID 14 sent successfully
 Client: Acknowledgment for Packet ID 16 sent successfully
-Client: Received packet with ID: 16
-Client: Acknowledgment for Packet ID 16 sent successfully
-Server: 0.0250 >> Acknowledgment received from client 55247 for Packet ID: 16
-Server: 0.0260 >> Acknowledgment received from client 51073 for Packet ID: 16
-Server: 0.0260 >> Data sent to client 51073, Packet ID: 17
-Server: 0.0260 >> Data sent to client 55247, Packet ID: 17
+Server: 0.0190 >> Acknowledgment received from client 60962 for Packet ID: 14
+Server: Packet with ID : 17 lost
+Server: Retransmission for packet 17 has been sent
+Server: 0.0190 >> Data sent to client 49695, Packet ID: 17
+Server: 0.0190 >> Acknowledgment received from client 49695 for Packet ID: 16
+Server: 0.0190 >> Data sent to client 49695, Packet ID: 18
 Client: Received packet with ID: 17
 Client: Acknowledgment for Packet ID 17 sent successfully
+Client: Received packet with ID: 18
+Client: Acknowledgment for Packet ID 18 sent successfully
+Server: 0.0190 >> Acknowledgment received from client 49695 for Packet ID: 17
+Server: 0.0200 >> Data sent to client 60962, Packet ID: 15
+Server: 0.0200 >> Acknowledgment received from client 49695 for Packet ID: 18
+Client: Received packet with ID: 15
+Client: Acknowledgment for Packet ID 15 sent successfully
+Server: 0.0200 >> Data sent to client 49695, Packet ID: 19
+Server: 0.0200 >> Acknowledgment received from client 60962 for Packet ID: 15
+Client: Received packet with ID: 19
+Client: Acknowledgment for Packet ID 19 sent successfully
+Server: 0.0200 >> Data sent to client 60962, Packet ID: 16
+Server: 0.0200 >> Acknowledgment received from client 49695 for Packet ID: 19
+Server: 0.0210 >> Data sent to client 60962, Packet ID: 17
+Client: Received packet with ID: 16
+Client: Acknowledgment for Packet ID 16 sent successfully
 Client: Received packet with ID: 17
 Client: Acknowledgment for Packet ID 17 sent successfully
-Server: 0.0260 >> Acknowledgment received from client 51073 for Packet ID: 17
-Server: 0.0260 >> Data sent to client 51073, Packet ID: 18
-Server: 0.0260 >> Acknowledgment received from client 55247 for Packet ID: 17
+Server: 0.0220 >> Acknowledgment received from client 60962 for Packet ID: 16
+Server: 0.0220 >> Data sent to client 60962, Packet ID: 18
+Server: 0.0230 >> Acknowledgment received from client 60962 for Packet ID: 17
+Server: 0.0230 >> Data sent to client 49695, Packet ID: 20
 Client: Received packet with ID: 18
 Client: Acknowledgment for Packet ID 18 sent successfully
-Server: 0.0270 >> Data sent to client 55247, Packet ID: 18
-Server: 0.0270 >> Acknowledgment received from client 51073 for Packet ID: 18
-Client: Received packet with ID: 18
-Client: Acknowledgment for Packet ID 18 sent successfully
-Server: 0.0270 >> Data sent to client 51073, Packet ID: 19
-Server: 0.0270 >> Acknowledgment received from client 55247 for Packet ID: 18
-Client: Received packet with ID: 19
-Client: Acknowledgment for Packet ID 19 sent successfully
-Server: 0.0280 >> Data sent to client 55247, Packet ID: 19
-Server: 0.0280 >> Acknowledgment received from client 51073 for Packet ID: 19
-Client: Received packet with ID: 19
-Client: Acknowledgment for Packet ID 19 sent successfully
-Server: 0.0280 >> Data sent to client 51073, Packet ID: 20
-Server: 0.0280 >> Acknowledgment received from client 55247 for Packet ID: 19
 Client: Received packet with ID: 20
 Client: Acknowledgment for Packet ID 20 sent successfully
-Server: 0.0290 >> Acknowledgment received from client 51073 for Packet ID: 20
-Server: 0.0290 >> Data sent to client 55247, Packet ID: 20
+Server: 0.0240 >> Acknowledgment received from client 60962 for Packet ID: 18
+Server: 0.0250 >> Data sent to client 49695, Packet ID: 21
+Server: 0.0250 >> Acknowledgment received from client 49695 for Packet ID: 20
+Server: 0.0250 >> Data sent to client 49695, Packet ID: 22
 Client: Received packet with ID: 21
-Client: Received packet with ID: 20
-Server: 0.0290 >> Data sent to client 51073, Packet ID: 21
 Client: Acknowledgment for Packet ID 21 sent successfully
+Client: Received packet with ID: 22
+Client: Acknowledgment for Packet ID 22 sent successfully
+Server: 0.0270 >> Acknowledgment received from client 49695 for Packet ID: 21
+Server: Thread for client 49695 finished.
+Server: 0.0280 >> Acknowledgment received from client 49695 for Packet ID: 22
+Server: Packet with ID : 19 lost
+Server: Retransmission for packet 19 has been sent
+Server: 0.0280 >> Data sent to client 60962, Packet ID: 19
+Client: Received packet with ID: 19
+Client: Acknowledgment for Packet ID 19 sent successfully
+Server: 0.0290 >> Acknowledgment received from client 60962 for Packet ID: 19
+Server: Packet with ID : 20 lost
+Server: Retransmission for packet 20 has been sent
+Server: 0.0300 >> Data sent to client 60962, Packet ID: 20
+Client: Received packet with ID: 20
 Client: Acknowledgment for Packet ID 20 sent successfully
-Server: 0.0300 >> Acknowledgment received from client 55247 for Packet ID: 20
-Server: 0.0300 >> Acknowledgment received from client 51073 for Packet ID: 21
+Server: 0.0310 >> Acknowledgment received from client 60962 for Packet ID: 20
+Server: 0.0310 >> Data sent to client 60962, Packet ID: 21
+Client: Received packet with ID: 21
+Client: Acknowledgment for Packet ID 21 sent successfully
+Server: 0.0340 >> Acknowledgment received from client 60962 for Packet ID: 21
 Server: Packet with ID : 22 lost
 Server: Retransmission for packet 22 has been sent
-Server: 0.0300 >> Data sent to client 55247, Packet ID: 21
-Server: 0.0310 >> Data sent to client 51073, Packet ID: 22
-Client: Received packet with ID: 21
-Client: Acknowledgment for Packet ID 21 sent successfully
+Server: 0.0340 >> Data sent to client 60962, Packet ID: 22
 Client: Received packet with ID: 22
 Client: Acknowledgment for Packet ID 22 sent successfully
-Server: 0.0310 >> Acknowledgment received from client 55247 for Packet ID: 21
-Server: Thread for client 51073 finished.
-Server: 0.0320 >> Acknowledgment received from client 51073 for Packet ID: 22
-Server: 0.0320 >> Data sent to client 55247, Packet ID: 22
-Client: Received packet with ID: 22
-Client: Acknowledgment for Packet ID 22 sent successfully
-Server: 0.0320 >> Acknowledgment received from client 55247 for Packet ID: 22
-Server: Thread for client 55247 finished.
+Server: 0.0370 >> Acknowledgment received from client 60962 for Packet ID: 22
+Server: Thread for client 60962 finished.
 Server: No more data to send.
 Server: All packets sent and acknowledged. Transfer finished.
 Server: Total Bytes Sent: 94484
-Server: Total Retransmissions Sent: 3
-Server: Total Time Spent: 0.0450 seconds
+Server: Total Retransmissions Sent: 7
+Server: Total Time Spent: 0.0380 seconds
 Client: Transfer finished
 Client: Transfer finished

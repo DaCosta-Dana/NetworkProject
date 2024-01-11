@@ -142,9 +142,9 @@ public class Main {
             // Create a DatagramSocket for the client
             DatagramSocket clientSocket = new DatagramSocket();
 
-            // Prepare the message to send to the server
-            String message = "1";
-            byte[] sendData = message.getBytes();
+            // Prepare the message to send and connect to the server
+            String connectionRequestMessage = "1";
+            byte[] sendData = connectionRequestMessage.getBytes();
 
             // Get the InetAddress for the server using the server_id (e.g. localhost)
             InetAddress serverAddress = InetAddress.getByName(server_id);

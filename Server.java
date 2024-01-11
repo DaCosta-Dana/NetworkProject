@@ -37,18 +37,24 @@ class Server {
 
         // Loop used to continuously wait for connections from cliens until the desired numberOfClients
         while (clientAddresses.size() < numberOfClients) {
-            byte[] message = new byte[2048];
-            DatagramPacket packet = new DatagramPacket(message, message.length);
+
+            // Byte array with a lenght of 2048 bytes 
+            byte[] receivedData = new byte[2048];       //to store the data that will be received from the 'receivedPacket'.
+            DatagramPacket receivedPacket = new DatagramPacket(receivedData, receivedData.length); 
+                //first parameter = where the received data will be stored
+                //second parameter = maximum amount of data that the packet can hold
             
-            // Receive incoming connection requests
-            serverSocket.receive(packet);
+            // Wait for and receive incoming connection requests
+            serverSocket.receive(receivedPacket);       //= blocking call, meaning it will wait until a packet is received.
     
             // Retrieve the actual size of the data
-            int dataSize = packet.getLength();
+            int dataSize = receivedPacket.getLength();
     
             // Create a new array to hold exactly the received data
             byte[] actualData = new byte[dataSize];
-            System.arraycopy(message, 0, actualData, 0, dataSize);
+
+            // Copy data from 'receivedData' to 'actualData' to ensure that only the actual received data is considered
+            System.arraycopy(receivedData, 0, actualData, 0, dataSize);
     
             // Convert the data into a string if necessary
             String messageString = new String(actualData);
@@ -56,15 +62,15 @@ class Server {
             // Check if the received message is a connection request (e.g., "1")
             if (messageString.equals("1")) {
                 // Print information about the connected client
-                System.out.printf("Server: Client connected - IP: %s, Port: %d%n", packet.getAddress().getHostAddress(), packet.getPort());   
+                System.out.printf("Server: Client connected - IP: %s, Port: %d%n", receivedPacket.getAddress().getHostAddress(), receivedPacket.getPort());   
                        //e.g., Server: Client connected - IP: 127.0.0.1, Port: 56463 -> client with IP address "127.0.0.1" has connected to the server using port "56463"
                 
                 // Add the client's address to the list of connected clients
-                clientAddresses.add((InetSocketAddress) packet.getSocketAddress());
+                clientAddresses.add((InetSocketAddress) receivedPacket.getSocketAddress());
 
             }
         }
-        
+
         System.out.println("Server: All clients connected.");
     }
 
