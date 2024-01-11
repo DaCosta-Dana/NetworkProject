@@ -11,10 +11,10 @@ public class Main {
 
 
     // public static void start_server(int serverListeningPort, int client_number, int size, String filename, float ack_probability) throws InterruptedException, IOException {
-    public static void start_server(int client_number, int size, String filename, float ack_probability)  throws InterruptedException, IOException {
+    public static void start_server(int numberOfClients, int size, String filename, float ack_probability)  throws InterruptedException, IOException {
          
 
-            Server server = new Server(client_number);
+            Server server = new Server(numberOfClients);
 
             assignedPort.set(server.getAssignedPort());
             System.out.println("The assigned port is " + assignedPort);
@@ -23,7 +23,7 @@ public class Main {
             server.waitForConnections();
 
             List<Thread> threads = new ArrayList<>();
-            FileSender fileSender = new FileSender(filename, server.serverSocket, size, client_number, server.clientAddresses, ack_probability);
+            FileSender fileSender = new FileSender(filename, server.serverSocket, size, numberOfClients, server.clientAddresses, ack_probability);
 
             Thread thread = new Thread(() -> fileSender.sendFile());
 
@@ -78,7 +78,6 @@ public class Main {
                 java Main localhost 2 file.txt 0.1 3
              */
 
-             /* TODO: do we need the port? */
              /* TODO: include protocol (UDP) to the command line??? */
 
             System.exit(1);
@@ -88,7 +87,7 @@ public class Main {
         String server_id = args[0];                             // id_process = localhost
         int numberOfClients = Integer.parseInt(args[1]);
         String filename = args[2];
-        float probability = Float.parseFloat(args[3]);          // 
+        float probability = Float.parseFloat(args[3]);         
         int window_size = Integer.parseInt(args[4]);
        
         // // for debugging

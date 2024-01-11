@@ -3,17 +3,14 @@ import java.net.*;
 import java.util.*;
 
 class Server {
-    
-    private UnreliableSender sender;
     private int clientNumber;
     DatagramSocket serverSocket;
     List<InetSocketAddress> clientAddresses;
     
-    public Server(int clientNumber) throws SocketException {
-        this.clientNumber = clientNumber;
+    public Server(int numberOfClients) throws SocketException {
+        this.clientNumber = numberOfClients;
         this.serverSocket = new DatagramSocket(); //initialise serverSocket without specifying a port
         this.clientAddresses = new ArrayList<>();
-        this.sender = new UnreliableSender(serverSocket);
     }
 
     // method to retrieve the dynamically assigned port
@@ -33,14 +30,14 @@ class Server {
             DatagramPacket packet = new DatagramPacket(message, message.length);
             serverSocket.receive(packet);
     
-            // Récupérer la taille réelle des données
+            // Retrieve the actual size of the data
             int dataSize = packet.getLength();
     
-            // Créer un nouveau tableau pour contenir exactement les données reçues
+            // Create a new array to hold exactly the received data
             byte[] actualData = new byte[dataSize];
             System.arraycopy(message, 0, actualData, 0, dataSize);
     
-            // Convertir les données en une chaîne si nécessaire
+            // Convert the data into a string if necessary
             String messageString = new String(actualData);
     
             if (messageString.equals("1")) {
