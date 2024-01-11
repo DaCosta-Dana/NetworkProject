@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
 
-    private static AtomicInteger assignedPort = new AtomicInteger(-1);  //shared data structure
+    private static AtomicInteger serverSocket = new AtomicInteger(-1);  //shared data structure
 
     public static void main(String[] args) {
 
@@ -41,13 +41,6 @@ public class Main {
         String filename = args[2];
         float probability = Float.parseFloat(args[3]);         
         int window_size = Integer.parseInt(args[4]);
-       
-        // // for debugging
-        // String server_id = "localhost";
-        // int numberOfClients = 2;
-        // String filename = "file.txt";
-        // float probability = 0.1f;
-        // int window_size = 3;
         
         try {
 
@@ -101,8 +94,8 @@ public class Main {
         Server server = new Server(numberOfClients);
 
         // Get the assigned port and display it
-        assignedPort.set(server.getAssignedPort());
-        System.out.println("The assigned port of the server socket is " + assignedPort);
+        serverSocket.set(server.getAssignedServerPort());
+        System.out.println("The dynamically assigned server socket is " + serverSocket);
 
         // Wait for clients to connect
         System.out.println("The server is waiting for clients to connect...");
@@ -149,13 +142,13 @@ public class Main {
             byte[] sendData = connectionRequestMessage.getBytes();
 
             // Create a DatagramPacket to send the data to the server
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverIPAddress, assignedPort.get());
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverIPAddress, serverSocket.get());
             
             // Send the packet to the server
             clientSocket.send(sendPacket);
 
             // Create a client instance to receive data from the server
-            Client client = new Client(clientSocket, assignedPort.get());
+            Client client = new Client(clientSocket, serverSocket.get());
 
             // Receive data from the server
             client.receive_data();

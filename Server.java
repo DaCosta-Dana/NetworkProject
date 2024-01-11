@@ -21,7 +21,7 @@ class Server {
     }
 
     // Method to retrieve the dynamically assigned port
-    public int getAssignedPort() {
+    public int getAssignedServerPort() {
         return serverSocket.getLocalPort();
     }
 
