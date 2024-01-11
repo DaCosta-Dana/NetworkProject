@@ -3,16 +3,16 @@ import java.net.*;
 import java.util.*;
 
 class Server {
-    private int serverPort;
+    private int serverListeningPort;
+    private UnreliableSender sender;
     private int clientNumber;
     DatagramSocket serverSocket;
     List<InetSocketAddress> clientAddresses;
-    private UnreliableSender sender;
-
-    public Server(int serverPort, int clientNumber) throws SocketException {
-        this.serverPort = serverPort;
+    
+    public Server(int serverListeningPort, int clientNumber) throws SocketException {
+        this.serverListeningPort = serverListeningPort;
         this.clientNumber = clientNumber;
-        this.serverSocket = new DatagramSocket(serverPort);
+        this.serverSocket = new DatagramSocket(serverListeningPort);
         this.clientAddresses = new ArrayList<>();
         this.sender = new UnreliableSender(serverSocket);
     }
