@@ -1,6 +1,8 @@
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
-import java.net.*;
 
 class Client {
     private DatagramSocket socket;

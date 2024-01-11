@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
-    private static AtomicInteger assignedPort = new AtomicInteger(-1); //shared data structure
+
+    private static AtomicInteger assignedPort = new AtomicInteger(-1);  //shared data structure
 
     public static void main(String[] args) {
 
