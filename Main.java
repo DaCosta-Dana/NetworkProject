@@ -22,16 +22,17 @@ public class Main {
                 \n<window_size>           = size of the window for Go-back-N
                 """);
             
-            /*  TO RUN THE PROGRAM, PLEASE COPY THE FOLLOWING TO THE TERMINAL
+            /*  Example command to run the program:
+
                 javac Main.java
                 java Main localhost 2 file.txt 0.1 3
-             */
+            
+            */
 
-             /* TODO: include protocol (UDP) to the command line??? */
+            /* TODO: include protocol (UDP) to the command line??? */
 
             System.exit(1);
         }
-
 
         String server_id = args[0];                             // id_process = localhost
         int numberOfClients = Integer.parseInt(args[1]);
@@ -45,7 +46,6 @@ public class Main {
         // String filename = "file.txt";
         // float probability = 0.1f;
         // int window_size = 3;
-   
         
         try {
 

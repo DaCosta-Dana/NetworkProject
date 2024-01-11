@@ -13,7 +13,7 @@ class Server {
     DatagramSocket serverSocket;
     List<InetSocketAddress> clientAddresses;
     
-    // Constructor for the Server class
+    // Constructor to initialize the Server
     public Server(int numberOfClients) throws SocketException {
         this.numberOfClients = numberOfClients;
         this.serverSocket = new DatagramSocket();

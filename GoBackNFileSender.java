@@ -55,10 +55,13 @@ class GoBackNFileSender {
 
     // Private method to send a specific packet to the client
     private void sendPacket(int packetId, InetSocketAddress clientAddress, long startTime) throws IOException {
+        
+        // Initialize buffer to store data from the file
         byte[] data = new byte[2048];
         int bytesRead;
     
         try (FileInputStream file = new FileInputStream(fileName)) {
+            // Skip bytes in the file to reach the appropriate position for the current packet
             long skipBytes = packetId * 2048;
             while (skipBytes > 0) {
                 long skipped = file.skip(skipBytes);
@@ -69,25 +72,28 @@ class GoBackNFileSender {
                 skipBytes -= skipped;
             }
     
+            // Read data from the file into the buffer
             bytesRead = file.read(data);
     
             if (bytesRead > 0) {
+                // Create the packet data by combining packet ID and file data
                 byte[] packetData = new byte[bytesRead + 6];
                 System.arraycopy(String.format("%06d", packetId).getBytes(), 0, packetData, 0, 6);
                 System.arraycopy(data, 0, packetData, 6, bytesRead);
     
+                // Create a DatagramPacket with the packet data and send it to the client
                 DatagramPacket packet = new DatagramPacket(packetData, packetData.length, clientAddress.getAddress(), clientAddress.getPort());
                 long timeTaken = System.currentTimeMillis() - startTime;
                 clientSocket.send(packet);
                 sentTimes.put(packetId, System.currentTimeMillis());
     
+                // Print information about the sent packet
                 System.out.printf("Server: %.4f >> Data sent to client %d, Packet ID: %d%n", timeTaken / 1000.0, clientAddress.getPort(), packetId);
     
+                // Update statistics and tracking for the sent packet
                 totalBytesSent += packetData.length;
                 sentPacketIds.add(packetId);
-
-                // Register the sent packet for acknowledgment tracking
-                acknowledgedPackets.add(packetId);
+                acknowledgedPackets.add(packetId);                 // Register the sent packet for acknowledgment tracking
             }
         }
     }
@@ -108,10 +114,14 @@ class GoBackNFileSender {
 
                 // Send the packet and handle IOException
                 try {
+                    // Simulate packet loss based on acknowledgment probability
                     if (Math.round(Math.random() * 1000) / 1000.0 < this.ack_probability) {
                         System.out.println("Server: Packet with ID : " + packetId + " lost");
+
+                        // Handle packet loss by retransmitting and waiting for acknowledgment
                         retransmitPacketsAndWait(startTime, clientAddress, packetId);
                     } else {
+                        // Send the packet to the client
                         sendPacket(packetId, clientAddress, startTime);
                     }
 
@@ -125,12 +135,14 @@ class GoBackNFileSender {
                 int lastAckedPacketId;
                 lastAckedPacketId = receiveAck(startTime, clientAddress, packetId);
 
+                // Move to the next packet
                 nextPacketId = lastAckedPacketId + 1;
             }
 
             long endTime = System.currentTimeMillis();
             totalTimeSpent += (endTime - startTime);
             end = true;
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
