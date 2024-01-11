@@ -52,11 +52,11 @@ public class Main {
     public static void main(String[] args) {
 
         if (args.length != 7) {
-            System.out.println("Usage: java Main <serverListeningPort> <numberOfClients> <window_size> <server_name> <serverConnectionPort> <ack_probability> <filename>");
+            System.out.println("Usage: java Main <server_id> <serverListeningPort> <numberOfClients> <serverConnectionPort> <filename> <probability> <window_size>");
             
             /*  COPY TO TERMINAL
                 javac main.java
-                java Main 12000 2 3 localhost 12000 0.1 file.txt
+                java Main localhost 12000 2 12000 file.txt 0.1 3
              */
 
              /* TODO: do we need the port? */
@@ -66,19 +66,22 @@ public class Main {
         }
 
 
-        int serverListeningPort = Integer.parseInt(args[0]);
-        int numberOfClients = Integer.parseInt(args[1]);
-        int window_size = Integer.parseInt(args[2]);
-        String server_name = args[3];                           // id_process
-        int serverConnectionPort = Integer.parseInt(args[4]);
-        float ack_probability = Float.parseFloat(args[5]);
-        String filename = args[6];
+        String server_id = args[0];                             // id_process = localhost
+        int serverListeningPort = Integer.parseInt(args[1]);
         
+        int numberOfClients = Integer.parseInt(args[2]);
+        int serverConnectionPort = Integer.parseInt(args[3]);
+
+        String filename = args[4];
+        float probability = Float.parseFloat(args[5]);          // probability of an UDP send not to be successful to simulate network errors
+        int window_size = Integer.parseInt(args[6]);
+       
+   
         
         try {
             Thread server_thread = new Thread(() -> {
                 try {
-                    start_server(serverListeningPort, numberOfClients, window_size, filename, ack_probability);
+                    start_server(serverListeningPort, numberOfClients, window_size, filename, probability);
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
                 }
@@ -88,7 +91,7 @@ public class Main {
             for (int i = 0; i < numberOfClients; i++) {
                 Thread client_thread = new Thread(() -> {
                     try {
-                        start_client(server_name, serverConnectionPort);
+                        start_client(server_id, serverConnectionPort);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
