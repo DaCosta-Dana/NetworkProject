@@ -7,28 +7,32 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
+//The Server class provides a simple implementation for a server that can accept multiple client connections using DatagramSocket.
 class Server {
     private int numberOfClients;
     DatagramSocket serverSocket;
     List<InetSocketAddress> clientAddresses;
     
+    // Constructor for the Server class
     public Server(int numberOfClients) throws SocketException {
         this.numberOfClients = numberOfClients;
-        this.serverSocket = new DatagramSocket(); //initialise serverSocket without specifying a port
+        this.serverSocket = new DatagramSocket();
         this.clientAddresses = new ArrayList<>();
     }
 
-    // method to retrieve the dynamically assigned port
+    // Method to retrieve the dynamically assigned port
     public int getAssignedPort() {
         return serverSocket.getLocalPort();
     }
 
+    // Private method to send a DatagramPacket to a specified address and port
     private boolean send(byte[] data, InetAddress address, int port) throws IOException {
         DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
         serverSocket.send(packet);
         return true;
     }
 
+    // Method to wait for connections from clients
     public void waitForConnections() throws IOException {
         while (clientAddresses.size() < numberOfClients) {
             byte[] message = new byte[2048];
@@ -53,6 +57,7 @@ class Server {
         System.out.println("Server: All clients connected.");
     }
 
+    // Method to send a finish signal to all connected clients
     public void sendFinishSignal() throws IOException {
         for (InetSocketAddress clientAddress : clientAddresses) {
             byte[] finishSignal = "finished".getBytes();
@@ -60,6 +65,7 @@ class Server {
         }
     }
 
+    // Method to close the server socket
     public void closeSocket() {
         serverSocket.close();
     }

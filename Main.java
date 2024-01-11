@@ -108,7 +108,7 @@ public class Main {
         List<Thread> threads = new ArrayList<>();
 
         // Create a FileSender instance for sending the file
-        FileSender fileSender = new FileSender(filename, server.serverSocket, size, numberOfClients, server.clientAddresses, probability);
+        GoBackNFileSender fileSender = new GoBackNFileSender(filename, server.serverSocket, size, numberOfClients, server.clientAddresses, probability);
 
         // Create a thread for sending the file
         Thread thread = new Thread(() -> fileSender.sendFile());
