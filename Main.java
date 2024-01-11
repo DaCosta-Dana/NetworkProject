@@ -41,7 +41,7 @@ public class Main {
             int port = 12000; // Set to 12000
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, port);
             clientSocket.send(sendPacket);
-            Receiver receiver = new Receiver(clientSocket, server_port);
+            Client receiver = new Client(clientSocket, server_port);
             receiver.receive_data();
             
         } catch (IOException e) {

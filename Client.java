@@ -2,13 +2,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.net.*;
 
-class Receiver {
+class Client {
     private DatagramSocket socket;
     private int total_bytes_received;
     private int retransmissions_received;
     private List<Integer> list_ack;
     
-    public Receiver(DatagramSocket socket, int port) {
+    public Client(DatagramSocket socket, int port) {
         this.socket = socket;
         this.total_bytes_received = 0;
         this.retransmissions_received = 0;
