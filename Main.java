@@ -27,6 +27,8 @@ public class Main {
                 javac Main.java
                 java Main localhost 2 file.txt 0.1 3
             
+                COMMAND TO DELTE ALL THE COMPILED FILES BY JAVA:
+                find . -name "*.class" -exec rm -f {} \;
             */
 
             /* TODO: include protocol (UDP) to the command line??? */
@@ -98,7 +100,7 @@ public class Main {
 
         // Get the assigned port and display it
         assignedPort.set(server.getAssignedPort());
-        System.out.println("The assigned port is " + assignedPort);
+        System.out.println("The assigned port of the server socket is " + assignedPort);
 
         // Wait for clients to connect
         System.out.println("The server is waiting for clients to connect...");

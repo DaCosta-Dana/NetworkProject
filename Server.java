@@ -34,9 +34,13 @@ class Server {
 
     // Method to wait for connections from clients
     public void waitForConnections() throws IOException {
+
+        // Loop used to continuously wait for connections from cliens until the desired numberOfClients
         while (clientAddresses.size() < numberOfClients) {
             byte[] message = new byte[2048];
             DatagramPacket packet = new DatagramPacket(message, message.length);
+            
+            // Receive incoming connection requests
             serverSocket.receive(packet);
     
             // Retrieve the actual size of the data
@@ -49,11 +53,18 @@ class Server {
             // Convert the data into a string if necessary
             String messageString = new String(actualData);
     
+            // Check if the received message is a connection request (e.g., "1")
             if (messageString.equals("1")) {
-                System.out.printf("Server: Client connected: %s%n", packet.getSocketAddress());
+                // Print information about the connected client
+                System.out.printf("Server: Client connected - IP: %s, Port: %d%n", packet.getAddress().getHostAddress(), packet.getPort());   
+                       //e.g., Server: Client connected - IP: 127.0.0.1, Port: 56463 -> client with IP address "127.0.0.1" has connected to the server using port "56463"
+                
+                // Add the client's address to the list of connected clients
                 clientAddresses.add((InetSocketAddress) packet.getSocketAddress());
+
             }
         }
+        
         System.out.println("Server: All clients connected.");
     }
 
