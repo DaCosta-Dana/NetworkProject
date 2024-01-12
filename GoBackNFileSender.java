@@ -71,6 +71,66 @@ class GoBackNFileSender {
         } 
     }
 
+    // Public method to initiate the file transfer to all clients
+    public void sendFile() {
+        // Initialize a set to keep track of acknowledged packets for each file transfer
+        acknowledgedPackets = new HashSet<>();
+        List<Thread> threads = new ArrayList<>();
+        long startTime = System.currentTimeMillis();
+    
+        // Launch a separate thread for each destination (clientAddresses) to send data concurrently
+        for (InetSocketAddress clientAddress : clientAddresses) {
+            Thread destination_thread = new Thread(() -> {
+                try {
+                    sendToClient(clientAddress, probability);
+                } catch (SocketTimeoutException e) {
+                    e.printStackTrace();
+                } catch (SocketException e) {
+                    
+                    e.printStackTrace();
+                }
+            });
+            threads.add(destination_thread);
+
+            //Start t
+            destination_thread.start();
+
+        //     / Add the thread to the list
+        // filesender_threads.add(filesender_thread);
+
+        // // Start all threads
+        // for (Thread t : filesender_threads) {
+        //     t.start();
+        // }
+        }
+    
+        // Wait for all threads to finish
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    
+        // Calculate and print statistics about the file transfer
+        long endTime = System.currentTimeMillis();
+        totalTimeSpent = endTime - startTime;
+    
+        if (end) {
+            close();
+            System.out.println("Server: No more data to send.");
+            System.out.println("Server: All packets sent and acknowledged. Transfer finished.");
+            System.out.printf("Server: Total Bytes Sent: %d%n", totalBytesSent);
+            System.out.printf("Server: Total Retransmissions Sent: %d%n", retransmissionsSent);
+            System.out.printf("Server: Total Time Spent: %.4f seconds%n", totalTimeSpent / 1000.0);
+            return;
+        }
+    }
+
+
+
+
     // Private method to send a specific packet to the client
     private void sendPacket(int packetId, InetSocketAddress clientAddress, long startTime) throws IOException {
         
@@ -336,51 +396,4 @@ class GoBackNFileSender {
         }
     }
     
-    // Public method to initiate the file transfer to all clients
-    // Update the sendFile method
-    public void sendFile() {
-        // Initialize a set to keep track of acknowledged packets for each file transfer
-        acknowledgedPackets = new HashSet<>();
-        List<Thread> threads = new ArrayList<>();
-        long startTime = System.currentTimeMillis();
-    
-        // Create and start a separate thread for each client to send data concurrently
-        for (InetSocketAddress clientAddress : clientAddresses) {
-            Thread thread = new Thread(() -> {
-                try {
-                    sendToClient(clientAddress, probability);
-                } catch (SocketTimeoutException e) {
-                    e.printStackTrace();
-                } catch (SocketException e) {
-                    
-                    e.printStackTrace();
-                }
-            });
-            threads.add(thread);
-            thread.start();
-        }
-    
-        // Wait for all threads to finish
-        for (Thread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    
-        // Calculate and print statistics about the file transfer
-        long endTime = System.currentTimeMillis();
-        totalTimeSpent = endTime - startTime;
-    
-        if (end) {
-            close();
-            System.out.println("Server: No more data to send.");
-            System.out.println("Server: All packets sent and acknowledged. Transfer finished.");
-            System.out.printf("Server: Total Bytes Sent: %d%n", totalBytesSent);
-            System.out.printf("Server: Total Retransmissions Sent: %d%n", retransmissionsSent);
-            System.out.printf("Server: Total Time Spent: %.4f seconds%n", totalTimeSpent / 1000.0);
-            return;
-        }
-    }
 }    

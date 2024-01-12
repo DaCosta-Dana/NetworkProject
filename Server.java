@@ -81,7 +81,7 @@ class Server {
             }
         }
 
-        System.out.println("Server: All clients connected.");
+        System.out.println("Server: All clients are connected.");
     }
 
     public void sendFile_goBackN() throws InterruptedException, IOException{
@@ -91,8 +91,10 @@ class Server {
         // Create a list to store filesender threads
         List<Thread> filesender_threads = new ArrayList<>();
 
-        // Create a thread for sending the file
-        Thread filesender_thread = new Thread(() -> fileSender.sendFile());
+        // Launch a thread for sending the file
+        Thread filesender_thread = new Thread(() -> 
+            fileSender.sendFile()
+        );
 
         // Add the thread to the list
         filesender_threads.add(filesender_thread);

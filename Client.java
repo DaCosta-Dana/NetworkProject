@@ -75,7 +75,7 @@ class Client {
             int packet_id = Integer.parseInt(modified_message.substring(0, 6));
 
             // Print the received packet ID to the console
-            System.out.println("Client: Received packet with ID: " + packet_id);
+            System.out.printf("Client: Received packet with ID: %d%n ", packet_id);
 
             // Send acknowledgment for the received packet
             send_ack(packet_id, receiveData.getAddress());

@@ -40,7 +40,6 @@ public class Main {
         int window_size = Integer.parseInt(args[4]);
         
         try {
-
             // Launch the server in a separate thread
             Thread server_thread = new Thread(() -> {
                 try {
@@ -55,7 +54,7 @@ public class Main {
 
             // Launch threads for each client
             for (int i = 0; i < numberOfClients; i++) {
-                // Start a client in a separate thread
+                // Launch a client in a separate thread
                 Thread client_thread = new Thread(() -> {
                     try {
                         launch_client(serverHostName);
@@ -104,17 +103,17 @@ public class Main {
         System.out.println("Server Port: " + serverPort);
 
         // Wait for clients to connect
-        System.out.println("The server is waiting for clients to connect...");
+        System.out.println("The server is waiting for "+ numberOfClients +" clients to connect...");
         server.waitForConnections(numberOfClients);
 
         // Send file to clients
+        System.out.println("------Ready to send data file packets:------");
         server.sendFile_goBackN();
     }
 
     public static void launch_client(String server_IP) throws Exception {
 
         try {
-
             // Create a Client instance and connect to Server
             Client client = new Client(server_IP, serverPort);;
             client.connectToServer();
