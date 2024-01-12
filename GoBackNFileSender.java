@@ -91,8 +91,7 @@ class GoBackNFileSender {
                 } catch (SocketTimeoutException e) {
                     e.printStackTrace();
                 } catch (SocketException e) {
-                    
-                    e.printStackTrace();
+                 
                 }
             });
             threads.add(destination_thread);
@@ -180,7 +179,12 @@ class GoBackNFileSender {
                 // Wait for acknowledgment for all packets from the current window
                 for (int packetId = oldestUnacknowledgedPacket; packetId < windowEnd; packetId++) {
                     for (InetSocketAddress addr : clientAddresses) {
-                        receiveAck(startTime, addr, packetId);
+                        try {
+                            receiveAck(startTime, addr, packetId);
+                        } catch (SocketTimeoutException e) {
+                            
+                        }
+                        
                     }
                 }
 
@@ -266,7 +270,7 @@ class GoBackNFileSender {
         baseMap.put(clientAddress, nextSeqNumMap.get(clientAddress));
     }
 
-    private int receiveAck(long startTime, InetSocketAddress clientAddress, int lastAckedPacketId) throws SocketException, SocketTimeoutException {
+    private int receiveAck(long startTime, InetSocketAddress clientAddress, int lastAckedPacketId) throws IOException {
         byte[] ackMessage = new byte[2048];
         DatagramPacket ackPacket = new DatagramPacket(ackMessage, ackMessage.length);
     
@@ -282,9 +286,7 @@ class GoBackNFileSender {
     
             try {
                 serverSocket.receive(ackPacket);
-            } catch (IOException e) {
-                // Handle other IOException, e.g., log or retry
-                e.printStackTrace();
+            } catch (SocketTimeoutException e) {
                 return lastAckedPacketId;
             }
     
@@ -306,6 +308,9 @@ class GoBackNFileSender {
             } else {
                 System.out.println("Server: Received an empty acknowledgment packet");
             }
+        
+        } catch (IOException e) {
+            e.printStackTrace();
             
         } finally {
             listAckLock.unlock();
