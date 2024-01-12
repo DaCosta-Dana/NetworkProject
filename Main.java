@@ -96,9 +96,10 @@ public class Main {
         // Create a server instance
         Server server = new Server(filename, probability, window_size);
 
+        //Get the server IP address and display it
         System.out.println("Server IP Address: " + server.getServerIPAddress(serverHostName));
 
-        // Get the dynamically assigned port and display it
+        // Get the dynamically assigned server port and display it
         serverPort.set(server.getAssignedServerPort());
         System.out.println("Server Port: " + serverPort);
 
@@ -108,11 +109,6 @@ public class Main {
 
         // Send file to clients
         server.sendFile_goBackN();
-
-        // Send a finish signal and close the server socket
-        server.sendFinishSignal();
-        server.closeSocket();
-
     }
 
     public static void launch_client(String server_IP) throws Exception {

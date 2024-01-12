@@ -84,7 +84,7 @@ class Server {
         System.out.println("Server: All clients connected.");
     }
 
-    public void sendFile_goBackN() throws InterruptedException{
+    public void sendFile_goBackN() throws InterruptedException, IOException{
         // Create a FileSender instance for sending the file
         GoBackNFileSender fileSender = new GoBackNFileSender(serverSocket, clientAddresses, filename, window_size, probability);
 
@@ -106,7 +106,12 @@ class Server {
         for (Thread t : filesender_threads) {
             t.join();
         }
-        
+
+        // Send a finish signal
+        sendFinishSignal();
+
+        // Close the server socket
+        serverSocket.close();
     }
 
     // Private method to send a DatagramPacket to a specified address and port
@@ -122,11 +127,6 @@ class Server {
             byte[] finishSignal = "finished".getBytes();
             send(finishSignal, clientAddress.getAddress(), clientAddress.getPort());
         }
-    }
-
-    // Method to close the server socket
-    public void closeSocket() {
-        serverSocket.close();
     }
 
 }
