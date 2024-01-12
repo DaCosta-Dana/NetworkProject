@@ -4,6 +4,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,17 @@ class Server {
         this.numberOfClients = numberOfClients;
         this.serverSocket = new DatagramSocket();
         this.clientAddresses = new ArrayList<>();
+    }
+
+    // Method to retrieve the server IP address
+    public String getServerIPAddress(String serverHostName) {
+        try {
+            InetAddress serverAddress = InetAddress.getByName(serverHostName);
+            return serverAddress.getHostAddress();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            return null; // Return null in case of an exception
+        }
     }
 
     // Method to retrieve the dynamically assigned port

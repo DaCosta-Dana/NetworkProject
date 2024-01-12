@@ -11,7 +11,7 @@ public class Main {
         if (args.length != 5) {
             System.out.println("""
                 Usage: java Main <id_process> <number_of_processes> <filename> <probability> <window_size>
-                \n<id_process>            = server ID/name 
+                \n<id_process>            = serverHostName (e.g, localhost)
                 \n<number_of_processes>   = number of clients
                 \n<filename>              = file to be send to each client
                 \n<probability>           = probability of an UDP send not to be successful
@@ -28,11 +28,12 @@ public class Main {
             */
 
             /* TODO: include protocol (UDP) to the command line??? */
+            /* TODO: what id_process??? if not localhost, make it in the server class .getLocalHost() */
 
             System.exit(1);
         }
 
-        String server_IP = args[0];                             // id_process = localhost
+        String serverHostName = args[0];                             // id_process = localhost
         int numberOfClients = Integer.parseInt(args[1]);
         String filename = args[2];
         float probability = Float.parseFloat(args[3]);         
@@ -40,10 +41,10 @@ public class Main {
         
         try {
 
-            // Start the server in a separate thread
+            // Launch the server in a separate thread
             Thread server_thread = new Thread(() -> {
                 try {
-                    launch_server(numberOfClients, window_size, filename, probability);
+                    launch_server(numberOfClients, serverHostName,window_size, filename, probability);
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
                 }
@@ -52,12 +53,12 @@ public class Main {
             // Create a list to store client threads
             List<Thread> client_threads = new ArrayList<>();
 
-            // Start threads for each client
+            // Launch threads for each client
             for (int i = 0; i < numberOfClients; i++) {
                 // Start a client in a separate thread
                 Thread client_thread = new Thread(() -> {
                     try {
-                        launch_client(server_IP);
+                        launch_client(serverHostName);
                         
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -67,14 +68,18 @@ public class Main {
                 client_threads.add(client_thread);
             }
 
-            // Start the server thread and all client threads
+            // Start the server thread
             server_thread.start();
+
+            // Start all client threads
             for (Thread t : client_threads) {               
                 t.start();
             }
 
-            // Wait for the server thread and all client threads to finish
+            // Wait for the server thread
             server_thread.join();
+
+            // Wait for all client threads to finish
             for (Thread t : client_threads) {
                 t.join();
             }
@@ -86,14 +91,18 @@ public class Main {
 
     private static AtomicInteger serverPort = new AtomicInteger(-1);  //shared data structure
 
-    public static void launch_server(int numberOfClients, int size, String filename, float probability)  throws InterruptedException, IOException {
+    public static void launch_server(int numberOfClients, String serverHostName, int window_size, String filename, float probability)  throws InterruptedException, IOException {
         
         // Create a server instance
         Server server = new Server(numberOfClients);
 
+        System.out.println("Server IP Address: " + server.getServerIPAddress(serverHostName));
+
         // Get the dynamically assigned port and display it
         serverPort.set(server.getAssignedServerPort());
         System.out.println("Server Port: " + serverPort);
+
+        
 
         // Wait for clients to connect
         System.out.println("The server is waiting for clients to connect...");
@@ -103,7 +112,7 @@ public class Main {
         List<Thread> threads = new ArrayList<>();
 
         // Create a FileSender instance for sending the file
-        GoBackNFileSender fileSender = new GoBackNFileSender(filename, server.serverSocket, size, numberOfClients, server.clientAddresses, probability);
+        GoBackNFileSender fileSender = new GoBackNFileSender(filename, server.serverSocket, window_size, numberOfClients, server.clientAddresses, probability);
 
         // Create a thread for sending the file
         Thread thread = new Thread(() -> fileSender.sendFile());
