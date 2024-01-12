@@ -105,38 +105,46 @@ class GoBackNFileSender {
 
         try {
             long startTime = System.currentTimeMillis();
-            int nextPacketId = 0;
+            int base = 0;
 
             clientSocket.setSoTimeout(ACK_TIMEOUT);
 
-            while (nextPacketId < fileSize / 2048) {
-                int packetId = nextPacketId;
+            while (base < fileSize / 2048) {
+                int windowEnd = (int) Math.min(base + windowSize, fileSize / 2048);
 
-                // Send the packet and handle IOException
-                try {
-                    // Simulate packet loss based on acknowledgment probability
-                    if (Math.round(Math.random() * 1000) / 1000.0 < this.ack_probability) {
-                        System.out.println("Server: Packet with ID : " + packetId + " lost");
+                for (int packetId = base; packetId < windowEnd; packetId++) {
+                    // Send the packet and handle IOException
+                    try {
+                        // Simulate packet loss based on acknowledgment probability
+                        if (Math.round(Math.random() * 1000) / 1000.0 < this.ack_probability) {
+                            System.out.println("Server: Packet with ID : " + packetId + " lost");
 
-                        // Handle packet loss by retransmitting and waiting for acknowledgment
-                        retransmitPacketsAndWait(startTime, clientAddress, packetId);
-                    } else {
-                        // Send the packet to the client
-                        sendPacket(packetId, clientAddress, startTime);
+                            // Handle packet loss by retransmitting and waiting for acknowledgment
+                            retransmitPacketsAndWait(startTime, clientAddress, packetId);
+                        } else {
+                            // Send the packet to the client
+                            sendPacket(packetId, clientAddress, startTime);
+                        }
+
+                        
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        // Handle the exception, e.g., log or retry
+                        continue;
                     }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    // Handle the exception, e.g., log or retry
-                    continue;
                 }
 
                 // Wait for acknowledgment for the current packet
-                int lastAckedPacketId;
-                lastAckedPacketId = receiveAck(startTime, clientAddress, packetId);
+                for (int packetId = base; packetId < windowEnd; packetId++) {
+                    for (InetSocketAddress addr : clientAddresses) {
+                        receiveAck(startTime, addr, packetId);
+                    }
+                }
 
-                // Move to the next packet
-                nextPacketId = lastAckedPacketId + 1;
+                // Move to the next window
+                base = windowEnd;
+                windowEnd += windowSize;
             }
 
             long endTime = System.currentTimeMillis();
@@ -152,7 +160,8 @@ class GoBackNFileSender {
     
 
     // Private method to slide the window after receiving acknowledgments
-        //TODO: In the slideWindow method, update the acknowledgment state after sliding the window
+    //TODO: In the slideWindow method, update the acknowledgment state after sliding the window
+    /* 
     private void slideWindow(long startTime, InetSocketAddress clientAddress, int base) {
         for (int i = base; i < nextSeqNumMap.get(clientAddress); i++) {
             int index = i - base;
@@ -166,6 +175,7 @@ class GoBackNFileSender {
         }
         baseMap.put(clientAddress, nextSeqNumMap.get(clientAddress));
     }
+    */
 
     // Private method to receive acknowledgment from the client
     private int receiveAck(long startTime, InetSocketAddress clientAddress, int lastAckedPacketId) throws SocketException {
@@ -273,11 +283,12 @@ class GoBackNFileSender {
                                 break;
                             }
                         }
-    
+                        /* 
                         if (baseAckedByAll) {
                             // Slide the window for the specific client
                             slideWindow(startTime, actualClientAddress, base);
                         }
+                        */
                     }
                 }
             } finally {
