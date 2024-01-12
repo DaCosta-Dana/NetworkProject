@@ -1,14 +1,10 @@
-import java.net.DatagramSocket;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
-
-    private static AtomicInteger serverSocket = new AtomicInteger(-1);  //shared data structure
+    
 
     public static void main(String[] args) {
 
@@ -36,7 +32,7 @@ public class Main {
             System.exit(1);
         }
 
-        String server_id = args[0];                             // id_process = localhost
+        String server_IP = args[0];                             // id_process = localhost
         int numberOfClients = Integer.parseInt(args[1]);
         String filename = args[2];
         float probability = Float.parseFloat(args[3]);         
@@ -47,7 +43,7 @@ public class Main {
             // Start the server in a separate thread
             Thread server_thread = new Thread(() -> {
                 try {
-                    start_server(numberOfClients, window_size, filename, probability);
+                    launch_server(numberOfClients, window_size, filename, probability);
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
                 }
@@ -61,7 +57,7 @@ public class Main {
                 // Start a client in a separate thread
                 Thread client_thread = new Thread(() -> {
                     try {
-                        start_client(server_id);
+                        launch_client(server_IP);
                         
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -88,14 +84,16 @@ public class Main {
         }
     }
 
-    public static void start_server(int numberOfClients, int size, String filename, float probability)  throws InterruptedException, IOException {
+    private static AtomicInteger serverPort = new AtomicInteger(-1);  //shared data structure
+
+    public static void launch_server(int numberOfClients, int size, String filename, float probability)  throws InterruptedException, IOException {
         
         // Create a server instance
         Server server = new Server(numberOfClients);
 
-        // Get the assigned port and display it
-        serverSocket.set(server.getAssignedServerPort());
-        System.out.println("The dynamically assigned server socket is " + serverSocket);
+        // Get the dynamically assigned port and display it
+        serverPort.set(server.getAssignedServerPort());
+        System.out.println("Server Port: " + serverPort);
 
         // Wait for clients to connect
         System.out.println("The server is waiting for clients to connect...");
@@ -129,26 +127,14 @@ public class Main {
 
     }
 
-    public static void start_client(String server_id) throws Exception {
+    public static void launch_client(String server_IP) throws Exception {
+
         try {
-            // Create a DatagramSocket for the client
-            DatagramSocket clientSocket = new DatagramSocket();
-
-            // Get the server IP Address using the server_id (e.g. localhost)
-            InetAddress serverIPAddress = InetAddress.getByName(server_id);
-            
-            // Prepare the message to send and connect to the server
-            String connectionRequestMessage = "1";
-            byte[] sendData = connectionRequestMessage.getBytes();
-
-            // Create a DatagramPacket to send the data to the server
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverIPAddress, serverSocket.get());
-            
-            // Send the packet to the server
-            clientSocket.send(sendPacket);
 
             // Create a client instance to receive data from the server
-            Client client = new Client(clientSocket, serverSocket.get());
+            Client client = new Client(server_IP, serverPort);
+
+            client.connectToServer();
 
             // Receive data from the server
             client.receive_data();
@@ -156,5 +142,6 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 }

@@ -32,7 +32,7 @@ class Server {
         return true;
     }
 
-    // Method to wait for connections from clients
+   
     public void waitForConnections() throws IOException {
 
         // Loop used to continuously wait for connections from cliens until the desired numberOfClients

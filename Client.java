@@ -1,23 +1,54 @@
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 class Client {
     private DatagramSocket clientSocket;
     private int total_bytes_received;
     // private int retransmissions_received;
     private List<Integer> list_ack;
-    private int serverSocket;
+    private String server_IP;
+    private AtomicInteger serverPort;
+    
     
     // Constructor to initialize the Client
-    public Client(DatagramSocket clientSocket, int serverSocket) {
-        this.clientSocket = clientSocket;
+    public Client(String server_IP,AtomicInteger serverPort) throws SocketException {
+        this.server_IP = server_IP;
+        this.serverPort = serverPort;
+        this.clientSocket = new DatagramSocket();
+        this.list_ack = new ArrayList<>();
         // this.total_bytes_received = 0;
         // this.retransmissions_received = 0;
-        this.list_ack = new ArrayList<>();
-        this.serverSocket = serverSocket;
+    }
+
+    public void connectToServer() throws IOException {
+
+        // Wait for the serverSocket to be dynamically assigned
+        while (serverPort.get() == -1) {
+            try {
+                Thread.sleep(100);  // Adjust sleep duration as needed
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Get the server IP Address (e.g. localhost)
+        InetAddress serverIPAddress = InetAddress.getByName(server_IP);
+        
+        // Prepare the message to send and connect to the server
+        String connectionRequestMessage = "1";
+        byte[] sendData = connectionRequestMessage.getBytes();
+
+        // Create a DatagramPacket to send the data to the server
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverIPAddress, serverPort.get());
+        
+        // Send the packet to the server
+        clientSocket.send(sendPacket);
     }
     
     public void receive_data() throws Exception {
@@ -67,7 +98,7 @@ class Client {
         byte[] acknowledgment = Integer.toString(packet_id).getBytes();
         
         // Create a DatagramPacket with the acknowledgment data, server address, and a specific port
-        DatagramPacket packet = new DatagramPacket(acknowledgment, acknowledgment.length, server_address, serverSocket); 
+        DatagramPacket packet = new DatagramPacket(acknowledgment, acknowledgment.length, server_address, serverPort.get()); 
         
         // Send the acknowledgment packet using the client socket
         clientSocket.send(packet);
