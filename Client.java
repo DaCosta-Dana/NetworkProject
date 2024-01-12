@@ -50,7 +50,7 @@ class Client {
         clientSocket.send(sendPacket);
     }
     
-    public void receive_data() throws Exception {
+    public void receiveFile() throws Exception {
         while (true) {
             // Create buffer to store incoming data packets
             byte[] buffer = new byte[2048];     // length of 2048 bytes (TODO: can be changed)

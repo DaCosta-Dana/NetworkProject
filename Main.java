@@ -44,7 +44,7 @@ public class Main {
             // Launch the server in a separate thread
             Thread server_thread = new Thread(() -> {
                 try {
-                    launch_server(numberOfClients, serverHostName,window_size, filename, probability);
+                    launch_server(serverHostName, numberOfClients,filename, probability, window_size);
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
                 }
@@ -91,10 +91,10 @@ public class Main {
 
     private static AtomicInteger serverPort = new AtomicInteger(-1);  //shared data structure
 
-    public static void launch_server(int numberOfClients, String serverHostName, int window_size, String filename, float probability)  throws InterruptedException, IOException {
+    public static void launch_server(String serverHostName, int numberOfClients, String filename, float probability, int window_size)  throws InterruptedException, IOException {
         
         // Create a server instance
-        Server server = new Server(numberOfClients);
+        Server server = new Server(filename, probability, window_size);
 
         System.out.println("Server IP Address: " + server.getServerIPAddress(serverHostName));
 
@@ -104,29 +104,10 @@ public class Main {
 
         // Wait for clients to connect
         System.out.println("The server is waiting for clients to connect...");
-        server.waitForConnections();
+        server.waitForConnections(numberOfClients);
 
-        // Create a FileSender instance for sending the file
-        GoBackNFileSender fileSender = new GoBackNFileSender(server.serverSocket, server.clientAddresses, filename, window_size, probability);
-
-        // Create a list to store filesender threads
-        List<Thread> filesender_threads = new ArrayList<>();
-
-        // Create a thread for sending the file
-        Thread filesender_thread = new Thread(() -> fileSender.sendFile());
-
-        // Add the thread to the list
-        filesender_threads.add(filesender_thread);
-
-        // Start all threads
-        for (Thread t : filesender_threads) {
-            t.start();
-        }
-
-        // Wait for all threads to finish
-        for (Thread t : filesender_threads) {
-            t.join();
-        }
+        // Send file to clients
+        server.sendFile_goBackN();
 
         // Send a finish signal and close the server socket
         server.sendFinishSignal();
@@ -142,8 +123,8 @@ public class Main {
             Client client = new Client(server_IP, serverPort);;
             client.connectToServer();
 
-            // Receive data from the server
-            client.receive_data();
+            // Receive file from the server
+            client.receiveFile();
             
         } catch (IOException e) {
             e.printStackTrace();

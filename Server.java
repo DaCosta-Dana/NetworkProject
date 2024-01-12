@@ -10,13 +10,18 @@ import java.util.List;
 
 //The Server class provides a simple implementation for a server that can accept multiple client connections using DatagramSocket.
 class Server {
-    private int numberOfClients;
+    private String filename;
+    private float probability;
+    private int window_size;
+
     DatagramSocket serverSocket;
     List<InetSocketAddress> clientAddresses;
     
     // Constructor to initialize the Server
-    public Server(int numberOfClients) throws SocketException {
-        this.numberOfClients = numberOfClients;
+    public Server(String filename, float probability, int window_size) throws SocketException {
+        this.filename = filename;
+        this.probability = probability;
+        this.window_size = window_size;
         this.serverSocket = new DatagramSocket();
         this.clientAddresses = new ArrayList<>();
     }
@@ -37,15 +42,7 @@ class Server {
         return serverSocket.getLocalPort();
     }
 
-    // Private method to send a DatagramPacket to a specified address and port
-    private boolean send(byte[] data, InetAddress address, int assignedPort) throws IOException {
-        DatagramPacket packet = new DatagramPacket(data, data.length, address, assignedPort);
-        serverSocket.send(packet);
-        return true;
-    }
-
-   
-    public void waitForConnections() throws IOException {
+    public void waitForConnections(int numberOfClients) throws IOException {
 
         // Loop used to continuously wait for connections from cliens until the desired numberOfClients
         while (clientAddresses.size() < numberOfClients) {
@@ -85,6 +82,38 @@ class Server {
         }
 
         System.out.println("Server: All clients connected.");
+    }
+
+    public void sendFile_goBackN() throws InterruptedException{
+        // Create a FileSender instance for sending the file
+        GoBackNFileSender fileSender = new GoBackNFileSender(serverSocket, clientAddresses, filename, window_size, probability);
+
+        // Create a list to store filesender threads
+        List<Thread> filesender_threads = new ArrayList<>();
+
+        // Create a thread for sending the file
+        Thread filesender_thread = new Thread(() -> fileSender.sendFile());
+
+        // Add the thread to the list
+        filesender_threads.add(filesender_thread);
+
+        // Start all threads
+        for (Thread t : filesender_threads) {
+            t.start();
+        }
+
+        // Wait for all threads to finish
+        for (Thread t : filesender_threads) {
+            t.join();
+        }
+        
+    }
+
+    // Private method to send a DatagramPacket to a specified address and port
+    private boolean send(byte[] data, InetAddress address, int assignedPort) throws IOException {
+        DatagramPacket packet = new DatagramPacket(data, data.length, address, assignedPort);
+        serverSocket.send(packet);
+        return true;
     }
 
     // Method to send a finish signal to all connected clients
