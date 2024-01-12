@@ -19,33 +19,39 @@ import java.util.concurrent.locks.ReentrantLock;
 
 //File sending logic: Go-back-N Protocol
 class GoBackNFileSender {
-    private String filename;
     private DatagramSocket serverSocket;
-    private int windowSize;
+    private List<InetSocketAddress> clientAddresses;
+    private String filename;
+    private int window_size;
+    private float probability;
+
     private int totalBytesSent;
     private int retransmissionsSent;
-    private List<InetSocketAddress> clientAddresses;
+    
     private Deque<Integer> sentPacketIds;
     private boolean end;
-    private boolean[] ackReceivedArray = new boolean[windowSize];  // To keep track of received acks
+    private boolean[] ackReceivedArray = new boolean[window_size];  // To keep track of received acks
     private long fileSize;
     private static final int ACK_TIMEOUT = 500;
     private Map<Integer, Long> sentTimes;
     private final Lock listAckLock;
     private Map<InetSocketAddress, Integer> baseMap;
     private Map<InetSocketAddress, Integer> nextSeqNumMap;
-    private float ack_probability;
+    
     private Set<Integer> acknowledgedPackets;  // To keep track of acknowledged packets
     private long totalTimeSpent;
 
     // Constructor to initialize FileSender
     public GoBackNFileSender(DatagramSocket serverSocket, List<InetSocketAddress> clientAddresses, String filename , int window_size, float probability) {
-        this.filename = filename;
         this.serverSocket = serverSocket;
-        this.windowSize = window_size;
+        this.clientAddresses = clientAddresses;
+        this.filename = filename;
+        this.window_size = window_size;
+        this.probability = probability;
+
         this.totalBytesSent = 0;
         this.retransmissionsSent = 0;
-        this.clientAddresses = clientAddresses;
+        
         this.sentPacketIds = new ArrayDeque<>();
         this.totalTimeSpent = 0;
         this.end = false;
@@ -54,7 +60,7 @@ class GoBackNFileSender {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.ackReceivedArray = new boolean[windowSize];
+        this.ackReceivedArray = new boolean[window_size];
         this.sentTimes = new HashMap<>();
         this.listAckLock = new ReentrantLock(); 
         baseMap = new HashMap<>();
@@ -62,8 +68,7 @@ class GoBackNFileSender {
         for (InetSocketAddress clientAddress : clientAddresses) {
             baseMap.put(clientAddress, 0);
             nextSeqNumMap.put(clientAddress, 0);
-        }
-        this.ack_probability = probability;
+        } 
     }
 
     // Private method to send a specific packet to the client
@@ -123,7 +128,7 @@ class GoBackNFileSender {
             int base = 0;
 
             while (base < fileSize / 2048) {
-                int windowEnd = (int) Math.min(base + windowSize, fileSize / 2048);
+                int windowEnd = (int) Math.min(base + window_size, fileSize / 2048);
 
                 // Send packets for the current window
                 for (int packetId = base; packetId < windowEnd; packetId++) {
@@ -219,7 +224,7 @@ class GoBackNFileSender {
     
             if (ackPacket.getLength() > 0) {
                 // Simulate acknowledgment loss based on acknowledgment probability
-                if (Math.random() >= ack_probability) {
+                if (Math.random() >= probability) {
                     int ackId = Integer.parseInt(new String(ackPacket.getData(), 0, ackPacket.getLength()));
     
                     // Find the client that sent the acknowledgment
@@ -298,11 +303,11 @@ class GoBackNFileSender {
                     // Update acknowledgment state for the specific client
                     int base = baseMap.get(actualClientAddress);
                     int index = ackId - base;
-                    if (index >= 0 && index < windowSize) {
+                    if (index >= 0 && index < window_size) {
                         ackReceivedArray[index] = true;
     
                         // Check if all packets in the window are acknowledged
-                        for (int i = 0; i < windowSize; i++) {
+                        for (int i = 0; i < window_size; i++) {
                             if (!ackReceivedArray[i]) {
                                 baseAckedByAll = false;
                                 break;
@@ -343,7 +348,7 @@ class GoBackNFileSender {
         for (InetSocketAddress clientAddress : clientAddresses) {
             Thread thread = new Thread(() -> {
                 try {
-                    sendToClient(clientAddress, ack_probability);
+                    sendToClient(clientAddress, probability);
                 } catch (SocketTimeoutException e) {
                     e.printStackTrace();
                 } catch (SocketException e) {

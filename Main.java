@@ -106,25 +106,25 @@ public class Main {
         System.out.println("The server is waiting for clients to connect...");
         server.waitForConnections();
 
-        // Initialize a list to store threads
-        List<Thread> threads = new ArrayList<>();
-
         // Create a FileSender instance for sending the file
         GoBackNFileSender fileSender = new GoBackNFileSender(server.serverSocket, server.clientAddresses, filename, window_size, probability);
 
+        // Create a list to store filesender threads
+        List<Thread> filesender_threads = new ArrayList<>();
+
         // Create a thread for sending the file
-        Thread thread = new Thread(() -> fileSender.sendFile());
+        Thread filesender_thread = new Thread(() -> fileSender.sendFile());
 
         // Add the thread to the list
-        threads.add(thread);
+        filesender_threads.add(filesender_thread);
 
         // Start all threads
-        for (Thread t : threads) {
+        for (Thread t : filesender_threads) {
             t.start();
         }
 
         // Wait for all threads to finish
-        for (Thread t : threads) {
+        for (Thread t : filesender_threads) {
             t.join();
         }
 
