@@ -48,7 +48,7 @@ class Server {
         while (clientAddresses.size() < numberOfClients) {
 
             // Create buffer to store incoming data packets
-            byte[] buffer = new byte[2048];        // length of 2048 bytes (TODO: can be changed)
+            byte[] buffer = new byte[2048];        // length of 2048 bytes TODO: create variable that holds the 2048 through the program
             
             // Create a DatagramPacket to receive data packet from the client
             DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length); 
