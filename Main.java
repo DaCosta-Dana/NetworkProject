@@ -102,8 +102,6 @@ public class Main {
         serverPort.set(server.getAssignedServerPort());
         System.out.println("Server Port: " + serverPort);
 
-        
-
         // Wait for clients to connect
         System.out.println("The server is waiting for clients to connect...");
         server.waitForConnections();
@@ -112,7 +110,7 @@ public class Main {
         List<Thread> threads = new ArrayList<>();
 
         // Create a FileSender instance for sending the file
-        GoBackNFileSender fileSender = new GoBackNFileSender(filename, server.serverSocket, window_size, numberOfClients, server.clientAddresses, probability);
+        GoBackNFileSender fileSender = new GoBackNFileSender(server.serverSocket, server.clientAddresses, filename, window_size, probability);
 
         // Create a thread for sending the file
         Thread thread = new Thread(() -> fileSender.sendFile());
@@ -140,9 +138,8 @@ public class Main {
 
         try {
 
-            // Create a client instance to receive data from the server
-            Client client = new Client(server_IP, serverPort);
-
+            // Create a Client instance and connect to Server
+            Client client = new Client(server_IP, serverPort);;
             client.connectToServer();
 
             // Receive data from the server

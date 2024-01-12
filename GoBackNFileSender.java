@@ -19,8 +19,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 //File sending logic: Go-back-N Protocol
 class GoBackNFileSender {
-    private String fileName;
-    private DatagramSocket clientSocket;
+    private String filename;
+    private DatagramSocket serverSocket;
     private int windowSize;
     private int totalBytesSent;
     private int retransmissionsSent;
@@ -39,17 +39,17 @@ class GoBackNFileSender {
     private long totalTimeSpent;
 
     // Constructor to initialize FileSender
-    public GoBackNFileSender(String fileName, DatagramSocket clientSocket, int size, int clientNumber, List<InetSocketAddress> clientAddresses, float ack_probability) {
-        this.fileName = fileName;
-        this.clientSocket = clientSocket;
-        this.windowSize = size;
+    public GoBackNFileSender(DatagramSocket serverSocket, List<InetSocketAddress> clientAddresses, String filename , int window_size, float probability) {
+        this.filename = filename;
+        this.serverSocket = serverSocket;
+        this.windowSize = window_size;
         this.totalBytesSent = 0;
         this.retransmissionsSent = 0;
         this.clientAddresses = clientAddresses;
         this.sentPacketIds = new ArrayDeque<>();
         this.totalTimeSpent = 0;
         this.end = false;
-        try (FileInputStream fileInputStream = new FileInputStream(fileName)) {
+        try (FileInputStream fileInputStream = new FileInputStream(filename)) {
             this.fileSize = fileInputStream.available();
         } catch (IOException e) {
             e.printStackTrace();
@@ -63,7 +63,7 @@ class GoBackNFileSender {
             baseMap.put(clientAddress, 0);
             nextSeqNumMap.put(clientAddress, 0);
         }
-        this.ack_probability = ack_probability;
+        this.ack_probability = probability;
     }
 
     // Private method to send a specific packet to the client
@@ -73,7 +73,7 @@ class GoBackNFileSender {
         byte[] data = new byte[2048];
         int bytesRead;
     
-        try (FileInputStream file = new FileInputStream(fileName)) {
+        try (FileInputStream file = new FileInputStream(filename)) {
             // Skip bytes in the file to reach the appropriate position for the current packet
             long skipBytes = packetId * 2048;
             while (skipBytes > 0) {
@@ -97,7 +97,7 @@ class GoBackNFileSender {
                 // Create a DatagramPacket with the packet data and send it to the client
                 DatagramPacket packet = new DatagramPacket(packetData, packetData.length, clientAddress.getAddress(), clientAddress.getPort());
                 long timeTaken = System.currentTimeMillis() - startTime;
-                clientSocket.send(packet);
+                serverSocket.send(packet);
                 sentTimes.put(packetId, System.currentTimeMillis());
     
                 // Print information about the sent packet
@@ -116,7 +116,7 @@ class GoBackNFileSender {
         int clientId = clientAddress.getPort();
         System.out.printf("Server: Thread for client %d started.%n", clientId);
 
-        clientSocket.setSoTimeout(ACK_TIMEOUT);
+        serverSocket.setSoTimeout(ACK_TIMEOUT);
 
         try {
             long startTime = System.currentTimeMillis();
@@ -148,7 +148,7 @@ class GoBackNFileSender {
                 }
 
                 // Set a timeout for acknowledgment reception
-                clientSocket.setSoTimeout(ACK_TIMEOUT);
+                serverSocket.setSoTimeout(ACK_TIMEOUT);
 
                // Wait for acknowledgment for all packets from the current window
                 for (int packetId = base; packetId < windowEnd; packetId++) {
@@ -158,13 +158,13 @@ class GoBackNFileSender {
                 }
 
                 // Reset socket timeout to 0 (infinite)
-                clientSocket.setSoTimeout(0);
+                serverSocket.setSoTimeout(0);
 
                 // Move to the next window
                 base = windowEnd;
 
                 // Reset socket timeout to 0 (infinite)
-                clientSocket.setSoTimeout(0);
+                serverSocket.setSoTimeout(0);
             }
 
             long endTime = System.currentTimeMillis();
@@ -202,15 +202,15 @@ class GoBackNFileSender {
         listAckLock.lock();
         try {
             // Set a timeout for acknowledgment reception
-            clientSocket.setSoTimeout(ACK_TIMEOUT);
+            serverSocket.setSoTimeout(ACK_TIMEOUT);
     
             // Check if the socket is still open
-            if (clientSocket.isClosed()) {
+            if (serverSocket.isClosed()) {
                 return lastAckedPacketId;
             }
     
             try {
-                clientSocket.receive(ackPacket);
+                serverSocket.receive(ackPacket);
             } catch (IOException e) {
                 // Handle other IOException, e.g., log or retry
                 e.printStackTrace();
@@ -326,8 +326,8 @@ class GoBackNFileSender {
 
     // Add a close method to close the DatagramSocket
     public void close() {
-        if (clientSocket != null && !clientSocket.isClosed()) {
-            clientSocket.close();
+        if (serverSocket != null && !serverSocket.isClosed()) {
+            serverSocket.close();
         }
     }
     

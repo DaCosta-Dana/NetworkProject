@@ -27,7 +27,6 @@ class Client {
     }
 
     public void connectToServer() throws IOException {
-
         // Wait for the serverSocket to be dynamically assigned
         while (serverPort.get() == -1) {
             try {
