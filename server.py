@@ -26,7 +26,6 @@ class FileSender:
         self.ack_lock = threading.Lock()
         self.sent_packet_ids = deque()
         self.list_ack = []
-        self.last_ack_received = -1
         self.end = False
         self.ack_received = 0
         self.end_acks = []
@@ -34,15 +33,23 @@ class FileSender:
         
 
     def send_packet(self, packet_id, data, client_address, start_time):
+        """
+        Sends packet to the client with the given packet ID and data.
 
+        Args:
+        - packet_id: The ID of the packet to send.
+        - data: The data to send.
+        - client_address: The address of the client to send the packet to.
+        - start_time: The start time of the file transfer.
+
+        Returns:
+        - None
+        """
 
         packet_data = {
             'id': packet_id,
             'packet': f"{packet_id:06d}".encode() + data
         }
-
-       # {0, 000002aaaaaaaaaaaaaaaaaaaaaaaaaaaa}
-
 
         self.client_socket.sendto(packet_data['packet'], client_address)
         
@@ -53,25 +60,37 @@ class FileSender:
 
         self.sent_packet_ids.append(int(packet_data['id']))
 
-        self.client_socket.settimeout(0.5)
+        self.client_socket.settimeout(0.005)
         
         if not data:
             print("No more datas to sent")
             self.end = True
             return
-    
+
+        time.sleep(0.0001)
 
     def receive_acknowledgment(self, start_time, window_size, file):
-        
-        data = file.read(2048)
+        """
+        Receives acknowledgment from the client and handles retransmission if necessary.
+
+        Args:
+        - start_time: The start time of the file transfer.
+        - window_size: The size of the window.
+        - file: The file being transferred.
+
+        Returns:
+        - None
+        """
+
+        data = file.read(60000)
         
         while self.sent_packet_ids:
 
             try:
 
-                time.sleep(0.1)
-                ack_message, _ = self.client_socket.recvfrom(2048)
-                time.sleep(0.05)
+                #time.sleep(0.0001)
+                ack_message, _ = self.client_socket.recvfrom(60000)
+                #time.sleep(0.0001)
                 
                 if ack_message:
 
@@ -107,12 +126,14 @@ class FileSender:
                                         self.list_ack.remove(self.ack_received)
 
 
-                                    data = file.read(2048)
+                                    data = file.read(60000)
 
                                     for client_address in self.client_addresses:
                                         self.send_packet(self.ack_received + self.size, data, client_address, start_time)
                                         
+                                        
                                     self.ack_received += 1
+                                    
                                 
                                 else:
                                     return
@@ -124,22 +145,31 @@ class FileSender:
                         
                        
 
-                       
-            except timeout:
-
-                self.retransmissions_sent += 1
-                for client_address in self.client_addresses:
-                    
-                    for packet_id2 in range(self.ack_received, self.ack_received + window_size):
-                                    
+                
+            except timeout :
+            
+                for packet_id2 in range(self.ack_received, self.ack_received + window_size):
+                    self.retransmissions_sent += 1
+                    for client_address in self.client_addresses:
+                               
                             self.send_packet(packet_id2, data, client_address, start_time)
-
+                            
                             time_taken = time.time() - start_time
                             print(f"{time_taken:.4f} >> Retransmission sent")
-
+                
+                time.sleep(0.0001)
                  
 
     def send_to_client(self, client_address):
+        """
+        Sends the file to the client with the given address.
+
+        Args:
+        - client_address: The address of the client to send the file to.
+
+        Returns:
+        - None
+        """
 
         client_id = str(client_address[1])
       
@@ -152,15 +182,15 @@ class FileSender:
             window_size = self.size
 
             while True:
-                for packet_id in range(self.last_ack_received + 1, self.last_ack_received + 1 + window_size): # A CHANGER
-                    data = file.read(2048)
+                for packet_id in range(0, window_size):
+                    data = file.read(60000)
 
                     if not data:
                         return
 
                     self.send_packet(packet_id, data, client_address, start_time)
                     
-                    time.sleep(0.05)
+                    time.sleep(0.0001)
 
                 if not data:
                     break
@@ -173,7 +203,18 @@ class FileSender:
         print(f"Thread for client {client_id} finished.")
 
     def send_file(self):
+        """
+        Sends the file to all connected clients.
+
+        Args:
+        - None
+
+        Returns:
+        - None
+        """
+
         threads = []
+        start_time = time.time()
 
         for client_address in self.client_addresses:
             thread = threading.Thread(target=self.send_to_client, args=(client_address,))
@@ -183,6 +224,13 @@ class FileSender:
         # Wait for all threads to finish
         for thread in threads:
             thread.join()
+        
+        end_time = time.time()
+        total_time = end_time - start_time
+        bandwidth_bps = self.total_bytes_sent / total_time
+        bandwidth_kbps = bandwidth_bps / 1024
+
+        print(f"Bandwidth: {bandwidth_bps:.2f} Bps {bandwidth_kbps:.2f} kbps)")
 
         print("All packets sent and acknowledged. Transfer finished.")
         print(f"Total Bytes Sent: {self.total_bytes_sent}")
@@ -199,8 +247,18 @@ class Server:
         self.client_addresses = []
 
     def wait_for_connections(self):
+        """
+        Waits for all clients to connect to the server.
+
+        Args:
+        - None
+
+        Returns:
+        - None
+        """
+
         while len(self.client_addresses) < self.client_number:
-            message, client_address = self.server_socket.recvfrom(2048)
+            message, client_address = self.server_socket.recvfrom(60000)
 
             if message == b'1':
                 print(f"Client connected: {client_address}")
@@ -209,12 +267,33 @@ class Server:
         print("All clients connected.")
 
     def send_finish_signal(self):
+        """
+        Sends the finish signal to all connected clients.
+
+        Args:
+        - None
+
+        Returns:
+        - None
+        """
+
         for client_address in self.client_addresses:
             self.server_socket.sendto(b'finished', client_address)
 
     def close_socket(self):
+        """
+        Closes the server socket.
+
+        Args:
+        - None
+
+        Returns:
+        - None
+        """
+
         self.server_socket.close()
 
 
+    
     
     
