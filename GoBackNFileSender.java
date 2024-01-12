@@ -191,9 +191,13 @@ class GoBackNFileSender {
                 clientSocket.receive(ackPacket);
             } catch (SocketTimeoutException e) {
                 // Handle timeout - retransmit the packets if needed
+                if (allAcksReceivedForPacket(lastAckedPacketId)){
+                    return lastAckedPacketId;
+                } else {
                 System.out.println("Server: Acknowledgment timeout. Retransmitting packets...");
                 retransmitPacketsAndWait(startTime, clientAddress, lastAckedPacketId);
                 return lastAckedPacketId;
+                }
             } catch (IOException e) {
                 // Handle other IOException, e.g., log or retry
                 e.printStackTrace();
@@ -227,6 +231,21 @@ class GoBackNFileSender {
         }
         return null;
     }
+
+    private boolean allAcksReceivedForPacket(int packetId) {
+        for (InetSocketAddress clientAddress : clientAddresses) {
+            int base = baseMap.get(clientAddress);
+            int index = packetId - base;
+    
+            // Check if the acknowledgment for the packet is received
+            if (index >= 0 && index < windowSize && !ackReceivedArray[index]) {
+                return false;  // Acknowledgment not received from this client
+            }
+        }
+    
+        return true;  // Acknowledgments received from all clients
+    }
+    
     
     // Private method to retransmit packets in case of acknowledgment timeout
     private void retransmitPacketsAndWait(long startTime, InetSocketAddress clientAddress, int lastAckedPacketId) {
