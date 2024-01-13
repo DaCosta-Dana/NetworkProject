@@ -8,18 +8,22 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 class Client {
-    private DatagramSocket clientSocket;
-    private int total_bytes_received;
-    // private int retransmissions_received;
-    private List<Integer> list_ack;
     private String server_IP;
     private AtomicInteger serverPort;
-    
+    private int bufferSize;
+
+    private DatagramSocket clientSocket;
+    private List<Integer> list_ack;
+
+    private int total_bytes_received;
+    // private int retransmissions_received;
     
     // Constructor to initialize the Client
-    public Client(String server_IP,AtomicInteger serverPort) throws SocketException {
+    public Client(String server_IP, AtomicInteger serverPort, int bufferSize) throws SocketException {
         this.server_IP = server_IP;
         this.serverPort = serverPort;
+        this.bufferSize = bufferSize;
+
         this.clientSocket = new DatagramSocket();
         this.list_ack = new ArrayList<>();
         // this.total_bytes_received = 0;
@@ -53,7 +57,7 @@ class Client {
     public void receiveFile() throws Exception {
         while (true) {
             // Create buffer to store incoming data packets
-            byte[] buffer = new byte[2048];     // length of 2048 bytes (TODO: can be changed)
+            byte[] buffer = new byte[bufferSize];
 
             // Create a DatagramPacket to receive data packet from the server
             DatagramPacket receiveData = new DatagramPacket(buffer, buffer.length);

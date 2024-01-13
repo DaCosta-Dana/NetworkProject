@@ -58,7 +58,7 @@ public class Main {
                 // Launch a client in a separate thread
                 Thread client_thread = new Thread(() -> {
                     try {
-                        launch_client(serverHostName);
+                        launch_client(serverHostName, bufferSize);
                         
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -112,11 +112,11 @@ public class Main {
         server.sendFile_goBackN();
     }
 
-    public static void launch_client(String server_IP) throws Exception {
+    public static void launch_client(String server_IP, int bufferSize) throws Exception {
 
         try {
             // Create a Client instance and connect to Server
-            Client client = new Client(server_IP, serverPort);;
+            Client client = new Client(server_IP, serverPort, bufferSize);;
             client.connectToServer();
 
             // Receive file from the server
@@ -126,5 +126,13 @@ public class Main {
             e.printStackTrace();
         }
 
+    }
+
+    public static long getCurrentTime() {
+        return System.currentTimeMillis();
+    }
+
+    public static double calculateElapsedTime(long startTime) {
+        return (getCurrentTime() - startTime) / 1000.0;
     }
 }

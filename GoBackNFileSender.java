@@ -109,7 +109,7 @@ class GoBackNFileSender {
         }
 
         // Calculate and print statistics about the file transfer
-        long endTime = System.currentTimeMillis();
+        long endTime = Main.getCurrentTime();
         totalTimeSpent = endTime - startTime;
 
         if (end) {
