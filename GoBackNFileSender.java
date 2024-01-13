@@ -52,6 +52,7 @@ class GoBackNFileSender {
         this.probability = probability;
 
         try (FileInputStream fileInputStream = new FileInputStream(filename)) {
+            // Open a FileInputStream to read a file, estimates its size using available()
             this.fileSize = fileInputStream.available();
         } catch (IOException e) {
             e.printStackTrace();
@@ -69,58 +70,56 @@ class GoBackNFileSender {
         this.listAckLock = new ReentrantLock(); 
         baseMap = new HashMap<>();
         nextSeqNumMap = new HashMap<>();
+
         for (InetSocketAddress clientAddress : clientAddresses) {
             baseMap.put(clientAddress, 0);
             nextSeqNumMap.put(clientAddress, 0);
         }
-        
     }
 
-    // Private method to send a specific packet to the client
-    private void sendPacket(int packetId, InetSocketAddress clientAddress, long startTime) throws IOException {
-        
-        // Initialize buffer to store data from the file
-        byte[] data = new byte[2048];
-        int bytesRead;
-    
-        try (FileInputStream file = new FileInputStream(filename)) {
-            // Skip bytes in the file to reach the appropriate position for the current packet
-            long skipBytes = packetId * 2048;
-            while (skipBytes > 0) {
-                long skipped = file.skip(skipBytes);
-                if (skipped <= 0) {
-                    System.err.println("Error skipping bytes in the file.");
-                    return;
+    // Public method to initiate the file transfer to all clients
+    public void sendFile() {
+        // Initialize a set to keep track of acknowledged packets for each file transfer
+        acknowledgedPackets = new HashSet<>();  
+        List<Thread> threads = new ArrayList<>();
+        long startTime = System.currentTimeMillis();
+
+        // Launch and start a separate thread for each client to send data concurrently
+        for (InetSocketAddress clientAddress : clientAddresses) {
+            Thread thread = new Thread(() -> {
+                try {
+                    sendToClient(clientAddress, probability);
+                } catch (SocketTimeoutException e) {
+                    e.printStackTrace();
                 }
-                skipBytes -= skipped;
-            }
-    
-            // Read data from the file into the buffer
-            bytesRead = file.read(data);
-    
-            if (bytesRead > 0) {
-                // Create the packet data by combining packet ID and file data
-                byte[] packetData = new byte[bytesRead + 6];
-                System.arraycopy(String.format("%06d", packetId).getBytes(), 0, packetData, 0, 6);
-                System.arraycopy(data, 0, packetData, 6, bytesRead);
-    
-                // Create a DatagramPacket with the packet data and send it to the client
-                DatagramPacket packet = new DatagramPacket(packetData, packetData.length, clientAddress.getAddress(), clientAddress.getPort());
-                long timeTaken = System.currentTimeMillis() - startTime;
-                serverSocket.send(packet);
-                sentTimes.put(packetId, System.currentTimeMillis());
-    
-                // Print information about the sent packet
-                System.out.printf("Server: %.4f >> Data sent to client %d, Packet ID: %d%n", timeTaken / 1000.0, clientAddress.getPort(), packetId);
-    
-                // Update statistics and tracking for the sent packet
-                totalBytesSent += packetData.length;
-                sentPacketIds.add(packetId);
-                acknowledgedPackets.add(packetId);                 // Register the sent packet for acknowledgment tracking
+            });
+            threads.add(thread);
+            thread.start();
+        }
+
+        // Wait for all threads to finish
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
+
+        // Calculate and print statistics about the file transfer
+        long endTime = System.currentTimeMillis();
+        totalTimeSpent = endTime - startTime;
+
+        if (end) {
+            System.out.println("Server: No more data to send.");
+            System.out.println("Server: All packets sent and acknowledged. Transfer finished.");
+            System.out.printf("Server: Total Bytes Sent: %d%n", totalBytesSent);
+            System.out.printf("Server: Total Retransmissions Sent: %d%n", retransmissionsSent);
+            System.out.printf("Server: Total Time Spent: %.4f seconds%n", totalTimeSpent / 1000.0);
+            return;
+        }
     }
-    
+
     // Private method to handle sending data to a specific client
     private void sendToClient(InetSocketAddress clientAddress, float probability) throws SocketTimeoutException {
         int clientId = clientAddress.getPort();
@@ -179,6 +178,51 @@ class GoBackNFileSender {
         }
 
         System.out.printf("Server: Thread for client %d finished.%n", clientId);
+    }
+
+    // Private method to send a specific packet to the client
+    private void sendPacket(int packetId, InetSocketAddress clientAddress, long startTime) throws IOException {
+        
+        // Initialize buffer to store data from the file
+        byte[] data = new byte[2048];
+        int bytesRead;
+    
+        try (FileInputStream file = new FileInputStream(filename)) {
+            // Skip bytes in the file to reach the appropriate position for the current packet
+            long skipBytes = packetId * 2048;
+            while (skipBytes > 0) {
+                long skipped = file.skip(skipBytes);
+                if (skipped <= 0) {
+                    System.err.println("Error skipping bytes in the file.");
+                    return;
+                }
+                skipBytes -= skipped;
+            }
+    
+            // Read data from the file into the buffer
+            bytesRead = file.read(data);
+    
+            if (bytesRead > 0) {
+                // Create the packet data by combining packet ID and file data
+                byte[] packetData = new byte[bytesRead + 6];
+                System.arraycopy(String.format("%06d", packetId).getBytes(), 0, packetData, 0, 6);
+                System.arraycopy(data, 0, packetData, 6, bytesRead);
+    
+                // Create a DatagramPacket with the packet data and send it to the client
+                DatagramPacket packet = new DatagramPacket(packetData, packetData.length, clientAddress.getAddress(), clientAddress.getPort());
+                long timeTaken = System.currentTimeMillis() - startTime;
+                serverSocket.send(packet);
+                sentTimes.put(packetId, System.currentTimeMillis());
+    
+                // Print information about the sent packet
+                System.out.printf("Server: %.4f >> Data sent to client %d, Packet ID: %d%n", timeTaken / 1000.0, clientAddress.getPort(), packetId);
+    
+                // Update statistics and tracking for the sent packet
+                totalBytesSent += packetData.length;
+                sentPacketIds.add(packetId);
+                acknowledgedPackets.add(packetId);                 // Register the sent packet for acknowledgment tracking
+            }
+        }
     }
     
 
@@ -320,49 +364,6 @@ class GoBackNFileSender {
     
             long timeTaken = System.currentTimeMillis() - startTime;
             System.out.printf("Server: %.4f >> Acknowledgment received from client %d for Packet ID: %d%n", timeTaken / 1000.0, actualClientAddress.getPort(), ackId);
-        }
-    }
-    
-    // Public method to initiate the file transfer to all clients
-    public void sendFile() {
-        // Initialize a set to keep track of acknowledged packets for each file transfer
-        acknowledgedPackets = new HashSet<>();  
-        List<Thread> threads = new ArrayList<>();
-        long startTime = System.currentTimeMillis();
-
-        // Create and start a separate thread for each client to send data concurrently
-        for (InetSocketAddress clientAddress : clientAddresses) {
-            Thread thread = new Thread(() -> {
-                try {
-                    sendToClient(clientAddress, probability);
-                } catch (SocketTimeoutException e) {
-                    e.printStackTrace();
-                }
-            });
-            threads.add(thread);
-            thread.start();
-        }
-
-        // Wait for all threads to finish
-        for (Thread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        // Calculate and print statistics about the file transfer
-        long endTime = System.currentTimeMillis();
-        totalTimeSpent = endTime - startTime;
-
-        if (end) {
-            System.out.println("Server: No more data to send.");
-            System.out.println("Server: All packets sent and acknowledged. Transfer finished.");
-            System.out.printf("Server: Total Bytes Sent: %d%n", totalBytesSent);
-            System.out.printf("Server: Total Retransmissions Sent: %d%n", retransmissionsSent);
-            System.out.printf("Server: Total Time Spent: %.4f seconds%n", totalTimeSpent / 1000.0);
-            return;
         }
     }
 }
