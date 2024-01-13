@@ -1,5 +1,6 @@
 import random
 from socket import *
+import time
 
 class UnreliableReceiver:
     def __init__(self, socket, ack_probability):
@@ -8,16 +9,19 @@ class UnreliableReceiver:
         self.total_bytes_received = 0
         self.retransmissions_received = 0
         self.file_path = "test.txt"
+        self.start_time = 0
 
     def unreliable_send_ack(self, packet_id, server_address, data):
         # Check if the probability of sending an acknowledgment is less than the given ack_probability
         if round(random.random(), 3) < self.ack_probability:
-            print(f"Packet with ID : {packet_id} lost")
+            time_taken = time.time() - self.start_time
+            print(f"{time_taken:.4f} >> CLIENT : Packet with ID : {packet_id} lost")
             
             return False
                 
         # Acknowledgment sent successfully
-        print(f"Acknowledgment for Packet ID {packet_id} sent successfully")
+        time_taken = time.time() - self.start_time
+        print(f"{time_taken:.4f} >> CLIENT : Acknowledgment for Packet ID {packet_id} sent successfully")
         acknowledgment = packet_id
             
         # Send the acknowledgment to the server
@@ -26,6 +30,9 @@ class UnreliableReceiver:
         return True
         
     def receive_data(self):
+
+        self.start_time = time.time()
+
         while True:
             # Receive the modified message and the server address
             modified_message, server_address = self.socket.recvfrom(60000)
@@ -41,11 +48,13 @@ class UnreliableReceiver:
             packet_id1 = modified_message[:6]
             data = modified_message[6:]
 
-            print(f"Received packet with ID: {packet_id1}")
+            time_taken = time.time() - self.start_time
+            print(f"{time_taken:.4f} >> CLIENT : Received packet with ID: {packet_id1}")
 
             # Check if the acknowledgment was sent successfully
             if not self.unreliable_send_ack(packet_id1, server_address, data):
-                print("Retransmission received")
+                time_taken = time.time() - self.start_time
+                print(f"{time_taken:.4f} >> CLIENT : Retransmission received")
                 self.retransmissions_received += 1
                 
             self.total_bytes_received += len(modified_message)
@@ -54,4 +63,3 @@ class UnreliableReceiver:
         print(f"Total Retransmission Received: {self.retransmissions_received}")
 
         self.socket.close()
-
