@@ -45,20 +45,25 @@ class GoBackNFileSender {
 
     // Constructor to initialize FileSender
     public GoBackNFileSender(DatagramSocket serverSocket, List<InetSocketAddress> clientAddresses, String filename, int window_size, float probability){
-        this.filename = filename;
         this.serverSocket = serverSocket;
-        this.window_size = window_size;
-        this.totalBytesSent = 0;
-        this.retransmissionsSent = 0;
         this.clientAddresses = clientAddresses;
-        this.sentPacketIds = new ArrayDeque<>();
-        this.totalTimeSpent = 0;
-        this.end = false;
+        this.filename = filename;
+        this.window_size = window_size;
+        this.probability = probability;
+
         try (FileInputStream fileInputStream = new FileInputStream(filename)) {
             this.fileSize = fileInputStream.available();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        this.totalBytesSent = 0;
+        this.retransmissionsSent = 0;
+        
+        this.sentPacketIds = new ArrayDeque<>();
+        this.totalTimeSpent = 0;
+        this.end = false;
+        
         this.ackReceivedArray = new boolean[window_size];
         this.sentTimes = new HashMap<>();
         this.listAckLock = new ReentrantLock(); 
@@ -68,7 +73,7 @@ class GoBackNFileSender {
             baseMap.put(clientAddress, 0);
             nextSeqNumMap.put(clientAddress, 0);
         }
-        this.probability = probability;
+        
     }
 
     // Private method to send a specific packet to the client
@@ -119,7 +124,7 @@ class GoBackNFileSender {
     // Private method to handle sending data to a specific client
     private void sendToClient(InetSocketAddress clientAddress, float probability) throws SocketTimeoutException {
         int clientId = clientAddress.getPort();
-        System.out.printf("Server: Thread for client %d started.%n", clientId);
+        System.out.printf("Server: Thread for Client with Port %d started.%n", clientId);
 
         try {
             long startTime = System.currentTimeMillis();
