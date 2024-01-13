@@ -84,17 +84,17 @@ class GoBackNFileSender {
         List<Thread> threads = new ArrayList<>();
         long startTime = System.currentTimeMillis();
 
-        // Launch and start a separate thread for each client to send data concurrently
+        // Launch a separate thread for each destination (clientAddresses) to send data concurrently
         for (InetSocketAddress clientAddress : clientAddresses) {
-            Thread thread = new Thread(() -> {
+            Thread destination_thread = new Thread(() -> {
                 try {
                     sendToClient(clientAddress, probability);
                 } catch (SocketTimeoutException e) {
                     e.printStackTrace();
                 }
             });
-            threads.add(thread);
-            thread.start();
+            threads.add(destination_thread);
+            destination_thread.start();
         }
 
         // Wait for all threads to finish
@@ -122,23 +122,28 @@ class GoBackNFileSender {
 
     // Private method to handle sending data to a specific client
     private void sendToClient(InetSocketAddress clientAddress, float probability) throws SocketTimeoutException {
+
+        // Identify the client
         int clientId = clientAddress.getPort();
         System.out.printf("Server: Thread for Client with Port %d started.%n", clientId);
 
         try {
             long startTime = System.currentTimeMillis();
-            int base = 0;
+            int oldestUnacknowledgedPacket = 0;             //initialised to 0
 
             serverSocket.setSoTimeout(waitFor_ACK);
 
-            while (base < fileSize / 2048) {
-                int windowEnd = (int) Math.min(base + window_size, fileSize / 2048);
+            while (oldestUnacknowledgedPacket < fileSize / 2048) {       //TODO: create variable that holds the 2048 through the program
+                
+                // Calculate windowEnd to not extend beyond the total number of packets
+                int windowEnd = (int) Math.min(oldestUnacknowledgedPacket + window_size, fileSize / 2048);
 
-                for (int packetId = base; packetId < windowEnd; packetId++) {
+                // Send packets for the current window
+                for (int packetId = oldestUnacknowledgedPacket; packetId < windowEnd; packetId++) {
                     // Send the packet and handle IOException
                     try {
                         // Simulate packet loss based on acknowledgment probability
-                        if (Math.round(Math.random() * 1000) / 1000.0 < this.probability) {
+                        if (Math.round(Math.random() * 1000) / 1000.0 < probability) {
                             System.out.println("Server: Packet with ID : " + packetId + " lost");
 
                             // Handle packet loss by retransmitting and waiting for acknowledgment
@@ -158,14 +163,14 @@ class GoBackNFileSender {
                 }
 
                 // Wait for acknowledgment for the current packet
-                for (int packetId = base; packetId < windowEnd; packetId++) {
+                for (int packetId = oldestUnacknowledgedPacket; packetId < windowEnd; packetId++) {
                     for (InetSocketAddress addr : clientAddresses) {
                         receiveAck(startTime, addr, packetId);
                     }
                 }
 
                 // Move to the next window
-                base = windowEnd;
+                oldestUnacknowledgedPacket = windowEnd;
                 windowEnd += window_size;
             }
 
