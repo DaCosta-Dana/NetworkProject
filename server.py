@@ -4,6 +4,8 @@ import threading
 import time
 from collections import deque
 
+
+
 class UnreliableSender:
     def __init__(self, socket):
         self.socket = socket
@@ -13,10 +15,12 @@ class UnreliableSender:
         return True
 
 
+
+
 class FileSender:
-    def __init__(self, file_name, client_socket, size, client_number, client_addresses):
+    def __init__(self, file_name, server_socket, size, client_number, client_addresses):
         self.file_name = file_name
-        self.client_socket = client_socket
+        self.server_socket = server_socket
         self.size = size
         self.total_bytes_sent = 0
         self.retransmissions_sent = 0
@@ -51,23 +55,23 @@ class FileSender:
             'packet': f"{packet_id:06d}".encode() + data
         }
 
-        self.client_socket.sendto(packet_data['packet'], client_address)
+        self.server_socket.sendto(packet_data['packet'], client_address)
         
         time_taken = time.time() - start_time
-        print(f"{time_taken:.4f} >> Data sent to client {client_address[1]}, Packet ID: {packet_data['id']}")
+        print(f"{time_taken:.4f} >> SERVER : Data sent to client, Packet ID: {packet_data['id']}")
 
         self.total_bytes_sent += len(packet_data['packet'])
 
         self.sent_packet_ids.append(int(packet_data['id']))
 
-        self.client_socket.settimeout(0.005)
+        self.server_socket.settimeout(0.005)
         
         if not data:
             print("No more datas to sent")
             self.end = True
             return
 
-        time.sleep(0.0001)
+        time.sleep(0.001)
 
     def receive_acknowledgment(self, start_time, window_size, file):
         """
@@ -88,38 +92,37 @@ class FileSender:
 
             try:
 
-                #time.sleep(0.0001)
-                ack_message, _ = self.client_socket.recvfrom(60000)
-                #time.sleep(0.0001)
-                
+               
+                ack_message, _ = self.server_socket.recvfrom(60000)
+
                 if ack_message:
 
                     ack_id = int(ack_message.decode())
             
 
                     time_taken = time.time() - start_time
-                    print(f"{time_taken:.4f} >> Acknowledgment received for Packet ID: {ack_id}")
+                    print(f"{time_taken:.4f} >> SERVER : Acknowledgment received for Packet ID: {ack_id}")
 
                     if self.test == True and ack_id == self.ack_received:       
                         self.list_ack.append(ack_id)
 
                     if ack_id not in self.end_acks:
-                        
-                        if len(self.list_ack) >= len(self.client_addresses): 
-            
-                            while self.list_ack.count(self.ack_received) == len(self.client_addresses) :
 
-                                if self.end == False:
+                        if self.end == False:
+                        
+                            if len(self.list_ack) >= len(self.client_addresses): 
+                
+                                while self.list_ack.count(self.ack_received) == len(self.client_addresses) :
 
                                     time_taken = time.time() - start_time
-                                    print(f"{time_taken:.4f} >> All acks received for the packet ID : {self.ack_received}")
+                                    print(f"{time_taken:.4f} >> SERVER : All acks received for the packet ID : {self.ack_received}")
                                     self.end_acks.append(self.ack_received)
 
                                     while self.ack_received in self.sent_packet_ids:
                                         self.sent_packet_ids.remove(self.ack_received)
 
                                     time_taken = time.time() - start_time
-                                    print(f"{time_taken:.4f} >> Moving window")
+                                    print(f"{time_taken:.4f} >> SERVER : Moving window")
                                     
                                     
                                     while self.ack_received in self.list_ack:
@@ -135,17 +138,15 @@ class FileSender:
                                     self.ack_received += 1
                                     
                                 
-                                else:
-                                    return
+                        else:
+                            return
 
                     elif ack_id in self.end_acks:
         
                         time_taken = time.time() - start_time
-                        print(f"{time_taken:.4f} >> Ack already received")
+                        print(f"{time_taken:.4f} >> SERVER : Ack already received")
                         
                        
-
-                
             except timeout :
             
                 for packet_id2 in range(self.ack_received, self.ack_received + window_size):
@@ -155,10 +156,11 @@ class FileSender:
                             self.send_packet(packet_id2, data, client_address, start_time)
                             
                             time_taken = time.time() - start_time
-                            print(f"{time_taken:.4f} >> Retransmission sent")
+                            print(f"{time_taken:.4f} >> SERVER : Retransmission sent")
                 
-                time.sleep(0.0001)
-                 
+                time.sleep(0.001)
+
+
 
     def send_to_client(self, client_address):
         """
@@ -190,17 +192,17 @@ class FileSender:
 
                     self.send_packet(packet_id, data, client_address, start_time)
                     
-                    time.sleep(0.0001)
+                    time.sleep(0.001)
 
                 if not data:
-                    break
+                    return
 
                 self.receive_acknowledgment(start_time, window_size, file)
 
                 if self.end == True:
                     return
 
-        print(f"Thread for client {client_id} finished.")
+
 
     def send_file(self):
         """
@@ -229,12 +231,18 @@ class FileSender:
         total_time = end_time - start_time
         bandwidth_bps = self.total_bytes_sent / total_time
         bandwidth_kbps = bandwidth_bps / 1024
+        bandwidth_mbps = bandwidth_bps / 1_000_000
 
-        print(f"Bandwidth: {bandwidth_bps:.2f} Bps {bandwidth_kbps:.2f} kbps)")
+        print(f"Total time : {total_time:.2f} sec")
+        print(f"Bandwidth: {bandwidth_bps:.2f} Bps,  {bandwidth_kbps:.2f} kbps, {bandwidth_mbps:.2f} Mbps)")
 
         print("All packets sent and acknowledged. Transfer finished.")
         print(f"Total Bytes Sent: {self.total_bytes_sent}")
         print(f"Total Retransmissions Sent: {self.retransmissions_sent}")
+
+
+
+
 
 
 class Server:
