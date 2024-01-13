@@ -1,636 +1,344 @@
 # this version's output 
-xiao@Shellys-Air NetworkProject % javac Main.java
-                java Main localhost 2 file.txt 0.1 3
-The assigned port of the server socket is 57177
-The server is waiting for clients to connect...
-Server: Client connected - IP: 127.0.0.1, Port: 56601
-Server: Client connected - IP: 127.0.0.1, Port: 63944
-Server: All clients connected.
-Server: Thread for client 56601 started.
-Server: Thread for client 63944 started.
-Server: 0.0000 >> Data sent to client 56601, Packet ID: 0
-Server: 0.0010 >> Data sent to client 56601, Packet ID: 1
-Server: 0.0020 >> Data sent to client 56601, Packet ID: 2
+Server IP Address: 127.0.0.1
+Server Port: 65237
+The server is waiting for 2 clients to connect...
+Server: Client connected - IP: 127.0.0.1, Port: 61735
+Server: Client connected - IP: 127.0.0.1, Port: 55135
+Server: All clients are connected.
+------Ready to send data file packets:------
+Server: Thread for Client with Port 61735 started.
+Server: Thread for Client with Port 55135 started.
+Server: 0.0010 >> Data sent to client 61735, Packet ID: 0
+Server: 0.0010 >> Data sent to client 55135, Packet ID: 0
 Client: Received packet with ID: 0
+ Client: Received packet with ID: 0
+ Server: 0.0010 >> Data sent to client 61735, Packet ID: 1
+Server: 0.0020 >> Data sent to client 55135, Packet ID: 1
 Client: Acknowledgment for Packet ID 0 sent successfully
-Server: Packet with ID : 0 lost
+Client: Acknowledgment for Packet ID 0 sent successfully
+Server: 0.0020 >> Data sent to client 61735, Packet ID: 2
+Server: 0.0020 >> Data sent to client 55135, Packet ID: 2
 Client: Received packet with ID: 1
-Client: Acknowledgment for Packet ID 1 sent successfully
-Server: 0.0070 >> Acknowledgment received from client 56601 for Packet ID: 0
-Server: Acknowledgment lost
+ Client: Acknowledgment for Packet ID 1 sent successfully
+Client: Received packet with ID: 1
+ Server: 0.0030 >> Acknowledgment received from client 61735 for Packet ID: 0
 Client: Received packet with ID: 2
+ Client: Acknowledgment for Packet ID 1 sent successfully
+Server: 0.0040 >> Acknowledgment received from client 55135 for Packet ID: 0
+Client: Received packet with ID: 2
+ Server: 0.0040 >> Acknowledgment received from client 61735 for Packet ID: 1
 Client: Acknowledgment for Packet ID 2 sent successfully
-Server: 0.0090 >> Acknowledgment received from client 56601 for Packet ID: 2
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-Server: Retransmission for packet 0 has been sent
-Server: 1.0140 >> Data sent to client 63944, Packet ID: 0
-Client: Received packet with ID: 0
-Client: Acknowledgment for Packet ID 0 sent successfully
-Server: 1.0160 >> Data sent to client 63944, Packet ID: 1
-Server: 1.0160 >> Acknowledgment received from client 63944 for Packet ID: 0
+Server: 0.0040 >> Acknowledgment received from client 55135 for Packet ID: 1
+Client: Acknowledgment for Packet ID 2 sent successfully
+Server: 0.0040 >> Acknowledgment received from client 61735 for Packet ID: 2
+Server: 0.0050 >> Acknowledgment received from client 55135 for Packet ID: 2
+Server: 0.0050 >> Data sent to client 61735, Packet ID: 3
+Client: Received packet with ID: 3
+ Client: Acknowledgment for Packet ID 3 sent successfully
+Server: 0.0050 >> Data sent to client 61735, Packet ID: 4
+Server: 0.0050 >> Acknowledgment received from client 61735 for Packet ID: 3
+Client: Received packet with ID: 4
+ Client: Acknowledgment for Packet ID 4 sent successfully
+Server: 0.0050 >> Data sent to client 61735, Packet ID: 5
+Server: 0.0060 >> Acknowledgment received from client 61735 for Packet ID: 4
+Client: Received packet with ID: 5
+ Client: Acknowledgment for Packet ID 5 sent successfully
+Server: 0.0060 >> Acknowledgment received from client 61735 for Packet ID: 5
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 1 has been sent
+Server: 0.5080 >> Data sent to client 55135, Packet ID: 1
 Client: Received packet with ID: 1
-Client: Acknowledgment for Packet ID 1 sent successfully
-Server: 1.0170 >> Data sent to client 56601, Packet ID: 3
-Server: Packet with ID : 4 lost
+ Client: Acknowledgment for Packet ID 1 sent successfully
+Server: 0.5090 >> Acknowledgment received from client 55135 for Packet ID: 1
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 2 has been sent
+Server: 1.0100 >> Data sent to client 55135, Packet ID: 2
+Client: Received packet with ID: 2
+ Client: Acknowledgment for Packet ID 2 sent successfully
+Server: 1.0100 >> Data sent to client 55135, Packet ID: 3
+Server: 1.0100 >> Acknowledgment received from client 55135 for Packet ID: 2
+Client: Received packet with ID: 3
+ Client: Acknowledgment for Packet ID 3 sent successfully
+Server: 1.0110 >> Data sent to client 55135, Packet ID: 4
+Client: Received packet with ID: 4
+ Client: Acknowledgment for Packet ID 4 sent successfully
+Client: Received packet with ID: 5
+ Server: 1.0110 >> Acknowledgment received from client 55135 for Packet ID: 3
+Server: 1.0120 >> Acknowledgment received from client 55135 for Packet ID: 4
+Server: 1.0120 >> Data sent to client 55135, Packet ID: 5
+Client: Acknowledgment for Packet ID 5 sent successfully
+Server: 1.0130 >> Acknowledgment received from client 55135 for Packet ID: 5
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 5 has been sent
+Server: 1.5130 >> Data sent to client 61735, Packet ID: 5
+Client: Received packet with ID: 5
+ Client: Acknowledgment for Packet ID 5 sent successfully
+Server: 1.5140 >> Acknowledgment received from client 61735 for Packet ID: 5
+Server: 1.5140 >> Data sent to client 61735, Packet ID: 6
+Client: Received packet with ID: 6
+ Client: Acknowledgment for Packet ID 6 sent successfully
+Server: 1.5140 >> Data sent to client 61735, Packet ID: 7
+Client: Received packet with ID: 7
+ Server: 1.5150 >> Data sent to client 61735, Packet ID: 8
+Client: Acknowledgment for Packet ID 7 sent successfully
+Server: 1.5150 >> Acknowledgment received from client 61735 for Packet ID: 7
+Client: Received packet with ID: 8
+ Client: Acknowledgment for Packet ID 8 sent successfully
+Server: 1.5150 >> Acknowledgment received from client 61735 for Packet ID: 8
+Server: Acknowledgment timeout. Retransmitting packets...
 Server: Retransmission for packet 4 has been sent
-Client: Received packet with ID: 3
-Client: Acknowledgment for Packet ID 3 sent successfully
-Server: 1.0160 >> Data sent to client 63944, Packet ID: 2
+Server: 2.0160 >> Data sent to client 55135, Packet ID: 4
 Client: Received packet with ID: 4
-Client: Acknowledgment for Packet ID 4 sent successfully
-Client: Received packet with ID: 2
-Client: Acknowledgment for Packet ID 2 sent successfully
-Server: 1.0170 >> Data sent to client 56601, Packet ID: 4
-Server: 1.0190 >> Acknowledgment received from client 63944 for Packet ID: 1
-Server: 1.0190 >> Data sent to client 56601, Packet ID: 5
+ Client: Acknowledgment for Packet ID 4 sent successfully
+Server: 2.0180 >> Acknowledgment received from client 55135 for Packet ID: 4
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 5 has been sent
+Server: 2.5190 >> Data sent to client 55135, Packet ID: 5
 Client: Received packet with ID: 5
-Client: Acknowledgment for Packet ID 5 sent successfully
-Server: 1.0200 >> Acknowledgment received from client 56601 for Packet ID: 3
-Server: 1.0210 >> Acknowledgment received from client 56601 for Packet ID: 4
-Server: 1.0210 >> Acknowledgment received from client 63944 for Packet ID: 2
-Server: 1.0220 >> Acknowledgment received from client 56601 for Packet ID: 5
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-Server: 3.5280 >> Data sent to client 56601, Packet ID: 6
+ Client: Acknowledgment for Packet ID 5 sent successfully
+Server: 2.5200 >> Data sent to client 55135, Packet ID: 6
+Server: 2.5210 >> Data sent to client 55135, Packet ID: 7
 Client: Received packet with ID: 6
-Client: Acknowledgment for Packet ID 6 sent successfully
-Server: 3.5280 >> Data sent to client 56601, Packet ID: 7
-Server: Packet with ID : 8 lost
-Server: 3.5290 >> Acknowledgment received from client 56601 for Packet ID: 6
+ Client: Acknowledgment for Packet ID 6 sent successfully
+Server: 2.5220 >> Data sent to client 55135, Packet ID: 8
 Client: Received packet with ID: 7
+ Server: 2.5220 >> Acknowledgment received from client 55135 for Packet ID: 5
 Client: Acknowledgment for Packet ID 7 sent successfully
-Server: 3.5290 >> Acknowledgment received from client 56601 for Packet ID: 7
+Server: 2.5230 >> Acknowledgment received from client 55135 for Packet ID: 6
+Client: Received packet with ID: 8
+ Client: Acknowledgment for Packet ID 8 sent successfully
+Server: 2.5230 >> Acknowledgment received from client 55135 for Packet ID: 7
+Server: 2.5240 >> Acknowledgment received from client 55135 for Packet ID: 8
+Server: Acknowledgment timeout. Retransmitting packets...
 Server: Retransmission for packet 8 has been sent
-Server: 3.5290 >> Data sent to client 63944, Packet ID: 3
-Client: Received packet with ID: 3
-Client: Acknowledgment for Packet ID 3 sent successfully
-Server: 3.5300 >> Data sent to client 56601, Packet ID: 8
-Server: 3.5300 >> Data sent to client 63944, Packet ID: 4
+Server: 3.0250 >> Data sent to client 61735, Packet ID: 8
 Client: Received packet with ID: 8
-Server: 3.5310 >> Acknowledgment received from client 63944 for Packet ID: 3
-Client: Received packet with ID: 4
-Client: Acknowledgment for Packet ID 4 sent successfully
-Client: Acknowledgment for Packet ID 8 sent successfully
-Server: 3.5310 >> Data sent to client 63944, Packet ID: 5
-Client: Received packet with ID: 5
-Client: Acknowledgment for Packet ID 5 sent successfully
-Server: 3.5310 >> Acknowledgment received from client 63944 for Packet ID: 4
-Server: 3.5320 >> Acknowledgment received from client 56601 for Packet ID: 8
-Server: 3.5320 >> Acknowledgment received from client 63944 for Packet ID: 5
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-Server: 4.5350 >> Data sent to client 56601, Packet ID: 9
+ Client: Acknowledgment for Packet ID 8 sent successfully
+Server: 3.0260 >> Acknowledgment received from client 61735 for Packet ID: 8
+Server: 3.0260 >> Data sent to client 61735, Packet ID: 9
 Client: Received packet with ID: 9
-Client: Acknowledgment for Packet ID 9 sent successfully
-Server: 4.5360 >> Data sent to client 56601, Packet ID: 10
+ Client: Acknowledgment for Packet ID 9 sent successfully
+Server: 3.0270 >> Data sent to client 61735, Packet ID: 10
 Client: Received packet with ID: 10
-Client: Acknowledgment for Packet ID 10 sent successfully
-Server: 4.5360 >> Acknowledgment received from client 56601 for Packet ID: 9
-Server: 4.5370 >> Data sent to client 56601, Packet ID: 11
-Server: 4.5370 >> Acknowledgment received from client 56601 for Packet ID: 10
+ Client: Acknowledgment for Packet ID 10 sent successfully
+Server: 3.0270 >> Acknowledgment received from client 61735 for Packet ID: 9
+Server: 3.0270 >> Data sent to client 61735, Packet ID: 11
 Client: Received packet with ID: 11
-Client: Acknowledgment for Packet ID 11 sent successfully
-Server: 4.5380 >> Acknowledgment received from client 56601 for Packet ID: 11
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-Server: 8.0460 >> Data sent to client 56601, Packet ID: 12
-Client: Received packet with ID: 12
-Client: Acknowledgment for Packet ID 12 sent successfully
-Server: 8.0460 >> Data sent to client 56601, Packet ID: 13
-Server: 8.0460 >> Acknowledgment received from client 56601 for Packet ID: 12
-Client: Received packet with ID: 13
-Client: Acknowledgment for Packet ID 13 sent successfully
-Server: 8.0460 >> Data sent to client 56601, Packet ID: 14
-Server: 8.0470 >> Acknowledgment received from client 56601 for Packet ID: 13
-Client: Received packet with ID: 14
-Client: Acknowledgment for Packet ID 14 sent successfully
-Server: 8.0470 >> Data sent to client 63944, Packet ID: 6
-Server: 8.0470 >> Acknowledgment received from client 56601 for Packet ID: 14
-Client: Received packet with ID: 6
-Server: 8.0470 >> Data sent to client 63944, Packet ID: 7
-Client: Acknowledgment for Packet ID 6 sent successfully
-Server: 8.0480 >> Data sent to client 63944, Packet ID: 8
-Server: 8.0480 >> Acknowledgment received from client 63944 for Packet ID: 6
+ Client: Acknowledgment for Packet ID 11 sent successfully
+Server: 3.0280 >> Acknowledgment received from client 61735 for Packet ID: 10
+Server: 3.0290 >> Acknowledgment received from client 61735 for Packet ID: 11
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 7 has been sent
+Server: 3.5300 >> Data sent to client 55135, Packet ID: 7
 Client: Received packet with ID: 7
-Client: Acknowledgment for Packet ID 7 sent successfully
-Server: 8.0480 >> Acknowledgment received from client 63944 for Packet ID: 7
+ Client: Acknowledgment for Packet ID 7 sent successfully
+Server: 3.5300 >> Acknowledgment received from client 55135 for Packet ID: 7
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 8 has been sent
+Server: 4.0310 >> Data sent to client 55135, Packet ID: 8
 Client: Received packet with ID: 8
-Client: Acknowledgment for Packet ID 8 sent successfully
-Server: 8.0490 >> Acknowledgment received from client 63944 for Packet ID: 8
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-Server: 9.0510 >> Data sent to client 56601, Packet ID: 15
-Client: Received packet with ID: 15
-Client: Acknowledgment for Packet ID 15 sent successfully
-Server: 9.0520 >> Data sent to client 56601, Packet ID: 16
-Server: 9.0520 >> Acknowledgment received from client 56601 for Packet ID: 15
-Client: Received packet with ID: 16
-Client: Acknowledgment for Packet ID 16 sent successfully
-Server: 9.0530 >> Data sent to client 56601, Packet ID: 17
-Client: Received packet with ID: 17
-Client: Acknowledgment for Packet ID 17 sent successfully
-Server: 9.0530 >> Acknowledgment received from client 56601 for Packet ID: 16
-Server: 9.0540 >> Acknowledgment received from client 56601 for Packet ID: 17
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-Server: 12.5630 >> Data sent to client 56601, Packet ID: 18
-Client: Received packet with ID: 18
-Server: Packet with ID : 19 lost
-Client: Acknowledgment for Packet ID 18 sent successfully
-Server: 12.5640 >> Acknowledgment received from client 56601 for Packet ID: 18
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-Server: Retransmission for packet 19 has been sent
-Server: 13.0650 >> Data sent to client 63944, Packet ID: 9
-Server: 13.0650 >> Data sent to client 56601, Packet ID: 19
+ Client: Acknowledgment for Packet ID 8 sent successfully
+Server: 4.0330 >> Data sent to client 55135, Packet ID: 9
 Client: Received packet with ID: 9
-Client: Acknowledgment for Packet ID 9 sent successfully
-Server: 13.0650 >> Data sent to client 63944, Packet ID: 10
-Client: Received packet with ID: 19
-Server: 13.0660 >> Data sent to client 56601, Packet ID: 20
+ Client: Acknowledgment for Packet ID 9 sent successfully
+Server: 4.0330 >> Acknowledgment received from client 55135 for Packet ID: 8
+Server: 4.0330 >> Data sent to client 55135, Packet ID: 10
 Client: Received packet with ID: 10
-Client: Acknowledgment for Packet ID 19 sent successfully
-Server: 13.0660 >> Data sent to client 63944, Packet ID: 11
-Client: Acknowledgment for Packet ID 10 sent successfully
-Server: 13.0660 >> Acknowledgment received from client 63944 for Packet ID: 9
+ Client: Acknowledgment for Packet ID 10 sent successfully
+Server: 4.0340 >> Acknowledgment received from client 55135 for Packet ID: 9
+Server: 4.0340 >> Acknowledgment received from client 55135 for Packet ID: 10
+Server: Packet with ID : 11 lost
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 10 has been sent
+Server: 4.5360 >> Data sent to client 55135, Packet ID: 10
+Client: Received packet with ID: 10
+ Client: Acknowledgment for Packet ID 10 sent successfully
+Server: 4.5380 >> Acknowledgment received from client 55135 for Packet ID: 10
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 11 has been sent
+Server: 5.0400 >> Data sent to client 55135, Packet ID: 11
 Client: Received packet with ID: 11
+ Server: Retransmission for packet 11 has been sent
 Client: Acknowledgment for Packet ID 11 sent successfully
-Client: Received packet with ID: 20
-Client: Acknowledgment for Packet ID 20 sent successfully
-Server: 13.0670 >> Acknowledgment received from client 56601 for Packet ID: 19
-Server: 13.0670 >> Acknowledgment received from client 63944 for Packet ID: 10
-Server: 13.0670 >> Acknowledgment received from client 63944 for Packet ID: 11
-Server: 13.0670 >> Acknowledgment received from client 56601 for Packet ID: 20
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-Server: 14.0690 >> Data sent to client 63944, Packet ID: 12
+Server: 5.0410 >> Data sent to client 61735, Packet ID: 12
+Client: Received packet with ID: 11
+ Server: 5.0410 >> Data sent to client 55135, Packet ID: 11
 Client: Received packet with ID: 12
-Client: Acknowledgment for Packet ID 12 sent successfully
-Server: 14.0700 >> Data sent to client 63944, Packet ID: 13
-Server: 14.0710 >> Data sent to client 63944, Packet ID: 14
-Server: 14.0710 >> Acknowledgment received from client 63944 for Packet ID: 12
+ Client: Acknowledgment for Packet ID 12 sent successfully
+Server: 5.0410 >> Data sent to client 61735, Packet ID: 13
+Client: Acknowledgment for Packet ID 11 sent successfully
 Client: Received packet with ID: 13
-Client: Acknowledgment for Packet ID 13 sent successfully
-Server: 14.0720 >> Acknowledgment received from client 63944 for Packet ID: 13
+ Client: Acknowledgment for Packet ID 13 sent successfully
+Server: 5.0420 >> Data sent to client 61735, Packet ID: 14
+Server: 5.0420 >> Acknowledgment received from client 55135 for Packet ID: 11
 Client: Received packet with ID: 14
-Client: Acknowledgment for Packet ID 14 sent successfully
-Server: 14.0720 >> Acknowledgment received from client 63944 for Packet ID: 14
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-Server: 15.0750 >> Data sent to client 56601, Packet ID: 21
-Client: Received packet with ID: 21
-Client: Acknowledgment for Packet ID 21 sent successfully
-Server: 15.0760 >> Data sent to client 56601, Packet ID: 22
-Server: 15.0760 >> Acknowledgment received from client 56601 for Packet ID: 21
-Client: Received packet with ID: 22
-Client: Acknowledgment for Packet ID 22 sent successfully
-Server: Acknowledgment lost
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-Server: 17.0810 >> Data sent to client 63944, Packet ID: 15
-Server: 17.0830 >> Data sent to client 63944, Packet ID: 16
-Server: 17.0840 >> Data sent to client 63944, Packet ID: 17
+ Client: Acknowledgment for Packet ID 14 sent successfully
+Server: 5.0430 >> Acknowledgment received from client 61735 for Packet ID: 12
+Server: 5.0430 >> Acknowledgment received from client 55135 for Packet ID: 11
+Server: 5.0430 >> Acknowledgment received from client 61735 for Packet ID: 13
+Server: 5.0430 >> Acknowledgment received from client 61735 for Packet ID: 14
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 11 has been sent
+Server: 5.5450 >> Data sent to client 61735, Packet ID: 11
+Client: Received packet with ID: 11
+ Client: Acknowledgment for Packet ID 11 sent successfully
+Server: 5.5460 >> Acknowledgment received from client 61735 for Packet ID: 11
+Server: 5.5460 >> Data sent to client 55135, Packet ID: 12
+Client: Received packet with ID: 12
+ Client: Acknowledgment for Packet ID 12 sent successfully
+Server: 5.5470 >> Data sent to client 55135, Packet ID: 13
+Client: Received packet with ID: 13
+ Client: Acknowledgment for Packet ID 13 sent successfully
+Server: 5.5470 >> Data sent to client 55135, Packet ID: 14
+Server: 5.5470 >> Acknowledgment received from client 55135 for Packet ID: 12
+Server: 5.5480 >> Acknowledgment received from client 55135 for Packet ID: 13
+Client: Received packet with ID: 14
+ Client: Acknowledgment for Packet ID 14 sent successfully
+Server: 5.5480 >> Acknowledgment received from client 55135 for Packet ID: 14
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 14 has been sent
+Server: 6.0500 >> Data sent to client 61735, Packet ID: 14
+Client: Received packet with ID: 14
+ Client: Acknowledgment for Packet ID 14 sent successfully
+Server: 6.0510 >> Acknowledgment received from client 61735 for Packet ID: 14
+Server: 6.0510 >> Data sent to client 61735, Packet ID: 15
 Client: Received packet with ID: 15
-Client: Acknowledgment for Packet ID 15 sent successfully
-Server: 17.0850 >> Acknowledgment received from client 63944 for Packet ID: 15
+ Client: Acknowledgment for Packet ID 15 sent successfully
+Server: 6.0520 >> Data sent to client 61735, Packet ID: 16
+Server: 6.0530 >> Acknowledgment received from client 61735 for Packet ID: 15
 Client: Received packet with ID: 16
-Client: Acknowledgment for Packet ID 16 sent successfully
+ Client: Acknowledgment for Packet ID 16 sent successfully
 Client: Received packet with ID: 17
-Client: Acknowledgment for Packet ID 17 sent successfully
-Server: 17.0850 >> Acknowledgment received from client 63944 for Packet ID: 16
-Server: 17.0860 >> Acknowledgment received from client 63944 for Packet ID: 17
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-Server: Thread for client 56601 finished.
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-Server: 20.5920 >> Data sent to client 63944, Packet ID: 18
+ Client: Acknowledgment for Packet ID 17 sent successfully
+Server: 6.0530 >> Data sent to client 61735, Packet ID: 17
+Server: 6.0540 >> Acknowledgment received from client 61735 for Packet ID: 16
+Server: 6.0550 >> Acknowledgment received from client 61735 for Packet ID: 17
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 13 has been sent
+Server: 6.5550 >> Data sent to client 55135, Packet ID: 13
+Client: Received packet with ID: 13
+ Client: Acknowledgment for Packet ID 13 sent successfully
+Server: 6.5560 >> Acknowledgment received from client 55135 for Packet ID: 13
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 14 has been sent
+Server: 7.0570 >> Data sent to client 55135, Packet ID: 14
+Client: Received packet with ID: 14
+ Client: Acknowledgment for Packet ID 14 sent successfully
+Server: 7.0580 >> Acknowledgment received from client 55135 for Packet ID: 14
+Client: Received packet with ID: 15
+ Client: Acknowledgment for Packet ID 15 sent successfully
+Server: 7.0580 >> Data sent to client 55135, Packet ID: 15
+Server: 7.0590 >> Acknowledgment received from client 55135 for Packet ID: 15
+Server: 7.0590 >> Data sent to client 55135, Packet ID: 16
+Client: Received packet with ID: 16
+ Client: Acknowledgment for Packet ID 16 sent successfully
+Server: 7.0600 >> Data sent to client 55135, Packet ID: 17
+Server: 7.0600 >> Acknowledgment received from client 55135 for Packet ID: 16
+Client: Received packet with ID: 17
+ Client: Acknowledgment for Packet ID 17 sent successfully
+Server: 7.0600 >> Acknowledgment received from client 55135 for Packet ID: 17
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 17 has been sent
+Server: 7.5620 >> Data sent to client 61735, Packet ID: 17
+Client: Received packet with ID: 17
+ Client: Acknowledgment for Packet ID 17 sent successfully
+Server: 7.5630 >> Acknowledgment received from client 61735 for Packet ID: 17
+Server: 7.5630 >> Data sent to client 61735, Packet ID: 18
 Client: Received packet with ID: 18
-Client: Acknowledgment for Packet ID 18 sent successfully
-Server: 20.5920 >> Data sent to client 63944, Packet ID: 19
+ Client: Acknowledgment for Packet ID 18 sent successfully
+Server: 7.5630 >> Data sent to client 61735, Packet ID: 19
 Client: Received packet with ID: 19
-Client: Acknowledgment for Packet ID 19 sent successfully
-Server: 20.5920 >> Data sent to client 63944, Packet ID: 20
+ Client: Acknowledgment for Packet ID 19 sent successfully
+Server: 7.5640 >> Acknowledgment received from client 61735 for Packet ID: 18
+Server: Packet with ID : 20 lost
+Server: 7.5640 >> Acknowledgment received from client 61735 for Packet ID: 19
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 16 has been sent
+Server: 8.0650 >> Data sent to client 61735, Packet ID: 16
+Client: Received packet with ID: 16
+ Client: Acknowledgment for Packet ID 16 sent successfully
+Server: 8.0660 >> Acknowledgment received from client 61735 for Packet ID: 16
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 17 has been sent
+Server: 8.5660 >> Data sent to client 61735, Packet ID: 17
+Client: Received packet with ID: 17
+ Client: Acknowledgment for Packet ID 17 sent successfully
+Server: 8.5670 >> Acknowledgment received from client 61735 for Packet ID: 17
+Server: Retransmission for packet 20 has been sent
+Server: 8.5670 >> Data sent to client 55135, Packet ID: 18
+Server: 8.5670 >> Data sent to client 61735, Packet ID: 20
 Client: Received packet with ID: 20
+ Client: Acknowledgment for Packet ID 20 sent successfully
+Client: Received packet with ID: 18
+ Client: Acknowledgment for Packet ID 18 sent successfully
+Server: 8.5670 >> Data sent to client 55135, Packet ID: 19
+Server: 8.5670 >> Acknowledgment received from client 61735 for Packet ID: 20
+Client: Received packet with ID: 19
+ Client: Acknowledgment for Packet ID 19 sent successfully
+Server: 8.5670 >> Data sent to client 55135, Packet ID: 20
+Client: Received packet with ID: 20
+ Server: 8.5670 >> Acknowledgment received from client 55135 for Packet ID: 18
 Client: Acknowledgment for Packet ID 20 sent successfully
-Server: 20.5930 >> Acknowledgment received from client 63944 for Packet ID: 18
-Server: 20.5930 >> Acknowledgment received from client 63944 for Packet ID: 19
-Server: 20.5940 >> Acknowledgment received from client 63944 for Packet ID: 20
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-Server: 22.0970 >> Data sent to client 63944, Packet ID: 21
+Server: 8.5680 >> Acknowledgment received from client 55135 for Packet ID: 19
+Server: 8.5680 >> Acknowledgment received from client 55135 for Packet ID: 20
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 20 has been sent
+Server: 9.0690 >> Data sent to client 61735, Packet ID: 20
+Client: Received packet with ID: 20
+ Client: Acknowledgment for Packet ID 20 sent successfully
+Server: 9.0700 >> Acknowledgment received from client 61735 for Packet ID: 20
+Server: 9.0700 >> Data sent to client 61735, Packet ID: 21
 Client: Received packet with ID: 21
-Client: Acknowledgment for Packet ID 21 sent successfully
-Server: 22.0980 >> Data sent to client 63944, Packet ID: 22
+ Client: Acknowledgment for Packet ID 21 sent successfully
+Server: 9.0710 >> Data sent to client 61735, Packet ID: 22
+Server: 9.0710 >> Acknowledgment received from client 61735 for Packet ID: 21
 Client: Received packet with ID: 22
-Client: Acknowledgment for Packet ID 22 sent successfully
-Server: 22.0980 >> Acknowledgment received from client 63944 for Packet ID: 21
-Server: 22.0990 >> Acknowledgment received from client 63944 for Packet ID: 22
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-java.net.SocketTimeoutException: Receive timed out
-        at java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)
-        at java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)
-        at GoBackNFileSender.receiveAck(GoBackNFileSender.java:200)
-        at GoBackNFileSender.sendToClient(GoBackNFileSender.java:143)
-        at GoBackNFileSender.lambda$sendFile$0(GoBackNFileSender.java:333)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-Server: Thread for client 63944 finished.
+ Client: Acknowledgment for Packet ID 22 sent successfully
+Server: 9.0710 >> Acknowledgment received from client 61735 for Packet ID: 22
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 19 has been sent
+Server: 9.5730 >> Data sent to client 61735, Packet ID: 19
+Client: Received packet with ID: 19
+ Client: Acknowledgment for Packet ID 19 sent successfully
+Server: 9.5740 >> Acknowledgment received from client 61735 for Packet ID: 19
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 20 has been sent
+Server: 10.0750 >> Data sent to client 61735, Packet ID: 20
+Client: Received packet with ID: 20
+ Client: Acknowledgment for Packet ID 20 sent successfully
+Server: 10.0760 >> Acknowledgment received from client 61735 for Packet ID: 20
+Server: 10.0770 >> Data sent to client 55135, Packet ID: 21
+Client: Received packet with ID: 21
+ Client: Acknowledgment for Packet ID 21 sent successfully
+Server: 10.0770 >> Data sent to client 55135, Packet ID: 22
+Client: Received packet with ID: 22
+ Client: Acknowledgment for Packet ID 22 sent successfully
+Server: 10.0780 >> Acknowledgment received from client 55135 for Packet ID: 21
+Server: 10.0780 >> Acknowledgment received from client 55135 for Packet ID: 22
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 22 has been sent
+Server: 10.5790 >> Data sent to client 61735, Packet ID: 22
+Client: Received packet with ID: 22
+ Client: Acknowledgment for Packet ID 22 sent successfully
+Server: 10.5800 >> Acknowledgment received from client 61735 for Packet ID: 22
+Server: Thread for client 61735 finished.
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 21 has been sent
+Server: 11.0810 >> Data sent to client 61735, Packet ID: 21
+Client: Received packet with ID: 21
+ Client: Acknowledgment for Packet ID 21 sent successfully
+Server: 11.0820 >> Acknowledgment received from client 61735 for Packet ID: 21
+Server: Acknowledgment timeout. Retransmitting packets...
+Server: Retransmission for packet 22 has been sent
+Server: 11.5830 >> Data sent to client 61735, Packet ID: 22
+Client: Received packet with ID: 22
+ Client: Acknowledgment for Packet ID 22 sent successfully
+Server: 11.5830 >> Acknowledgment received from client 61735 for Packet ID: 22
+Server: Thread for client 55135 finished.
 Server: No more data to send.
 Server: All packets sent and acknowledged. Transfer finished.
-Server: Total Bytes Sent: 94484
-Server: Total Retransmissions Sent: 4
-Server: Total Time Spent: 23.1040 seconds
-java.net.SocketException: Socket closed
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.send(DatagramSocketAdaptor.java:224)
-        at java.base/java.net.DatagramSocket.send(DatagramSocket.java:662)
-        at Server.send(Server.java:31)
-        at Server.sendFinishSignal(Server.java:81)
-        at Main.start_server(Main.java:134)
-        at Main.lambda$main$0(Main.java:57)
-        at java.base/java.lang.Thread.run(Thread.java:1623)
-Caused by: java.nio.channels.ClosedChannelException
-        at java.base/sun.nio.ch.DatagramChannelImpl.ensureOpen(DatagramChannelImpl.java:280)
-        at java.base/sun.nio.ch.DatagramChannelImpl.blockingSend(DatagramChannelImpl.java:893)
-        at java.base/sun.nio.ch.DatagramSocketAdaptor.send(DatagramSocketAdaptor.java:220)
-        ... 6 more
+Server: Total Bytes Sent: 141726
+Server: Total Retransmissions Sent: 25
+Server: Total Time Spent: 11.5850 seconds
+Client: Transfer finished
+Client: Transfer finished
