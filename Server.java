@@ -88,26 +88,19 @@ class Server {
         // Create a FileSender instance for sending the file
         GoBackNFileSender fileSender = new GoBackNFileSender(serverSocket, clientAddresses, filename, window_size, probability);
 
-        // Create a list to store filesender threads
-        List<Thread> filesender_threads = new ArrayList<>();
+        // // Create a list to store filesender threads
+        // List<Thread> filesender_threads = new ArrayList<>();
 
         // Launch a thread for sending the file
         Thread filesender_thread = new Thread(() -> 
             fileSender.sendFile()
         );
 
-        // Add the thread to the list
-        filesender_threads.add(filesender_thread);
+        // Start the thread
+        filesender_thread.start();
 
-        // Start all threads
-        for (Thread t : filesender_threads) {
-            t.start();
-        }
-
-        // Wait for all threads to finish
-        for (Thread t : filesender_threads) {
-            t.join();
-        }
+        // Wait for the thread to finish
+        filesender_thread.join();
 
         // Send a finish signal
         sendFinishSignal();
