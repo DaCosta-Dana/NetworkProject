@@ -117,7 +117,7 @@ class GoBackNFileSender {
     }
     
     // Private method to handle sending data to a specific client
-    private void sendToClient(InetSocketAddress clientAddress, double ack_probability) throws SocketTimeoutException {
+    private void sendToClient(InetSocketAddress clientAddress, float probability) throws SocketTimeoutException {
         int clientId = clientAddress.getPort();
         System.out.printf("Server: Thread for client %d started.%n", clientId);
 
