@@ -7,6 +7,14 @@ public class Main {
     
     public static void main(String[] args) {
 
+        int bufferSize = 2048;
+        
+        String serverHostName = args[0];                             // id_process = localhost
+        int numberOfClients = Integer.parseInt(args[1]);
+        String filename = args[2];
+        float probability = Float.parseFloat(args[3]);         
+        int window_size = Integer.parseInt(args[4]);
+
         if (args.length != 5) {
             System.out.println("""
                 Usage: java Main <id_process> <number_of_processes> <filename> <probability> <window_size>
@@ -31,18 +39,12 @@ public class Main {
 
             System.exit(1);
         }
-
-        String serverHostName = args[0];                             // id_process = localhost
-        int numberOfClients = Integer.parseInt(args[1]);
-        String filename = args[2];
-        float probability = Float.parseFloat(args[3]);         
-        int window_size = Integer.parseInt(args[4]);
         
         try {
             // Launch the server in a separate thread
             Thread server_thread = new Thread(() -> {
                 try {
-                    launch_server(serverHostName, numberOfClients,filename, probability, window_size);
+                    launch_server(serverHostName, numberOfClients,filename, probability, window_size, bufferSize);
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
                 }
@@ -89,10 +91,10 @@ public class Main {
 
     private static AtomicInteger serverPort = new AtomicInteger(-1);  //shared data structure
 
-    public static void launch_server(String serverHostName, int numberOfClients, String filename, float probability, int window_size)  throws InterruptedException, IOException {
+    public static void launch_server(String serverHostName, int numberOfClients, String filename, float probability, int window_size, int bufferSize)  throws InterruptedException, IOException {
         
         // Create a server instance
-        Server server = new Server(filename, probability, window_size);
+        Server server = new Server(filename, probability, window_size, bufferSize);
 
         //Get the server IP address and display it
         System.out.println("Server IP Address: " + server.getServerIPAddress(serverHostName));

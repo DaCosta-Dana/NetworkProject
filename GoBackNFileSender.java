@@ -24,6 +24,7 @@ class GoBackNFileSender {
     private String filename;
     private int window_size;
     private float probability;
+    private int bufferSize;
 
     private static final int waitFor_ACK = 500; // milliseconds
     private long fileSize;
@@ -44,12 +45,13 @@ class GoBackNFileSender {
     private long totalTimeSpent;
 
     // Constructor to initialize FileSender
-    public GoBackNFileSender(DatagramSocket serverSocket, List<InetSocketAddress> clientAddresses, String filename, int window_size, float probability){
+    public GoBackNFileSender(DatagramSocket serverSocket, List<InetSocketAddress> clientAddresses, String filename, int window_size, float probability, int bufferSize){
         this.serverSocket = serverSocket;
         this.clientAddresses = clientAddresses;
         this.filename = filename;
         this.window_size = window_size;
         this.probability = probability;
+        this.bufferSize = bufferSize;
 
         try (FileInputStream fileInputStream = new FileInputStream(filename)) {
             // Open a FileInputStream to read a file, estimates its size using available()
@@ -133,10 +135,10 @@ class GoBackNFileSender {
 
             serverSocket.setSoTimeout(waitFor_ACK);
 
-            while (oldestUnacknowledgedPacket < fileSize / 2048) {       //TODO: create variable that holds the 2048 through the program
+            while (oldestUnacknowledgedPacket < fileSize / bufferSize) {
                 
                 // Calculate windowEnd to not extend beyond the total number of packets
-                int windowEnd = (int) Math.min(oldestUnacknowledgedPacket + window_size, fileSize / 2048);
+                int windowEnd = (int) Math.min(oldestUnacknowledgedPacket + window_size, fileSize / bufferSize);
 
                 // Send packets for the current window
                 for (int packetId = oldestUnacknowledgedPacket; packetId < windowEnd; packetId++) {
@@ -189,12 +191,12 @@ class GoBackNFileSender {
     private void sendPacket(int packetId, InetSocketAddress clientAddress, long startTime) throws IOException {
         
         // Initialize buffer to store data from the file
-        byte[] data = new byte[2048];
+        byte[] data = new byte[bufferSize];
         int bytesRead;
     
         try (FileInputStream file = new FileInputStream(filename)) {
             // Skip bytes in the file to reach the appropriate position for the current packet
-            long skipBytes = packetId * 2048;
+            long skipBytes = packetId * bufferSize;
             while (skipBytes > 0) {
                 long skipped = file.skip(skipBytes);
                 if (skipped <= 0) {
@@ -251,7 +253,7 @@ class GoBackNFileSender {
 
     // Private method to receive acknowledgment from the client
     private int receiveAck(long startTime, InetSocketAddress clientAddress, int lastAckedPacketId) throws SocketException {
-        byte[] ackMessage = new byte[2048];
+        byte[] ackMessage = new byte[bufferSize];
         DatagramPacket ackPacket = new DatagramPacket(ackMessage, ackMessage.length);
     
         listAckLock.lock();

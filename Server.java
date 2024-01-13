@@ -13,15 +13,18 @@ class Server {
     private String filename;
     private float probability;
     private int window_size;
+    private int bufferSize;
 
     DatagramSocket serverSocket;
     List<InetSocketAddress> clientAddresses;
     
     // Constructor to initialize the Server
-    public Server(String filename, float probability, int window_size) throws SocketException {
+    public Server(String filename, float probability, int window_size, int bufferSize) throws SocketException {
         this.filename = filename;
         this.probability = probability;
         this.window_size = window_size;
+        this.bufferSize = bufferSize;
+
         this.serverSocket = new DatagramSocket();
         this.clientAddresses = new ArrayList<>();
     }
@@ -48,7 +51,7 @@ class Server {
         while (clientAddresses.size() < numberOfClients) {
 
             // Create buffer to store incoming data packets
-            byte[] buffer = new byte[2048];        // length of 2048 bytes TODO: create variable that holds the 2048 through the program
+            byte[] buffer = new byte[bufferSize];
             
             // Create a DatagramPacket to receive data packet from the client
             DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length); 
@@ -85,35 +88,24 @@ class Server {
     }
 
     public void sendFile_goBackN() throws InterruptedException, IOException{
-        // Create a FileSender instance for sending the file
-        GoBackNFileSender fileSender = new GoBackNFileSender(serverSocket, clientAddresses, filename, window_size, probability);
+        // Create a FileSender instance
+        GoBackNFileSender fileSender = new GoBackNFileSender(serverSocket, clientAddresses, filename, window_size, probability, bufferSize);
 
-        // // Create a list to store filesender threads
-        // List<Thread> filesender_threads = new ArrayList<>();
-
-        // Launch a thread for sending the file
-        Thread filesender_thread = new Thread(() -> 
-            fileSender.sendFile()
-        );
-
-        // Start the thread
-        filesender_thread.start();
-
-        // Wait for the thread to finish
-        filesender_thread.join();
-
-        // Send a finish signal
+        // Send the file
+        fileSender.sendFile();
+        
+        // Send a finish signal to all connected clients
         sendFinishSignal();
+
+        // // TODO: Rethink the design with ALTERNATIVE (applicable if the function only used once)
+        // for (InetSocketAddress clientAddress : clientAddresses) {
+        //     byte[] finishSignal = "finished".getBytes();
+        //     DatagramPacket packet = new DatagramPacket(finishSignal, finishSignal.length, clientAddress.getAddress(), clientAddress.getPort());
+        //     serverSocket.send(packet);
+        // }
 
         // Close the server socket
         serverSocket.close();
-    }
-
-    // Private method to send a DatagramPacket to a specified address and port
-    private boolean send(byte[] data, InetAddress address, int assignedPort) throws IOException {
-        DatagramPacket packet = new DatagramPacket(data, data.length, address, assignedPort);
-        serverSocket.send(packet);
-        return true;
     }
 
     // Method to send a finish signal to all connected clients
@@ -122,6 +114,12 @@ class Server {
             byte[] finishSignal = "finished".getBytes();
             send(finishSignal, clientAddress.getAddress(), clientAddress.getPort());
         }
+    }
+
+    // Private method to send a DatagramPacket to a specified address and port
+    private void send(byte[] data, InetAddress address, int assignedPort) throws IOException {
+        DatagramPacket packet = new DatagramPacket(data, data.length, address, assignedPort);
+        serverSocket.send(packet);
     }
 
 }
