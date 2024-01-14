@@ -7,7 +7,6 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -33,7 +32,7 @@ class GoBackNFileSender {
     private int totalRetransmissionsSent;
 
     // Declare ackCountMap as a ConcurrentHashMap
-    private Map<Integer, AtomicInteger> ackCountDictionary;
+    private ConcurrentHashMap <Integer, AtomicInteger> packetID_ACKCount_Map;
 
     // Constructor to initialize FileSender
     public GoBackNFileSender(DatagramSocket serverSocket, List<InetSocketAddress> clientAddresses, String filename, int window_size, float probability, int bufferSize){
@@ -51,7 +50,7 @@ class GoBackNFileSender {
             e.printStackTrace();
         }
 
-        ackCountDictionary = new ConcurrentHashMap<>();
+        packetID_ACKCount_Map = new ConcurrentHashMap<>();
 
         // statistics summary
         totalBytesSent = 0;
@@ -290,17 +289,17 @@ class GoBackNFileSender {
                     // 0                        = starting index in the byte array from which to begin converting.
                     // ackPacket.getLength()    = number of bytes to convert. This ensures that only the actual data of the ACK packet is converted
                  
-                double timeTaken = System.currentTimeMillis()/1000.0 - startTime; // in seconds    
-                if (packet_ID == ACK_ID){
-                    // Print information about the correct received ACK packet
-                    System.out.printf("%.4f >> Server: ACK received from Client %d for Packet ID: %d%n", timeTaken, clientAddress.getPort(), packet_ID);
+                
+                double timeTaken = System.currentTimeMillis()/1000.0 - startTime; // in seconds   
 
-                    return true;
-                }
-                // Print information about the corrupted received ACK packet
-                System.err.printf("%.4f >> Server: corrupted ACK received from Client %d for Packet ID: %d%n", timeTaken, clientAddress.getPort(), packet_ID);
+                //TODO: this needs to be checked
+                System.out.println(ACK_ID==packet_ID); 
+                System.out.println(ACK_ID);
+               
+                System.out.printf("%.4f >> Server: ACK received from Client %d for Packet ID: %d%n", timeTaken, clientAddress.getPort(), packet_ID);
 
-                return false;
+                return true;
+                
 
             } else{
                 return false;
