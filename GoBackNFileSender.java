@@ -203,14 +203,14 @@ class GoBackNFileSender {
     }
 
     // Private method to send a specific packet to the client
-    private void sendPacket(int packetId, InetSocketAddress clientAddress) throws IOException {
+    private void sendPacket(int packetId, InetSocketAddress clientAddress) throws IOException { //TODO: need to go through, focus on the ackPackets if necessary
         
         // Simulate packet loss based on acknowledgment probability
         Random random = new Random();
         float randomValue = random.nextFloat();     // returns a random float value between 0.0 (inclusive) and 1.0 (exclusive)
         if (randomValue < probability) {
+            
             System.out.println("Note: Packet ID "+ packetId +" lost for Client " + clientAddress.getPort());
-
             return; // Exit the method to avoid sending the packet because of packet loss simulation
         }
 
@@ -258,7 +258,7 @@ class GoBackNFileSender {
 
 
     // Private method to receive acknowledgment from the client
-    private int receiveAck(InetSocketAddress clientAddress, int lastAckedPacketId) throws SocketException {
+    private int receiveAck(InetSocketAddress clientAddress, int lastAckedPacketId) throws SocketException { //TODO: understand and go through
         byte[] ackMessage = new byte[bufferSize];
         DatagramPacket ackPacket = new DatagramPacket(ackMessage, ackMessage.length);
     
@@ -297,9 +297,42 @@ class GoBackNFileSender {
     
         return lastAckedPacketId;
     }
+
+    // Private method to retransmit packets in case of acknowledgment timeout
+    private void retransmitPacketsAndWait(InetSocketAddress clientAddress, int lastAckedPacketId) { //TODO: understand and go through
+        listAckLock.lock();
+        try {
+                try {
+                    System.out.println("Server: Retransmission for packet " + lastAckedPacketId + " has been sent");
+                    sendPacket(lastAckedPacketId, clientAddress);
+                    retransmissionsSent++;
+                    
+    
+                    // Wait for acknowledgment for this retransmitted packet with timeout
+                    long timeout = System.currentTimeMillis() + waitFor_ACK;
+                    while (!acknowledgedPackets.contains(lastAckedPacketId) && System.currentTimeMillis() < timeout) {
+                        try {
+                            // Sleep and wait for acknowledgment
+                            Thread.sleep(10); // Adjust the sleep time if needed
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+    
+                    if (!acknowledgedPackets.contains(lastAckedPacketId)) {
+                        // Handle acknowledgment timeout, e.g., log or take appropriate action
+                        System.out.println("Server: Acknowledgment timeout for packet " + lastAckedPacketId);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        } finally {
+            listAckLock.unlock();
+        }
+    }
     
     // Private method to find the client address in the list of client addresses
-    private InetSocketAddress findClientAddress(List<InetSocketAddress> clientAddresses, SocketAddress address) {
+    private InetSocketAddress findClientAddress(List<InetSocketAddress> clientAddresses, SocketAddress address) { //TODO: understand and go through
         for (InetSocketAddress clientAddress : clientAddresses) {
             if (clientAddress.equals(address)) {
                 return clientAddress;
@@ -309,7 +342,7 @@ class GoBackNFileSender {
     } 
     
     // Private method to process acknowledgment from the client
-    private void processAck(int ackId, InetSocketAddress clientAddress, InetSocketAddress actualClientAddress) {
+    private void processAck(int ackId, InetSocketAddress clientAddress, InetSocketAddress actualClientAddress) { //TODO: understand and go through
         // Check if acknowledgment is from the expected client
         if (sentPacketIds.contains(ackId)) {
             // Mark acknowledgment from the specific client
@@ -347,36 +380,4 @@ class GoBackNFileSender {
         }
     }
 
-    // Private method to retransmit packets in case of acknowledgment timeout
-    private void retransmitPacketsAndWait(InetSocketAddress clientAddress, int lastAckedPacketId) {
-        listAckLock.lock();
-        try {
-                try {
-                    System.out.println("Server: Retransmission for packet " + lastAckedPacketId + " has been sent");
-                    sendPacket(lastAckedPacketId, clientAddress);
-                    retransmissionsSent++;
-                    
-    
-                    // Wait for acknowledgment for this retransmitted packet with timeout
-                    long timeout = System.currentTimeMillis() + waitFor_ACK;
-                    while (!acknowledgedPackets.contains(lastAckedPacketId) && System.currentTimeMillis() < timeout) {
-                        try {
-                            // Sleep and wait for acknowledgment
-                            Thread.sleep(10); // Adjust the sleep time if needed
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-    
-                    if (!acknowledgedPackets.contains(lastAckedPacketId)) {
-                        // Handle acknowledgment timeout, e.g., log or take appropriate action
-                        System.out.println("Server: Acknowledgment timeout for packet " + lastAckedPacketId);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-        } finally {
-            listAckLock.unlock();
-        }
-    }
 }
