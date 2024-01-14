@@ -81,18 +81,20 @@ class GoBackNFileSender {
 
     // Public method to initiate the file transfer to all clients
     public void sendFile() {
-        // Initialize a set to keep track of acknowledged packets for each file transfer
-        acknowledgedPackets = new HashSet<>();  
-        List<Thread> destination_threads = new ArrayList<>();
-
         // Register start time
         long startTime = System.currentTimeMillis();
+
+        // Initialize a set to keep track of acknowledged packets for each file transfer
+        acknowledgedPackets = new HashSet<>(); //TODO: what use???
+
+        // Create a list to store destination threads
+        List<Thread> destination_threads = new ArrayList<>();
 
         // Launch a separate thread for each destination (clientAddresses) to send data concurrently
         for (InetSocketAddress clientAddress : clientAddresses) {
             Thread destination_thread = new Thread(() -> {
                 try {
-                    sendToClient(clientAddress, probability);
+                    sendToClient(clientAddress, probability, startTime);
                 } catch (SocketTimeoutException e) {
                     e.printStackTrace();
                 }
@@ -102,9 +104,9 @@ class GoBackNFileSender {
         }
 
         // Wait for all threads to finish
-        for (Thread thread : destination_threads) {
+        for (Thread t : destination_threads) {
             try {
-                thread.join();
+                t.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -128,14 +130,13 @@ class GoBackNFileSender {
     }
 
     // Private method to handle sending data to a specific client
-    private void sendToClient(InetSocketAddress clientAddress, float probability) throws SocketTimeoutException {
+    private void sendToClient(InetSocketAddress clientAddress, float probability, long startTime) throws SocketTimeoutException {
 
         // Identify the client
         int clientId = clientAddress.getPort();
         System.out.printf("Server: Thread for Client with Port %d started.%n", clientId);
 
         try {
-            long startTime = System.currentTimeMillis();
             int oldestUnacknowledgedPacket = 0;             //initialised to 0
 
             serverSocket.setSoTimeout(waitFor_ACK);
