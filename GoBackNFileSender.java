@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -38,16 +39,15 @@ class GoBackNFileSender {
     
     private Deque<Integer> sentPacketIds;
     private boolean end;
-    private boolean[] ackReceivedArray = new boolean[window_size];  // To keep track of received acks
     
     private Map<Integer, Long> sentTimes;
     private final Lock listAckLock;
     private Map<InetSocketAddress, Integer> baseMap;
     private Map<InetSocketAddress, Integer> nextSeqNumMap;
     
+    private boolean[] ackReceivedArray; 
     private Set<Integer> acknowledgedPackets;  // To keep track of acknowledged packets
     
-
     // Constructor to initialize FileSender
     public GoBackNFileSender(DatagramSocket serverSocket, List<InetSocketAddress> clientAddresses, String filename, int window_size, float probability, int bufferSize){
         this.serverSocket = serverSocket;
@@ -59,21 +59,26 @@ class GoBackNFileSender {
 
         try (FileInputStream fileInputStream = new FileInputStream(filename)) {
             // Open a FileInputStream to read a file, estimates its size using available()
-            this.fileSize = fileInputStream.available();
+            fileSize = fileInputStream.available();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        this.totalBytesSent = 0;
-        this.retransmissionsSent = 0;
+        // Initialize a set to keep track of acknowledged packets for each file transfer
+        acknowledgedPackets = new HashSet<>();
+        ackReceivedArray = new boolean[window_size]; // To keep track of received acks
+
+        totalBytesSent = 0;
+        retransmissionsSent = 0;
         
-        this.sentPacketIds = new ArrayDeque<>();
-        this.totalTimeSpent = 0;
-        this.end = false;
+        sentPacketIds = new ArrayDeque<>();
+        totalTimeSpent = 0;
+        end = false;
         
-        this.ackReceivedArray = new boolean[window_size];
-        this.sentTimes = new HashMap<>();
-        this.listAckLock = new ReentrantLock(); 
+        ackReceivedArray = new boolean[window_size];
+        sentTimes = new HashMap<>();
+        listAckLock = new ReentrantLock(); 
+
         baseMap = new HashMap<>();
         nextSeqNumMap = new HashMap<>();
 
@@ -97,9 +102,6 @@ class GoBackNFileSender {
             }
         }
 
-        // Initialize a set to keep track of acknowledged packets for each file transfer
-        acknowledgedPackets = new HashSet<>(); //TODO: what use???
-
         // Create a list to store destination threads
         List<Thread> destination_threads = new ArrayList<>();
 
@@ -114,11 +116,9 @@ class GoBackNFileSender {
             });
             destination_threads.add(destination_thread);
 
-            // // Starting each destination thread immediately after creating it
-            // destination_thread.start();
         }
 
-        // Start all client threads
+        // Start all destination threads
         for (Thread t : destination_threads) {               
             t.start();
         }
@@ -172,19 +172,23 @@ class GoBackNFileSender {
         try {
             int oldestUnacknowledgedPacket = 0;             //initialised to 0
 
+            // Setting a maximum time that the server socket will block while waiting for an incoming connection
             serverSocket.setSoTimeout(waitFor_ACK);
 
+            // Loop that continues until all packets are acknowledged
             while (oldestUnacknowledgedPacket < fileSize / bufferSize) {
                 
-                // Calculate windowEnd to not extend beyond the total number of packets
+                // Calculates the end of the current window, to not extend beyond the total number of packets
                 int windowEnd = (int) Math.min(oldestUnacknowledgedPacket + window_size, fileSize / bufferSize);
 
-                // Send packets for the current window
+                // Loop iterates through the packets in the current window.
                 for (int packetId = oldestUnacknowledgedPacket; packetId < windowEnd; packetId++) {
-                    // Send the packet and handle IOException
+
                     try {
                         // Simulate packet loss based on acknowledgment probability
-                        if (Math.round(Math.random() * 1000) / 1000.0 < probability) {
+                        Random random = new Random();
+                        float randomValue = random.nextFloat();     // returns a random float value between 0.0 (inclusive) and 1.0 (exclusive)
+                        if (randomValue < probability) {
                             System.out.println("Server: Packet lost for Client " + client_ID+ " with ID " + packetId);
 
                             // Handle packet loss by retransmitting and waiting for acknowledgment
@@ -192,13 +196,10 @@ class GoBackNFileSender {
                         } else {
                             // Send the packet to the client
                             sendPacket(packetId, clientAddress);
-                        }
-
-                        
+                        }  
 
                     } catch (IOException e) {
                         e.printStackTrace();
-                        // Handle the exception, e.g., log or retry
                         continue;
                     }
                 }
