@@ -5,14 +5,9 @@ import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -40,17 +35,6 @@ class GoBackNFileSender {
     // Declare ackCountMap as a ConcurrentHashMap
     private Map<Integer, AtomicInteger> ackCountDictionary;
 
-    //TODO: Idk what the variables below are meant for
-        
-        private Deque<Integer> sentPacketIDs;
-        private boolean end;
-
-        private Map<Integer, Integer> baseMap;
-        private Map<Integer, Integer> nextSeqNumMap;
-        
-        private boolean[] ackReceivedArray; 
-        private Set<Integer> acknowledgedPackets;  // To keep track of acknowledged packets
-    
     // Constructor to initialize FileSender
     public GoBackNFileSender(DatagramSocket serverSocket, List<InetSocketAddress> clientAddresses, String filename, int window_size, float probability, int bufferSize){
         this.serverSocket = serverSocket;
@@ -72,28 +56,7 @@ class GoBackNFileSender {
         // statistics summary
         totalBytesSent = 0;
         totalRetransmissionsSent = 0;
-
-        // TODO: no idea yet of its use
-            // Initialize a set to keep track of acknowledged packets for each file transfer
-            acknowledgedPackets = new HashSet<>();
-            ackReceivedArray = new boolean[window_size]; // To keep track of received acks
-
-            
-            sentPacketIDs = new ArrayDeque<>();
-            totalTimeSpent = 0;
-            end = false;
-            
-            ackReceivedArray = new boolean[window_size];
-
-            baseMap = new HashMap<>();
-            nextSeqNumMap = new HashMap<>();
-
-            // Assuming clientAddresses is a list of InetSocketAddress containing all your clients
-            for (InetSocketAddress clientAddress : clientAddresses) {
-                int client_ID = clientAddress.getPort();
-                baseMap.put(client_ID, 0); // Initialize base packet ID for each client to 0
-                nextSeqNumMap.put(client_ID, 0); // Initialize next sequence number for each client to 0
-            }
+        totalTimeSpent = 0;
     }
 
     // Public method to initiate the file transfer to all clients
@@ -144,14 +107,12 @@ class GoBackNFileSender {
         totalTimeSpent = endTime - startTime;
 
         // Print statistics about the file transfer
-        if (end) {
-            System.out.println("Server: No more data to send.");
-            System.out.println("Server: All packets sent and acknowledged. Transfer finished.");
-            System.out.printf("Server: Total Bytes Sent: %d%n", totalBytesSent);
-            System.out.printf("Server: Total Retransmissions Sent: %d%n", totalRetransmissionsSent);
-            System.out.printf("Server: Total Time Spent: %.4f seconds%n", totalTimeSpent);
-            return;
-        }
+        System.out.println("Server: No more data to send.");
+        System.out.println("Server: All packets sent and acknowledged. Transfer finished.");
+        System.out.printf("Server: Total Bytes Sent: %d%n", totalBytesSent);
+        System.out.printf("Server: Total Retransmissions Sent: %d%n", totalRetransmissionsSent);
+        System.out.printf("Server: Total Time Spent: %.4f seconds%n", totalTimeSpent);
+
     }
 
     // Private method to send the start time to a specific client
@@ -185,20 +146,10 @@ class GoBackNFileSender {
             // Loop iterates through the packets in the current window (e.g., 0, 1, 2 for window_size = 3)
             for (int packet_ID = oldestUnacknowledgedPacket; packet_ID < windowEnd; packet_ID++) {
 
-                try {
-                    // Send the packet to the client
-                    sendPacketWithLoss_UDP( clientAddress, packet_ID, probability);
+                transmitPacketsAndWaitACK(clientAddress, packet_ID);
 
-                    // Wait for acknowledgment for the sent packet
-                    waitFor_receiveAck(clientAddress, packet_ID);       //TODO: Note this returns an int for packet_ID -> received
-
-                    // Update acknowledgment count for the packet ID using ConcurrentHashMap TODO: make this work
-                    // ackCountMap.compute(packet_ID, (k, v) -> (v == null) ? new AtomicInteger(1) : new AtomicInteger(v.get() + 1));
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    continue;
-                }
+                // Update acknowledgment count for the packet ID using ConcurrentHashMap TODO: make this work
+                // ackCountMap.compute(packet_ID, (k, v) -> (v == null) ? new AtomicInteger(1) : new AtomicInteger(v.get() + 1));
             }
 
             // Move to the next window
@@ -208,9 +159,36 @@ class GoBackNFileSender {
 
         endTime = System.currentTimeMillis();
         totalTimeSpent += (endTime - startTime);
-        end = true;
+        // end = true;
 
         System.out.printf("Server: Thread for client %d finished.%n", client_ID);
+    }
+
+    // Private recursive method to transmit packets and handle ACK timeouts, the recursive nature allows it to keep retransmitting until ACK is received
+    private void transmitPacketsAndWaitACK(InetSocketAddress clientAddress, int packet_ID) {
+        try {
+            // Send the packet to the client
+            sendPacketWithLoss_UDP(clientAddress, packet_ID, probability);
+
+            // Wait for acknowledgment for the sent packet
+            boolean packet_ID_receivedACK = waitFor_receiveAck(clientAddress, packet_ID);
+
+            // Check if retransmission needed (ACK timeout occurred)
+            if (!packet_ID_receivedACK) {
+                // Print information about the retransmission
+                double timeTaken = System.currentTimeMillis()/1000.0 - startTime; // in seconds
+                System.out.printf("%.4f >> Server: Retransmission to Client %d for Packet ID %d will be sent.%n", timeTaken, clientAddress.getPort(), packet_ID);
+
+                // Recursive call to (re)transmitPacketsAndWaitACK
+                transmitPacketsAndWaitACK(clientAddress, packet_ID);
+
+                // Increment the total retransmissions count
+                totalRetransmissionsSent++;
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // Wrapper function to the UDP send function to simulate loss
@@ -282,13 +260,12 @@ class GoBackNFileSender {
     
                 // Update statistics and tracking for the sent packet
                 totalBytesSent += packetData.length;
-                sentPacketIDs.add(packet_ID);                   //TODO: use?
             }
         }
     }
 
     // Private method to receive acknowledgment from the client
-    private int waitFor_receiveAck(InetSocketAddress clientAddress, int packet_ID) throws SocketException { //TODO: understand and go through
+    private boolean waitFor_receiveAck(InetSocketAddress clientAddress, int packet_ID) throws SocketException { //TODO: understand and go through
         
         // Initialize buffer to store the ACK data
         byte[] buffer = new byte[bufferSize];
@@ -303,82 +280,45 @@ class GoBackNFileSender {
             // Attempt to receive the ackPacket using the serverSocket
             serverSocket.receive(ackPacket);
 
+            // If the ACK packet has a length greater than 0, meaning an ACK packet is received.
+            if (ackPacket.getLength() > 0) {
+
+                // Extracts the ACK ID from the ACK message (e.g., get ACK ID 0 for Packet ID 0)
+                int ACK_ID = Integer.parseInt(new String(ackPacket.getData(), 0, ackPacket.getLength()));    //TODO: necessary to parse??
+                    // ackPacket.getData()      = retrieves the raw bytes of the ACK packet into a byte array
+                    // new String(...)          = converts the byte array to a string
+                    // 0                        = starting index in the byte array from which to begin converting.
+                    // ackPacket.getLength()    = number of bytes to convert. This ensures that only the actual data of the ACK packet is converted
+                 
+                double timeTaken = System.currentTimeMillis()/1000.0 - startTime; // in seconds    
+                if (packet_ID == ACK_ID){
+                    // Print information about the correct received ACK packet
+                    System.out.printf("%.4f >> Server: ACK received from Client %d for Packet ID: %d%n", timeTaken, clientAddress.getPort(), packet_ID);
+
+                    return true;
+                }
+                // Print information about the corrupted received ACK packet
+                System.err.printf("%.4f >> Server: corrupted ACK received from Client %d for Packet ID: %d%n", timeTaken, clientAddress.getPort(), packet_ID);
+
+                return false;
+
+            } else{
+                return false;
+            }
+
+
         } catch (SocketTimeoutException e) {        //occurs means that no acknowledgment was received within the specified timeout (waitFor_ACK). 
 
             // Handle timeout - retransmit the packets if needed
             System.err.printf("Server: Wait for ACK Timeout over: ACK not received from Client %d for Packet ID %d. Retransmitting packet...%n", clientAddress.getPort(), packet_ID);
-
-            //TODO: what does the retransmission return?
-            retransmitPacketsAndWait(clientAddress, packet_ID);
-            return -1;
+            return false; 
 
         } catch (IOException e) {
             // Handle other IOException, e.g., log or retry
             e.printStackTrace();
+            return false;
         }
-
-        // If the acknowledgment packet has a length greater than 0, it means an acknowledgment is received.
-        if (ackPacket.getLength() > 0) {
-
-            // Extracts the acknowledgment ID from the acknowledgment message
-            int ACK_ID = Integer.parseInt(new String(ackPacket.getData(), 0, ackPacket.getLength()));    //TODO: how does the ack look like?? necessary to parse??
-
-            // Update acknowledgment state for the specific client
-            processAck(ACK_ID, clientAddress, clientAddress.getPort());     //TODO: I think unecessary
-
-            // Print information about the sent packet
-            double timeTaken = System.currentTimeMillis()/1000.0 - startTime; // in seconds
-            System.out.printf("%.4f >> Server: ACK received from Client %d for Packet ID: %d%n", timeTaken, clientAddress.getPort(), ACK_ID);
-        }
-
-        return packet_ID;           // ID of the last packet that was successfully acknowledged.
-
+        
+        
     }
-
-    // Private method to retransmit packets in case of acknowledgment timeout
-    private void retransmitPacketsAndWait(InetSocketAddress clientAddress, int packet_ID) {
-        try {
-            System.out.println("Server: Retransmission for Packet ID " + packet_ID + " will be sent.");
-            sendPacket_UDP(clientAddress, packet_ID);
-            totalRetransmissionsSent++;
-    
-            // Wait for acknowledgment for this retransmitted packet
-            int ackId = waitFor_receiveAck(clientAddress, packet_ID);
-    
-            if (ackId == -1) {
-                // Handle acknowledgment timeout, e.g., log or take appropriate action
-                System.out.println("Server: Acknowledgment timeout for packet " + packet_ID);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    
-    // Private method to process acknowledgment from the client
-    private void processAck(int ackId, InetSocketAddress clientAddress, int client_ID) { //TODO: understand and go through
-        // Check if acknowledgment is from the expected client
-        if (sentPacketIDs.contains(ackId)) {
-
-            // Mark acknowledgment from the specific client
-            boolean baseAckedByAll = true;
-            if (sentPacketIDs.contains(ackId)) {
-                // Update acknowledgment state for the specific client
-                int base = baseMap.get(client_ID);
-                int index = ackId - base;
-                if (index >= 0 && index < window_size) {
-                    ackReceivedArray[index] = true;
-
-                    // Check if all packets in the window are acknowledged
-                    for (int i = 0; i < window_size; i++) {
-                        if (!ackReceivedArray[i]) {
-                            baseAckedByAll = false;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
 }
