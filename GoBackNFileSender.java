@@ -3,7 +3,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayDeque;
@@ -321,37 +320,32 @@ class GoBackNFileSender {
         // If the acknowledgment packet has a length greater than 0, it means an acknowledgment is received.
         if (ackPacket.getLength() > 0) {
 
-            int ackId = Integer.parseInt(new String(ackPacket.getData(), 0, ackPacket.getLength()));
+            // Extracts the acknowledgment ID from the acknowledgment message
+            int ACK_ID = Integer.parseInt(new String(ackPacket.getData(), 0, ackPacket.getLength()));    //TODO: how does the ack look like?? necessary to parse??
 
             // Update acknowledgment state for the specific client
-            processAck(ackId, clientAddress, clientAddress.getPort());
+            processAck(ACK_ID, clientAddress, clientAddress.getPort());     //TODO: I think unecessary
 
-            //System.out.printf("Server: %.4f >> Acknowledgment received from client %d for Packet ID: %d%n", timeTaken / 1000.0, clientAddr.getPort(), ackId);
+            // Print information about the sent packet
+            double timeTaken = System.currentTimeMillis()/1000.0 - startTime; // in seconds
+            System.out.printf("%.4f >> Server: ACK received from Client %d for Packet ID: %d%n", timeTaken, clientAddress.getPort(), ACK_ID);
         }
 
-        return packet_ID;
+        return packet_ID;           // ID of the last packet that was successfully acknowledged.
+
     }
 
     // Private method to retransmit packets in case of acknowledgment timeout
-    private void retransmitPacketsAndWait(InetSocketAddress clientAddress, int packet_ID) { //TODO: understand and go through
- 
+    private void retransmitPacketsAndWait(InetSocketAddress clientAddress, int packet_ID) {
         try {
             System.out.println("Server: Retransmission for Packet ID " + packet_ID + " will be sent.");
-            sendPacket_UDP(clientAddress,packet_ID);
+            sendPacket_UDP(clientAddress, packet_ID);
             totalRetransmissionsSent++;
-            
-            // Wait for acknowledgment for this retransmitted packet with timeout
-            long timeout = System.currentTimeMillis() + waitFor_ACK;
-            while (!acknowledgedPackets.contains(packet_ID) && System.currentTimeMillis() < timeout) {
-                try {
-                    // Sleep and wait for acknowledgment
-                    Thread.sleep(10); // Adjust the sleep time if needed
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (!acknowledgedPackets.contains(packet_ID)) {
+    
+            // Wait for acknowledgment for this retransmitted packet
+            int ackId = waitFor_receiveAck(clientAddress, packet_ID);
+    
+            if (ackId == -1) {
                 // Handle acknowledgment timeout, e.g., log or take appropriate action
                 System.out.println("Server: Acknowledgment timeout for packet " + packet_ID);
             }
@@ -359,6 +353,7 @@ class GoBackNFileSender {
             e.printStackTrace();
         }
     }
+    
     
     // Private method to process acknowledgment from the client
     private void processAck(int ackId, InetSocketAddress clientAddress, int client_ID) { //TODO: understand and go through
@@ -381,17 +376,8 @@ class GoBackNFileSender {
                             break;
                         }
                     }
-                    /* 
-                    if (baseAckedByAll) {
-                        // Slide the window for the specific client
-                        slideWindow(startTime, actualClientAddress, base);
-                    }
-                    */
                 }
             }
-    
-            double timeTaken = System.currentTimeMillis()/1000.0 - startTime;
-            System.out.printf("%.4f >> Server: ACK received from client %d for Packet ID: %d%n", timeTaken, client_ID, ackId);
         }
     }
 
