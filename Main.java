@@ -37,6 +37,8 @@ public class Main {
             /* TODO: include protocol (UDP) to the command line??? */
             /* TODO: what id_process??? if not localhost, make it in the server class .getLocalHost() */
 
+            // TODO: client ID: 1,2,3?
+
             System.exit(1);
         }
         

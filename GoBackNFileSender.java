@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -27,26 +26,28 @@ class GoBackNFileSender {
     private float probability;
     private int bufferSize;
 
-    private static final int waitFor_ACK = 500; // milliseconds
+    private static final int waitFor_ACK = 500; // in milliseconds (1000 milliseconds = 1 second)
     private long fileSize;
 
     private double startTime;
     private double endTime;
     private double totalTimeSpent;
 
-    private int totalBytesSent;
-    private int retransmissionsSent;
-    
-    private Deque<Integer> sentPacketIds;
-    private boolean end;
-    
-    private Map<Integer, Long> sentTimes;
-    private final Lock listAckLock;
-    private Map<InetSocketAddress, Integer> baseMap;
-    private Map<InetSocketAddress, Integer> nextSeqNumMap;
-    
-    private boolean[] ackReceivedArray; 
-    private Set<Integer> acknowledgedPackets;  // To keep track of acknowledged packets
+    //TODO: Idk what the variables below are meant for
+
+        private int totalBytesSent;
+        private int retransmissionsSent;
+        
+        private Deque<Integer> sentPacketIDs;
+        private boolean end;
+        
+        private Map<Integer, Long> sentTimes;
+        private final Lock listAckLock;
+        private Map<InetSocketAddress, Integer> baseMap;
+        private Map<InetSocketAddress, Integer> nextSeqNumMap;
+        
+        private boolean[] ackReceivedArray; 
+        private Set<Integer> acknowledgedPackets;  // To keep track of acknowledged packets
     
     // Constructor to initialize FileSender
     public GoBackNFileSender(DatagramSocket serverSocket, List<InetSocketAddress> clientAddresses, String filename, int window_size, float probability, int bufferSize){
@@ -71,7 +72,7 @@ class GoBackNFileSender {
         totalBytesSent = 0;
         retransmissionsSent = 0;
         
-        sentPacketIds = new ArrayDeque<>();
+        sentPacketIDs = new ArrayDeque<>();
         totalTimeSpent = 0;
         end = false;
         
@@ -90,17 +91,9 @@ class GoBackNFileSender {
 
     // Public method to initiate the file transfer to all clients
     public void sendFile() {
+
         // Register start time
         startTime = (System.currentTimeMillis())/1000.0;
-
-        // Send the start time to each client before launching the threads
-        for (InetSocketAddress clientAddress : clientAddresses) {
-            try {
-                sendStartTimeToClient(clientAddress, startTime);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
 
         // Create a list to store destination threads
         List<Thread> destination_threads = new ArrayList<>();
@@ -108,6 +101,15 @@ class GoBackNFileSender {
         // Launch a separate thread for each destination (clientAddresses) to send data concurrently
         for (InetSocketAddress clientAddress : clientAddresses) {
             Thread destination_thread = new Thread(() -> {
+
+                // Send the start time to the client
+                try {
+                    sendStartTimeToClient(clientAddress, startTime);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // Send data to the client
                 sendToClient(clientAddress, probability);
             });
             destination_threads.add(destination_thread);
@@ -154,6 +156,8 @@ class GoBackNFileSender {
         DatagramPacket startTimePacket = new DatagramPacket(startTimeBytes, startTimeBytes.length, clientAddress.getAddress(), clientAddress.getPort());
         serverSocket.send(startTimePacket);
 
+        // Print information about sending the start time
+        System.out.printf("Server: Start time sent to client %d%n", clientAddress.getPort());
     }
 
     // Private method to handle sending data to a specific client
@@ -165,24 +169,21 @@ class GoBackNFileSender {
 
         int oldestUnacknowledgedPacket = 0;             //initialised to 0
 
-        // // Setting a maximum time that the server socket will block while waiting for an incoming connection
-        // serverSocket.setSoTimeout(waitFor_ACK);
-
         // Loop that continues until all packets are acknowledged
         while (oldestUnacknowledgedPacket < fileSize / bufferSize) {
             
             // Calculates the end of the current window, to not extend beyond the total number of packets
             int windowEnd = (int) Math.min(oldestUnacknowledgedPacket + window_size, fileSize / bufferSize);
 
-            // Loop iterates through the packets in the current window.
-            for (int packetId = oldestUnacknowledgedPacket; packetId < windowEnd; packetId++) {
+            // Loop iterates through the packets in the current window (e.g., 0, 1, 2 for window_size = 3)
+            for (int packet_ID = oldestUnacknowledgedPacket; packet_ID < windowEnd; packet_ID++) {
 
                 try {
                     // Send the packet to the client
-                    sendPacket(packetId, clientAddress);
+                    sendPacketWithLoss_UDP( clientAddress, packet_ID, probability);
 
                     // Wait for acknowledgment for the sent packet
-                    receiveAck(clientAddress, packetId);
+                    receiveAck(clientAddress, packet_ID);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -202,63 +203,85 @@ class GoBackNFileSender {
         System.out.printf("Server: Thread for client %d finished.%n", client_ID);
     }
 
-    // Private method to send a specific packet to the client
-    private void sendPacket(int packetId, InetSocketAddress clientAddress) throws IOException { //TODO: need to go through, focus on the ackPackets if necessary
-        
+    // Wrapper function to the UDP send function to simulate loss
+    private void sendPacketWithLoss_UDP(InetSocketAddress clientAddress, int packet_ID, float probability) throws IOException {
         // Simulate packet loss based on acknowledgment probability
-        Random random = new Random();
-        float randomValue = random.nextFloat();     // returns a random float value between 0.0 (inclusive) and 1.0 (exclusive)
-        if (randomValue < probability) {
-            
-            System.out.println("Note: Packet ID "+ packetId +" lost for Client " + clientAddress.getPort());
-            return; // Exit the method to avoid sending the packet because of packet loss simulation
+        if (Math.random() < (1 - probability)) {
+            // If the random number is within the success probability, send the packet
+            sendPacket_UDP(clientAddress, packet_ID);
+        } else {
+            System.out.println("Server: Packet lost for Client " + clientAddress.getPort() + " with ID " + packet_ID);
+            // Simulate packet loss, you may choose to handle it as needed (e.g., log or retry)
         }
+    }
 
-        // Initialize buffer to store data from the file
-        byte[] data = new byte[bufferSize];
-        int bytesRead;
-    
+    // Private method to send a specific packet to the client
+    private void sendPacket_UDP(InetSocketAddress clientAddress, int packet_ID) throws IOException { 
+
+        // FileInputStream ('file') is created to read from the specified 'filename'.
         try (FileInputStream file = new FileInputStream(filename)) {
-            // Skip bytes in the file to reach the appropriate position for the current packet
-            long skipBytes = packetId * bufferSize;
+            
+            // Skip bytes in the file to reach the appropriate position for the current packet.
+            long skipBytes = packet_ID * bufferSize;    // calculates the number of bytes to skip based on the packet_ID and bufferSize
+            
             while (skipBytes > 0) {
+                
                 long skipped = file.skip(skipBytes);
+                
                 if (skipped <= 0) {
                     System.err.println("Error skipping bytes in the file.");
                     return;
                 }
                 skipBytes -= skipped;
             }
+
+            // Initialize buffer to store the data that will be read from the file
+            byte[] buffer = new byte[bufferSize];
     
-            // Read data from the file into the buffer
-            bytesRead = file.read(data);
+            // Read data from the modified (after skip) 'file' into the 'buffer' , and the actual number of bytes read is stored in 'numberOf_bytesRead'.
+            int numberOf_bytesRead = file.read(buffer);
     
-            if (bytesRead > 0) {
-                // Create the packet data by combining packet ID and file data
-                byte[] packetData = new byte[bytesRead + 6];
-                System.arraycopy(String.format("%06d", packetId).getBytes(), 0, packetData, 0, 6);
-                System.arraycopy(data, 0, packetData, 6, bytesRead);
+            if (numberOf_bytesRead > 0) {
+
+                // Create the packet data declared as a byte array with a length of 'bytesRead + 6' to combinie packet ID and the actual file content (data)
+                byte[] packetData = new byte[numberOf_bytesRead + 6];        // additional 6 bytes are used to store the formatted packet ID (e.g., 000001) at the beginning.
+
+                // Copy the formatted packet ID bytes to the beginning of the packetData array
+                System.arraycopy(String.format("%06d", packet_ID).getBytes(), 0, packetData, 0, 6);
+                    // %06d -> '0'  = character used for padding; '6' = minimum width of the field
+                    // .getBytes()  = converts the formatted string into a byte array
+                    // 0            = starting position in the source array (here: String.format("%06d", packetId).getBytes())
+                    // packetData   = destination array (where we are copying the data)
+                    // 6            = number of elements to copy (length of the formatted packet ID)
+
+                // Copy the actual content (data) read from the file (buffer) into the packetData array starting from position 6 (after the packet ID)
+                System.arraycopy(buffer, 0, packetData, 6, numberOf_bytesRead);
+                    // buffer                = source array (data read from the file)
+                    // 0                     = starting position in the source array
+                    // 6                     = starting position in the destination array (packetData, after the packet ID)
+                    // numberOf_bytesRead    = number of elements to copy (lenght of the buffer)
     
-                // Create a DatagramPacket with the packet data and send it to the client
+                // Create a DatagramPacket 'packet' with the packet data and send it to the client
                 DatagramPacket packet = new DatagramPacket(packetData, packetData.length, clientAddress.getAddress(), clientAddress.getPort());
-                double timeTaken = System.currentTimeMillis()/1000.0 - startTime;
-                serverSocket.send(packet);
-                sentTimes.put(packetId, System.currentTimeMillis());
+                serverSocket.send(packet);      // Send this packet using the serverSocket
     
                 // Print information about the sent packet
-                System.out.printf("%.4f >> Server: Data sent to client %d, Packet ID: %d%n", timeTaken, clientAddress.getPort(), packetId);
+                double timeTaken = System.currentTimeMillis()/1000.0 - startTime; // in seconds
+                System.out.printf("%.4f >> Server: Data sent to client %d, Packet ID: %d%n", timeTaken, clientAddress.getPort(), packet_ID);
     
                 // Update statistics and tracking for the sent packet
                 totalBytesSent += packetData.length;
-                sentPacketIds.add(packetId);
-                acknowledgedPackets.add(packetId);                 // Register the sent packet for acknowledgment tracking
+                sentPacketIDs.add(packet_ID);
+
+                //TODO:???
+                acknowledgedPackets.add(packet_ID);                 // Register the sent packet for acknowledgment tracking
             }
         }
     }
 
 
     // Private method to receive acknowledgment from the client
-    private int receiveAck(InetSocketAddress clientAddress, int lastAckedPacketId) throws SocketException { //TODO: understand and go through
+    private int receiveAck(InetSocketAddress clientAddress, int lastAckedPacketID) throws SocketException { //TODO: understand and go through
         byte[] ackMessage = new byte[bufferSize];
         DatagramPacket ackPacket = new DatagramPacket(ackMessage, ackMessage.length);
     
@@ -272,12 +295,12 @@ class GoBackNFileSender {
             } catch (SocketTimeoutException e) {
                 // Handle timeout - retransmit the packets if needed
                 System.out.println("Server: Timeout over, ACK not received. Retransmitting packets...");
-                retransmitPacketsAndWait(clientAddress, lastAckedPacketId);
-                return lastAckedPacketId;
+                retransmitPacketsAndWait(clientAddress, lastAckedPacketID);
+                return lastAckedPacketID;
             } catch (IOException e) {
                 // Handle other IOException, e.g., log or retry
                 e.printStackTrace();
-                return lastAckedPacketId;
+                return lastAckedPacketID;
             }
     
             if (ackPacket.getLength() > 0) {
@@ -295,22 +318,22 @@ class GoBackNFileSender {
             listAckLock.unlock();
         }
     
-        return lastAckedPacketId;
+        return lastAckedPacketID;
     }
 
     // Private method to retransmit packets in case of acknowledgment timeout
-    private void retransmitPacketsAndWait(InetSocketAddress clientAddress, int lastAckedPacketId) { //TODO: understand and go through
+    private void retransmitPacketsAndWait(InetSocketAddress clientAddress, int lastAckedPacketID) { //TODO: understand and go through
         listAckLock.lock();
         try {
                 try {
-                    System.out.println("Server: Retransmission for packet " + lastAckedPacketId + " has been sent");
-                    sendPacket(lastAckedPacketId, clientAddress);
+                    System.out.println("Server: Retransmission for packet " + lastAckedPacketID + " has been sent");
+                    sendPacket_UDP(clientAddress,lastAckedPacketID);
                     retransmissionsSent++;
                     
     
                     // Wait for acknowledgment for this retransmitted packet with timeout
                     long timeout = System.currentTimeMillis() + waitFor_ACK;
-                    while (!acknowledgedPackets.contains(lastAckedPacketId) && System.currentTimeMillis() < timeout) {
+                    while (!acknowledgedPackets.contains(lastAckedPacketID) && System.currentTimeMillis() < timeout) {
                         try {
                             // Sleep and wait for acknowledgment
                             Thread.sleep(10); // Adjust the sleep time if needed
@@ -319,9 +342,9 @@ class GoBackNFileSender {
                         }
                     }
     
-                    if (!acknowledgedPackets.contains(lastAckedPacketId)) {
+                    if (!acknowledgedPackets.contains(lastAckedPacketID)) {
                         // Handle acknowledgment timeout, e.g., log or take appropriate action
-                        System.out.println("Server: Acknowledgment timeout for packet " + lastAckedPacketId);
+                        System.out.println("Server: Acknowledgment timeout for packet " + lastAckedPacketID);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -344,12 +367,12 @@ class GoBackNFileSender {
     // Private method to process acknowledgment from the client
     private void processAck(int ackId, InetSocketAddress clientAddress, InetSocketAddress actualClientAddress) { //TODO: understand and go through
         // Check if acknowledgment is from the expected client
-        if (sentPacketIds.contains(ackId)) {
+        if (sentPacketIDs.contains(ackId)) {
             // Mark acknowledgment from the specific client
             listAckLock.lock();
             try {
                 boolean baseAckedByAll = true;
-                if (sentPacketIds.contains(ackId)) {
+                if (sentPacketIDs.contains(ackId)) {
                     // Update acknowledgment state for the specific client
                     int base = baseMap.get(actualClientAddress);
                     int index = ackId - base;
