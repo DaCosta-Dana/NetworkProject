@@ -3,7 +3,9 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -14,6 +16,8 @@ class Client {
 
     private DatagramSocket clientSocket;
     private List<Integer> list_ack;
+
+    private long startTime;
 
     private int total_bytes_received;
     // private int retransmissions_received;
@@ -26,8 +30,6 @@ class Client {
 
         this.clientSocket = new DatagramSocket();
         this.list_ack = new ArrayList<>();
-        // this.total_bytes_received = 0;
-        // this.retransmissions_received = 0;
     }
 
     public void connectToServer() throws IOException {
@@ -55,37 +57,46 @@ class Client {
     }
     
     public void receiveFile() throws Exception {
+
+        // Create buffer to store incoming data packets
+        byte[] buffer = new byte[bufferSize];
+
+        // Create a DatagramPacket to receive start time from the server
+        DatagramPacket startTimePacket = new DatagramPacket(buffer, buffer.length);
+        clientSocket.receive(startTimePacket);
+
+        // Extract start time from the received message
+        this.startTime = Long.parseLong(new String(startTimePacket.getData(), 0, startTimePacket.getLength()));
+
+        // Create and reuse (in while) a DatagramPacket to receive data packet from the server
+        DatagramPacket receiveData = new DatagramPacket(buffer, buffer.length); // Reuse the same buffer to store incoming data packets
+            //second parameter "buffer.length" = maximum amount of data that the packet can hold
+
         while (true) {
-            // Create buffer to store incoming data packets
-            byte[] buffer = new byte[bufferSize];
-
-            // Create a DatagramPacket to receive data packet from the server
-            DatagramPacket receiveData = new DatagramPacket(buffer, buffer.length);
-                //second parameter "buffer.length" = maximum amount of data that the packet can hold
-
             // Wait for and Receive a data packet from the server
             clientSocket.receive(receiveData);
 
             // Convert the received data to a string
-            String modified_message = new String(receiveData.getData(), 0, receiveData.getLength());
+            String received_data = new String(receiveData.getData(), 0, receiveData.getLength());
 
             // Check if the "finished" signal is received
-            if (modified_message.equals("finished")) {
+            if (received_data.equals("finished")) {
                 System.out.println("Client: Transfer finished");
                 break;
             }
 
             // Extract the packet ID from the received message
-            int packet_id = Integer.parseInt(modified_message.substring(0, 6));
+            int packet_id = Integer.parseInt(received_data.substring(0, 6));
 
-            // Print the received packet ID to the console
-            System.out.printf("Client: Received packet with ID: %d%n", packet_id);
+            // Print the received packet ID and synchronized time to the console
+            long synchronizedTime = System.currentTimeMillis() - startTime;
+            System.out.printf("Client: %.4f >> Received packet with ID: %d%n", synchronizedTime / 1000.0, packet_id);
 
             // Send acknowledgment for the received packet
             send_ack(packet_id, receiveData.getAddress());
 
             // Update the total bytes received
-            total_bytes_received += modified_message.length();
+            total_bytes_received += received_data.length();
         }
 
         // Close the socket after the transfer is finished

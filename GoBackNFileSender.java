@@ -84,6 +84,15 @@ class GoBackNFileSender {
         // Register start time
         long startTime = System.currentTimeMillis();
 
+        // Send the start time to each client before launching the threads
+        for (InetSocketAddress clientAddress : clientAddresses) {
+            try {
+                sendStartTimeToClient(clientAddress, startTime);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         // Initialize a set to keep track of acknowledged packets for each file transfer
         acknowledgedPackets = new HashSet<>(); //TODO: what use???
 
@@ -100,6 +109,8 @@ class GoBackNFileSender {
                 }
             });
             destination_threads.add(destination_thread);
+
+            // Starting each destination thread immediately after creating it
             destination_thread.start();
         }
 
@@ -127,6 +138,19 @@ class GoBackNFileSender {
             System.out.printf("Server: Total Time Spent: %.4f seconds%n", totalTimeSpent / 1000.0);
             return;
         }
+    }
+
+    // Private method to send the start time to a specific client
+    private void sendStartTimeToClient(InetSocketAddress clientAddress, long startTime) throws IOException {
+        // Convert the start time to bytes
+        byte[] startTimeBytes = String.valueOf(startTime).getBytes();
+
+        // Create a DatagramPacket with the start time data and send it to the client
+        DatagramPacket startTimePacket = new DatagramPacket(startTimeBytes, startTimeBytes.length, clientAddress.getAddress(), clientAddress.getPort());
+        serverSocket.send(startTimePacket);
+
+        // Print information about sending the start time
+        System.out.printf("Server: Start time sent to client %d%n", clientAddress.getPort());
     }
 
     // Private method to handle sending data to a specific client
