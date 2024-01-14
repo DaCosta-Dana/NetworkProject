@@ -15,10 +15,12 @@ class Client {
     private int bufferSize;
 
     private DatagramSocket clientSocket;
+    int client_ID;
+
+    private double startTime;
+    private double synchronizedTimeSec;
+
     private List<Integer> list_ack;
-
-    private long startTime;
-
     private int total_bytes_received;
     // private int retransmissions_received;
     
@@ -29,10 +31,14 @@ class Client {
         this.bufferSize = bufferSize;
 
         this.clientSocket = new DatagramSocket();
+        this.client_ID = clientSocket.getLocalPort();
+
         this.list_ack = new ArrayList<>();
+        
     }
 
     public void connectToServer() throws IOException {
+
         // Wait for the serverSocket to be dynamically assigned
         while (serverPort.get() == -1) {
             try {
@@ -53,7 +59,7 @@ class Client {
         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverIPAddress, serverPort.get());
         
         // Send the packet to the server
-        clientSocket.send(sendPacket);
+        clientSocket.send(sendPacket);        
     }
     
     public void receiveFile() throws Exception {
@@ -66,7 +72,7 @@ class Client {
         clientSocket.receive(startTimePacket);
 
         // Extract start time from the received message
-        this.startTime = Long.parseLong(new String(startTimePacket.getData(), 0, startTimePacket.getLength()));
+        this.startTime = Double.parseDouble(new String(startTimePacket.getData(), 0, startTimePacket.getLength()));
 
         // Create and reuse (in while) a DatagramPacket to receive data packet from the server
         DatagramPacket receiveData = new DatagramPacket(buffer, buffer.length); // Reuse the same buffer to store incoming data packets
@@ -81,7 +87,7 @@ class Client {
 
             // Check if the "finished" signal is received
             if (received_data.equals("finished")) {
-                System.out.println("Client: Transfer finished");
+                System.out.printf("Client %d: Transfer finished%n", client_ID);
                 break;
             }
 
@@ -89,8 +95,8 @@ class Client {
             int packet_id = Integer.parseInt(received_data.substring(0, 6));
 
             // Print the received packet ID and synchronized time to the console
-            long synchronizedTime = System.currentTimeMillis() - startTime;
-            System.out.printf("Client: %.4f >> Received packet with ID: %d%n", synchronizedTime / 1000.0, packet_id);
+            this.synchronizedTimeSec = System.currentTimeMillis()/1000.0 - startTime;
+            System.out.printf("%.4f >> Client %d: Received packet with ID: %d%n", synchronizedTimeSec, client_ID, packet_id);
 
             // Send acknowledgment for the received packet
             send_ack(packet_id, receiveData.getAddress());
@@ -106,7 +112,7 @@ class Client {
     public boolean send_ack(int packet_id, InetAddress server_address) throws Exception {
 
         // Print acknowledgment information to console
-        System.out.println("Client: Acknowledgment for Packet ID " + packet_id + " sent successfully");
+        System.out.printf("%.4f >> Client %d: ACK sent for Packet ID: %d%n",synchronizedTimeSec, client_ID, packet_id);
 
         // Convert the acknowledgment to bytes
         byte[] acknowledgment = Integer.toString(packet_id).getBytes();

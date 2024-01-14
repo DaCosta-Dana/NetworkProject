@@ -29,6 +29,10 @@ class GoBackNFileSender {
     private static final int waitFor_ACK = 500; // milliseconds
     private long fileSize;
 
+    private double startTime;
+    private double endTime;
+    private double totalTimeSpent;
+
     private int totalBytesSent;
     private int retransmissionsSent;
     
@@ -42,7 +46,7 @@ class GoBackNFileSender {
     private Map<InetSocketAddress, Integer> nextSeqNumMap;
     
     private Set<Integer> acknowledgedPackets;  // To keep track of acknowledged packets
-    private long totalTimeSpent;
+    
 
     // Constructor to initialize FileSender
     public GoBackNFileSender(DatagramSocket serverSocket, List<InetSocketAddress> clientAddresses, String filename, int window_size, float probability, int bufferSize){
@@ -82,7 +86,7 @@ class GoBackNFileSender {
     // Public method to initiate the file transfer to all clients
     public void sendFile() {
         // Register start time
-        long startTime = System.currentTimeMillis();
+        startTime = (System.currentTimeMillis())/1000.0;
 
         // Send the start time to each client before launching the threads
         for (InetSocketAddress clientAddress : clientAddresses) {
@@ -103,15 +107,20 @@ class GoBackNFileSender {
         for (InetSocketAddress clientAddress : clientAddresses) {
             Thread destination_thread = new Thread(() -> {
                 try {
-                    sendToClient(clientAddress, probability, startTime);
+                    sendToClient(clientAddress, probability);
                 } catch (SocketTimeoutException e) {
                     e.printStackTrace();
                 }
             });
             destination_threads.add(destination_thread);
 
-            // Starting each destination thread immediately after creating it
-            destination_thread.start();
+            // // Starting each destination thread immediately after creating it
+            // destination_thread.start();
+        }
+
+        // Start all client threads
+        for (Thread t : destination_threads) {               
+            t.start();
         }
 
         // Wait for all threads to finish
@@ -124,7 +133,7 @@ class GoBackNFileSender {
         }
 
         // Register end time
-        long endTime = System.currentTimeMillis();
+        endTime = (System.currentTimeMillis())/1000.0;
 
         // Calculate total time
         totalTimeSpent = endTime - startTime;
@@ -135,13 +144,13 @@ class GoBackNFileSender {
             System.out.println("Server: All packets sent and acknowledged. Transfer finished.");
             System.out.printf("Server: Total Bytes Sent: %d%n", totalBytesSent);
             System.out.printf("Server: Total Retransmissions Sent: %d%n", retransmissionsSent);
-            System.out.printf("Server: Total Time Spent: %.4f seconds%n", totalTimeSpent / 1000.0);
+            System.out.printf("Server: Total Time Spent: %.4f seconds%n", totalTimeSpent);
             return;
         }
     }
 
     // Private method to send the start time to a specific client
-    private void sendStartTimeToClient(InetSocketAddress clientAddress, long startTime) throws IOException {
+    private void sendStartTimeToClient(InetSocketAddress clientAddress, double startTime) throws IOException {
         // Convert the start time to bytes
         byte[] startTimeBytes = String.valueOf(startTime).getBytes();
 
@@ -149,16 +158,16 @@ class GoBackNFileSender {
         DatagramPacket startTimePacket = new DatagramPacket(startTimeBytes, startTimeBytes.length, clientAddress.getAddress(), clientAddress.getPort());
         serverSocket.send(startTimePacket);
 
-        // Print information about sending the start time
-        System.out.printf("Server: Start time sent to client %d%n", clientAddress.getPort());
+        // // Print information about sending the start time
+        // System.out.printf("Server: Start time sent to client %d%n", clientAddress.getPort());
     }
 
     // Private method to handle sending data to a specific client
-    private void sendToClient(InetSocketAddress clientAddress, float probability, long startTime) throws SocketTimeoutException {
+    private void sendToClient(InetSocketAddress clientAddress, float probability) throws SocketTimeoutException {
 
         // Identify the client
-        int clientId = clientAddress.getPort();
-        System.out.printf("Server: Thread for Client with Port %d started.%n", clientId);
+        int client_ID = clientAddress.getPort();
+        System.out.printf("Server: Thread for Client with Port %d started.%n", client_ID);
 
         try {
             int oldestUnacknowledgedPacket = 0;             //initialised to 0
@@ -176,13 +185,13 @@ class GoBackNFileSender {
                     try {
                         // Simulate packet loss based on acknowledgment probability
                         if (Math.round(Math.random() * 1000) / 1000.0 < probability) {
-                            System.out.println("Server: Packet with ID : " + packetId + " lost");
+                            System.out.println("Server: Packet lost for Client " + client_ID+ " with ID " + packetId);
 
                             // Handle packet loss by retransmitting and waiting for acknowledgment
-                            retransmitPacketsAndWait(startTime, clientAddress, packetId);
+                            retransmitPacketsAndWait(clientAddress, packetId);
                         } else {
                             // Send the packet to the client
-                            sendPacket(packetId, clientAddress, startTime);
+                            sendPacket(packetId, clientAddress);
                         }
 
                         
@@ -197,7 +206,7 @@ class GoBackNFileSender {
                 // Wait for acknowledgment for the current packet
                 for (int packetId = oldestUnacknowledgedPacket; packetId < windowEnd; packetId++) {
                     for (InetSocketAddress addr : clientAddresses) {
-                        receiveAck(startTime, addr, packetId);
+                        receiveAck(addr, packetId);
                     }
                 }
 
@@ -214,11 +223,11 @@ class GoBackNFileSender {
             e.printStackTrace();
         }
 
-        System.out.printf("Server: Thread for client %d finished.%n", clientId);
+        System.out.printf("Server: Thread for client %d finished.%n", client_ID);
     }
 
     // Private method to send a specific packet to the client
-    private void sendPacket(int packetId, InetSocketAddress clientAddress, long startTime) throws IOException {
+    private void sendPacket(int packetId, InetSocketAddress clientAddress) throws IOException {
         
         // Initialize buffer to store data from the file
         byte[] data = new byte[bufferSize];
@@ -247,12 +256,12 @@ class GoBackNFileSender {
     
                 // Create a DatagramPacket with the packet data and send it to the client
                 DatagramPacket packet = new DatagramPacket(packetData, packetData.length, clientAddress.getAddress(), clientAddress.getPort());
-                long timeTaken = System.currentTimeMillis() - startTime;
+                double timeTaken = System.currentTimeMillis()/1000.0 - startTime;
                 serverSocket.send(packet);
                 sentTimes.put(packetId, System.currentTimeMillis());
     
                 // Print information about the sent packet
-                System.out.printf("Server: %.4f >> Data sent to client %d, Packet ID: %d%n", timeTaken / 1000.0, clientAddress.getPort(), packetId);
+                System.out.printf("%.4f >> Server: Data sent to client %d, Packet ID: %d%n", timeTaken, clientAddress.getPort(), packetId);
     
                 // Update statistics and tracking for the sent packet
                 totalBytesSent += packetData.length;
@@ -282,7 +291,7 @@ class GoBackNFileSender {
     */
 
     // Private method to receive acknowledgment from the client
-    private int receiveAck(long startTime, InetSocketAddress clientAddress, int lastAckedPacketId) throws SocketException {
+    private int receiveAck(InetSocketAddress clientAddress, int lastAckedPacketId) throws SocketException {
         byte[] ackMessage = new byte[bufferSize];
         DatagramPacket ackPacket = new DatagramPacket(ackMessage, ackMessage.length);
     
@@ -296,7 +305,7 @@ class GoBackNFileSender {
             } catch (SocketTimeoutException e) {
                 // Handle timeout - retransmit the packets if needed
                 System.out.println("Server: Acknowledgment timeout. Retransmitting packets...");
-                retransmitPacketsAndWait(startTime, clientAddress, lastAckedPacketId);
+                retransmitPacketsAndWait(clientAddress, lastAckedPacketId);
                 return lastAckedPacketId;
             } catch (IOException e) {
                 // Handle other IOException, e.g., log or retry
@@ -311,7 +320,7 @@ class GoBackNFileSender {
                 InetSocketAddress clientAddr = findClientAddress(clientAddresses, ackPacket.getSocketAddress());
     
                 // Update acknowledgment state for the specific client
-                processAck(ackId, clientAddress, startTime, clientAddr);
+                processAck(ackId, clientAddress, clientAddr);
     
                 //System.out.printf("Server: %.4f >> Acknowledgment received from client %d for Packet ID: %d%n", timeTaken / 1000.0, clientAddr.getPort(), ackId);
             }
@@ -333,12 +342,12 @@ class GoBackNFileSender {
     }
     
     // Private method to retransmit packets in case of acknowledgment timeout
-    private void retransmitPacketsAndWait(long startTime, InetSocketAddress clientAddress, int lastAckedPacketId) {
+    private void retransmitPacketsAndWait(InetSocketAddress clientAddress, int lastAckedPacketId) {
         listAckLock.lock();
         try {
                 try {
                     System.out.println("Server: Retransmission for packet " + lastAckedPacketId + " has been sent");
-                    sendPacket(lastAckedPacketId, clientAddress, startTime);
+                    sendPacket(lastAckedPacketId, clientAddress);
                     retransmissionsSent++;
                     
     
@@ -366,7 +375,7 @@ class GoBackNFileSender {
     }
     
     // Private method to process acknowledgment from the client
-    private void processAck(int ackId, InetSocketAddress clientAddress, long startTime, InetSocketAddress actualClientAddress) {
+    private void processAck(int ackId, InetSocketAddress clientAddress, InetSocketAddress actualClientAddress) {
         // Check if acknowledgment is from the expected client
         if (sentPacketIds.contains(ackId)) {
             // Mark acknowledgment from the specific client
@@ -399,8 +408,8 @@ class GoBackNFileSender {
                 listAckLock.unlock();
             }
     
-            long timeTaken = System.currentTimeMillis() - startTime;
-            System.out.printf("Server: %.4f >> Acknowledgment received from client %d for Packet ID: %d%n", timeTaken / 1000.0, actualClientAddress.getPort(), ackId);
+            double timeTaken = System.currentTimeMillis()/1000.0 - startTime;
+            System.out.printf("%.4f >> Server: ACK received from client %d for Packet ID: %d%n", timeTaken, actualClientAddress.getPort(), ackId);
         }
     }
 }
