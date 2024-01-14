@@ -128,11 +128,4 @@ public class Main {
 
     }
 
-    public static long getCurrentTime() {
-        return System.currentTimeMillis();
-    }
-
-    public static double calculateElapsedTime(long startTime) {
-        return (getCurrentTime() - startTime) / 1000.0;
-    }
 }

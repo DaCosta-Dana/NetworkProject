@@ -83,7 +83,9 @@ class GoBackNFileSender {
     public void sendFile() {
         // Initialize a set to keep track of acknowledged packets for each file transfer
         acknowledgedPackets = new HashSet<>();  
-        List<Thread> threads = new ArrayList<>();
+        List<Thread> destination_threads = new ArrayList<>();
+
+        // Register start time
         long startTime = System.currentTimeMillis();
 
         // Launch a separate thread for each destination (clientAddresses) to send data concurrently
@@ -95,12 +97,12 @@ class GoBackNFileSender {
                     e.printStackTrace();
                 }
             });
-            threads.add(destination_thread);
+            destination_threads.add(destination_thread);
             destination_thread.start();
         }
 
         // Wait for all threads to finish
-        for (Thread thread : threads) {
+        for (Thread thread : destination_threads) {
             try {
                 thread.join();
             } catch (InterruptedException e) {
@@ -108,10 +110,13 @@ class GoBackNFileSender {
             }
         }
 
-        // Calculate and print statistics about the file transfer
-        long endTime = Main.getCurrentTime();
+        // Register end time
+        long endTime = System.currentTimeMillis();
+
+        // Calculate total time
         totalTimeSpent = endTime - startTime;
 
+        // Print statistics about the file transfer
         if (end) {
             System.out.println("Server: No more data to send.");
             System.out.println("Server: All packets sent and acknowledged. Transfer finished.");
