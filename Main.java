@@ -111,7 +111,7 @@ public class Main {
 
         // Send file to clients
         System.out.println("------Ready to send data file packets:------");
-        server.sendFile_goBackN();
+        server.sendFile_goBackN(numberOfClients);
     }
 
     public static void launch_client(String server_IP, int bufferSize) throws Exception {

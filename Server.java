@@ -87,22 +87,15 @@ class Server {
         System.out.println("Server: All clients are connected.");
     }
 
-    public void sendFile_goBackN() throws InterruptedException, IOException{
+    public void sendFile_goBackN(int numberOfClients) throws InterruptedException, IOException{
         // Create a FileSender instance
         GoBackNFileSender fileSender = new GoBackNFileSender(serverSocket, clientAddresses, filename, window_size, probability, bufferSize);
 
         // Send the file
-        fileSender.sendFile();
+        fileSender.sendFile(numberOfClients);
         
         // Send a finish signal to all connected clients
         sendFinishSignal();
-
-        // // TODO: Rethink the design with ALTERNATIVE (applicable if the function only used once)
-        // for (InetSocketAddress clientAddress : clientAddresses) {
-        //     byte[] finishSignal = "finished".getBytes();
-        //     DatagramPacket packet = new DatagramPacket(finishSignal, finishSignal.length, clientAddress.getAddress(), clientAddress.getPort());
-        //     serverSocket.send(packet);
-        // }
 
         // Close the server socket
         serverSocket.close();
