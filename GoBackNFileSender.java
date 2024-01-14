@@ -79,7 +79,7 @@ class GoBackNFileSender {
                 }
 
                 // Send data to the client
-                sendToClient(numberOfClients, clientAddress, probability);
+                sendToDestination(numberOfClients, clientAddress, probability);
             });
             destination_threads.add(destination_thread);
 
@@ -128,7 +128,7 @@ class GoBackNFileSender {
     }
 
     // Private method to handle sending data to a specific client
-    private void sendToClient(int numberOfClients, InetSocketAddress clientAddress, float probability) {
+    private void sendToDestination(int numberOfClients, InetSocketAddress clientAddress, float probability) {
 
         // Identify the client
         int client_ID = clientAddress.getPort();
@@ -176,7 +176,7 @@ class GoBackNFileSender {
             if (!packet_ID_receivedACK) {
                 // Print information about the retransmission
                 double timeTaken = System.currentTimeMillis()/1000.0 - startTime; // in seconds
-                System.out.printf("%.4f >> Server: Retransmission to Client %d for Packet ID %d will be sent.%n", timeTaken, clientAddress.getPort(), packet_ID);
+                System.out.printf("%.4f >>> Server: Retransmission to Client %d for Packet ID %d will be sent.%n", timeTaken, clientAddress.getPort(), packet_ID);
 
                 // Recursive call to (re)transmitPacketsAndWaitACK
                 transmitPacketsAndWaitACK(clientAddress, packet_ID);
@@ -255,7 +255,7 @@ class GoBackNFileSender {
     
                 // Print information about the sent packet
                 double timeTaken = System.currentTimeMillis()/1000.0 - startTime; // in seconds
-                System.out.printf("%.4f >> Server: Data sent to Client %d, Packet ID: %d%n", timeTaken, clientAddress.getPort(), packet_ID);
+                System.out.printf("%.4f >>> Server: Data sent to Client %d, Packet ID: %d%n", timeTaken, clientAddress.getPort(), packet_ID);
     
                 // Update statistics and tracking for the sent packet
                 totalBytesSent += packetData.length;
@@ -293,10 +293,10 @@ class GoBackNFileSender {
                 double timeTaken = System.currentTimeMillis()/1000.0 - startTime; // in seconds   
 
                 //TODO: this needs to be checked
-                System.out.println(ACK_ID==packet_ID); 
-                System.out.println(ACK_ID);
+                // System.out.println(ACK_ID==packet_ID); 
+                // System.out.println(ACK_ID);
                
-                System.out.printf("%.4f >> Server: ACK received from Client %d for Packet ID: %d%n", timeTaken, clientAddress.getPort(), packet_ID);
+                System.out.printf("%.4f >>> Server: ACK received from Client %d for Packet ID: %d%n", timeTaken, clientAddress.getPort(), packet_ID);
 
                 return true;
                 

@@ -94,7 +94,7 @@ class Client {
 
             // Print the received packet ID and synchronized time to the console
             this.synchronizedTimeSec = System.currentTimeMillis()/1000.0 - startTime;
-            System.out.printf("%.4f >> Client %d: Received packet with ID: %d%n", synchronizedTimeSec, client_ID, packet_id);
+            System.out.printf("%.4f >>> Client %d: Received packet with ID: %d%n", synchronizedTimeSec, client_ID, packet_id);
 
             // Send acknowledgment for the received packet
             send_ack(packet_id, receiveData.getAddress());
@@ -110,7 +110,7 @@ class Client {
     public boolean send_ack(int packet_id, InetAddress server_address) throws Exception {
 
         // Print acknowledgment information to console
-        System.out.printf("%.4f >> Client %d: ACK sent for Packet ID: %d%n",synchronizedTimeSec, client_ID, packet_id);
+        System.out.printf("%.4f >>> Client %d: ACK sent for Packet ID: %d%n",synchronizedTimeSec, client_ID, packet_id);
 
         // Convert the acknowledgment to bytes
         byte[] acknowledgment = Integer.toString(packet_id).getBytes();
