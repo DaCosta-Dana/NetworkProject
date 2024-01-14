@@ -78,8 +78,8 @@ class GoBackNFileSender {
                     e.printStackTrace();
                 }
 
-                // Send data to the client
-                sendToDestination(numberOfClients, clientAddress, probability);
+                // Send data to the client destination
+                sendToDestination_goBackN(numberOfClients, clientAddress, probability);
             });
             destination_threads.add(destination_thread);
 
@@ -128,7 +128,7 @@ class GoBackNFileSender {
     }
 
     // Private method to handle sending data to a specific client
-    private void sendToDestination(int numberOfClients, InetSocketAddress clientAddress, float probability) {
+    private void sendToDestination_goBackN(int numberOfClients, InetSocketAddress clientAddress, float probability) {
 
         // Identify the client
         int client_ID = clientAddress.getPort();
