@@ -7,7 +7,7 @@ public class Main {
     
     public static void main(String[] args) {
 
-        int bufferSize = 2048;
+        int bufferSize = 60000;
         
         String serverHostName = args[0];                             // id_process = localhost
         int numberOfClients = Integer.parseInt(args[1]);
@@ -30,14 +30,10 @@ public class Main {
                 javac Main.java
                 java Main localhost 2 file.txt 0.1 3
             
-                COMMAND TO DELTE ALL THE COMPILED FILES BY JAVA:
+            /*
+                COMMAND SHORTCUT TO DELTE ALL THE COMPILED FILES BY JAVA:
                 find . -name "*.class" -exec rm -f {} \;
             */
-
-            /* TODO: include protocol (UDP) to the command line??? */
-            /* TODO: what id_process??? if not localhost, make it in the server class .getLocalHost() */
-
-            // TODO: client ID: 1,2,3?
 
             System.exit(1);
         }

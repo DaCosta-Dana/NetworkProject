@@ -105,7 +105,6 @@ class Client {
 
         // Print total bytes received and retransmissions received
         System.out.printf("Client %d: Total Bytes Received: %d%n", client_ID, total_bytes_received);
-        //System.out.printf("Client %d: Total Retransmissions Received: %d%n", client_ID, retransmissions_received); //TODO: not handled
 
         // Close the socket after the transfer is finished
         clientSocket.close();
