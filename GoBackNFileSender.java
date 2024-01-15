@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 //File sending logic: Go-back-N Protocol
 class GoBackNFileSender {
@@ -26,13 +28,15 @@ class GoBackNFileSender {
     private double startTime;
     private double endTime;             //TODO: check if it is used more than once? if not, then initialize it where it is used
 
-    // statistics summary
-    private double totalTimeSpent;      //TODO: check if it is used more than once? if not, then initialize it where it is used
-    private int totalBytesSent;
-    private int totalRetransmissionsSent;
+    // Shared variables
+    private int sendBase = 0;
+    private int nextSeqNum = 0;
+    private Lock lock = new ReentrantLock();
 
-    // Declare ackCountMap as a ConcurrentHashMap
-    private ConcurrentHashMap <Integer, AtomicInteger> packetID_ACKCount_Map;
+    // statistics summary
+    private double totalTimeSpent = 0;      //TODO: check if it is used more than once? if not, then initialize it where it is used
+    private int totalBytesSent = 0;
+    private int totalRetransmissionsSent = 0;
 
     // Constructor to initialize FileSender
     public GoBackNFileSender(DatagramSocket serverSocket, List<InetSocketAddress> clientAddresses, String filename, int window_size, float probability, int bufferSize){
@@ -50,12 +54,6 @@ class GoBackNFileSender {
             e.printStackTrace();
         }
 
-        packetID_ACKCount_Map = new ConcurrentHashMap<>();
-
-        // statistics summary
-        totalBytesSent = 0;
-        totalRetransmissionsSent = 0;
-        totalTimeSpent = 0;
     }
 
     // Public method to initiate the file transfer to all clients
@@ -78,8 +76,8 @@ class GoBackNFileSender {
                     e.printStackTrace();
                 }
 
-                // Send data to the client destination
-                sendToDestination_goBackN(numberOfClients, clientAddress, probability);
+                // Send data to the client
+                sendWith_goBackN(numberOfClients, clientAddress, probability);
             });
             destination_threads.add(destination_thread);
 
@@ -128,22 +126,25 @@ class GoBackNFileSender {
     }
 
     // Private method to handle sending data to a specific client
-    private void sendToDestination_goBackN(int numberOfClients, InetSocketAddress clientAddress, float probability) {
+    private void sendWith_goBackN(int numberOfClients, InetSocketAddress clientAddress, float probability) {
 
         // Identify the client
         int client_ID = clientAddress.getPort();
         System.out.printf("Server: Thread for Client with Port %d started.%n", client_ID);
 
-        int oldestUnacknowledgedPacket = 0;             //initialised to 0
+        //TODO: might need to be outside this function
+        //Two pointers initialised to keep track of
+        int send_base = 0;             // oldest unACKed packet
+        int nextseqnum = 0;            // next packet to send
 
         // Loop that continues until all packets are acknowledged
-        while (oldestUnacknowledgedPacket < fileSize / bufferSize) {
+        while (send_base < fileSize / bufferSize) {
             
             // Calculates the end of the current window, to not extend beyond the total number of packets
-            int windowEnd = (int) Math.min(oldestUnacknowledgedPacket + window_size, fileSize / bufferSize);
+            int windowEnd = (int) Math.min(send_base + window_size, fileSize / bufferSize);
 
             // Loop iterates through the packets in the current window (e.g., 0, 1, 2 for window_size = 3)
-            for (int packet_ID = oldestUnacknowledgedPacket; packet_ID < windowEnd; packet_ID++) {
+            for (int packet_ID = send_base; packet_ID < windowEnd; packet_ID++) {
 
                 transmitPacketsAndWaitACK(clientAddress, packet_ID);
 
@@ -152,16 +153,91 @@ class GoBackNFileSender {
             }
 
             // Move to the next window
-            oldestUnacknowledgedPacket = windowEnd;
+            send_base = windowEnd;
             windowEnd += window_size;
         }
 
         endTime = System.currentTimeMillis();
         totalTimeSpent += (endTime - startTime);
-        // end = true;
 
         System.out.printf("Server: Thread for client %d finished.%n", client_ID);
     }
+
+    // private void senderLogic(InetSocketAddress clientAddress, float probability) {
+    //     while (true) {
+    //         lock.lock();
+    //         try {
+    //             if (nextSeqNum < sendBase + window_size) {
+    //                 sendPacketWithLoss_UDP(clientAddress, nextSeqNum, probability);
+    //                 nextSeqNum++;
+    //             }
+    
+    //             if (receiveAckForSendBase(clientAddress)) {
+    //                 sendBase++;
+    
+    //                 if (sendBase == nextSeqNum) {
+    //                     // Stop the timer (by setting SO_TIMEOUT to 0, meaning no timeout)
+    //                     serverSocket.setSoTimeout(0);
+    //                 } else {
+    //                     // Start the timer (measures the timeout for the packet at sendBase)
+    //                     serverSocket.setSoTimeout(timeoutValueInMillis);
+    
+    //                     // Handle timeout here if needed
+    //                     if (timeoutOccurred()) {
+    //                         // Retransmit packets from sendBase to nextSeqNum-1
+    //                         for (int i = sendBase; i < nextSeqNum; i++) {
+    //                             sendPacketWithLoss_UDP(clientAddress, i, probability);
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         } catch (SocketTimeoutException timeoutException) {
+    //             // Handle socket timeout (timeoutOccurred)
+    //             // Retransmit packets from sendBase to nextSeqNum-1
+    //             for (int i = sendBase; i < nextSeqNum; i++) {
+    //                 sendPacketWithLoss_UDP(clientAddress, i, probability);
+    //             }
+    //         } finally {
+    //             lock.unlock();
+    //         }
+    //     }
+    // }
+    
+
+    // private void sendWith_goBackN(int numberOfClients, InetSocketAddress clientAddress, float probability) {
+
+    //     // Identify the client
+    //     int client_ID = clientAddress.getPort();
+    //     System.out.printf("Server: Thread for Client with Port %d started.%n", client_ID);
+
+    //     int send_base = 0;             //initialised to 0
+
+    //     // Loop that continues until all packets are acknowledged
+    //     while (send_base < fileSize / bufferSize) {
+            
+    //         // Calculates the end of the current window, to not extend beyond the total number of packets
+    //         int windowEnd = (int) Math.min(send_base + window_size, fileSize / bufferSize);
+
+    //         // Loop iterates through the packets in the current window (e.g., 0, 1, 2 for window_size = 3)
+    //         for (int packet_ID = send_base; packet_ID < windowEnd; packet_ID++) {
+
+    //             transmitPacketsAndWaitACK(clientAddress, packet_ID);
+
+    //             // Update acknowledgment count for the packet ID using ConcurrentHashMap TODO: make this work
+    //             // ackCountMap.compute(packet_ID, (k, v) -> (v == null) ? new AtomicInteger(1) : new AtomicInteger(v.get() + 1));
+    //         }
+
+    //         // Move to the next window
+    //         send_base = windowEnd;
+    //         windowEnd += window_size;
+    //     }
+
+    //     endTime = System.currentTimeMillis();
+    //     totalTimeSpent += (endTime - startTime);
+    //     // end = true;
+
+    //     System.out.printf("Server: Thread for client %d finished.%n", client_ID);
+    // }
 
     // Private recursive method to transmit packets and handle ACK timeouts, the recursive nature allows it to keep retransmitting until ACK is received
     private void transmitPacketsAndWaitACK(InetSocketAddress clientAddress, int packet_ID) {
@@ -318,6 +394,6 @@ class GoBackNFileSender {
             return false;
         }
         
-        
     }
 }
+

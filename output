@@ -2,215 +2,215 @@
 # BUG:  retransmission only done for one client!!
 
 Server IP Address: 127.0.0.1
-Server Port: 60879
+Server Port: 62115
 The server is waiting for 2 clients to connect...
-Server: Client connected - IP: 127.0.0.1, Port: 61742
-Server: Client connected - IP: 127.0.0.1, Port: 64300
+Server: Client connected - IP: 127.0.0.1, Port: 65406
+Server: Client connected - IP: 127.0.0.1, Port: 56721
 Server: All clients are connected.
 ------Ready to send data file packets:------
-Server: Start time sent to client 64300
-Server: Thread for Client with Port 64300 started.
-Server: Start time sent to client 61742
-Server: Thread for Client with Port 61742 started.
-0.0030 >> Server: Data sent to Client 61742, Packet ID: 0
-0.0030 >> Server: Data sent to Client 64300, Packet ID: 0
-0.0040 >> Client 61742: Received packet with ID: 0
-0.0040 >> Client 61742: ACK sent for Packet ID: 0
-0.0040 >> Client 64300: Received packet with ID: 0
-0.0050 >> Server: ACK received from Client 61742 for Packet ID: 0
-0.0040 >> Client 64300: ACK sent for Packet ID: 0
-0.0050 >> Server: Data sent to Client 61742, Packet ID: 1
-0.0050 >> Client 61742: Received packet with ID: 1
-0.0050 >> Client 61742: ACK sent for Packet ID: 1
-0.0050 >> Server: ACK received from Client 64300 for Packet ID: 0
-0.0060 >> Server: ACK received from Client 61742 for Packet ID: 1
-0.0060 >> Server: Data sent to Client 64300, Packet ID: 1
-0.0060 >> Server: Data sent to Client 61742, Packet ID: 2
-0.0060 >> Client 64300: Received packet with ID: 1
-0.0060 >> Client 64300: ACK sent for Packet ID: 1
-0.0060 >> Client 61742: Received packet with ID: 2
-0.0060 >> Client 61742: ACK sent for Packet ID: 2
-0.0070 >> Server: ACK received from Client 64300 for Packet ID: 1
-0.0070 >> Server: ACK received from Client 61742 for Packet ID: 2
-0.0070 >> Server: Data sent to Client 64300, Packet ID: 2
-0.0080 >> Server: Data sent to Client 61742, Packet ID: 3
-0.0080 >> Client 61742: Received packet with ID: 3
-0.0080 >> Client 61742: ACK sent for Packet ID: 3
-0.0080 >> Client 64300: Received packet with ID: 2
-0.0080 >> Client 64300: ACK sent for Packet ID: 2
-0.0080 >> Server: ACK received from Client 64300 for Packet ID: 3
-0.0080 >> Server: ACK received from Client 61742 for Packet ID: 2
-0.0090 >> Server: Data sent to Client 64300, Packet ID: 3
-0.0090 >> Server: Data sent to Client 61742, Packet ID: 4
-0.0090 >> Client 64300: Received packet with ID: 3
-0.0090 >> Client 64300: ACK sent for Packet ID: 3
-0.0090 >> Client 61742: Received packet with ID: 4
-0.0090 >> Client 61742: ACK sent for Packet ID: 4
-0.0090 >> Server: ACK received from Client 64300 for Packet ID: 3
-0.0100 >> Server: ACK received from Client 61742 for Packet ID: 4
-0.0100 >> Server: Data sent to Client 64300, Packet ID: 4
-0.0100 >> Server: Data sent to Client 61742, Packet ID: 5
-0.0100 >> Client 64300: Received packet with ID: 4
-0.0100 >> Client 64300: ACK sent for Packet ID: 4
-0.0100 >> Client 61742: Received packet with ID: 5
-0.0100 >> Client 61742: ACK sent for Packet ID: 5
-0.0110 >> Server: ACK received from Client 64300 for Packet ID: 4
-0.0110 >> Server: ACK received from Client 61742 for Packet ID: 5
-0.0110 >> Server: Data sent to Client 64300, Packet ID: 5
-0.0110 >> Client 64300: Received packet with ID: 5
-0.0110 >> Client 64300: ACK sent for Packet ID: 5
-0.0110 >> Server: Data sent to Client 61742, Packet ID: 6
-0.0110 >> Client 61742: Received packet with ID: 6
-0.0110 >> Client 61742: ACK sent for Packet ID: 6
-0.0120 >> Server: ACK received from Client 64300 for Packet ID: 5
-0.0120 >> Server: ACK received from Client 61742 for Packet ID: 6
-0.0120 >> Server: Data sent to Client 64300, Packet ID: 6
-0.0120 >> Client 64300: Received packet with ID: 6
-0.0120 >> Client 64300: ACK sent for Packet ID: 6
-0.0120 >> Server: Data sent to Client 61742, Packet ID: 7
-0.0130 >> Server: ACK received from Client 64300 for Packet ID: 6
-0.0130 >> Client 61742: Received packet with ID: 7
-0.0130 >> Server: Data sent to Client 64300, Packet ID: 7
-0.0130 >> Client 64300: Received packet with ID: 7
-0.0130 >> Client 64300: ACK sent for Packet ID: 7
-0.0130 >> Client 61742: ACK sent for Packet ID: 7
-0.0140 >> Server: ACK received from Client 61742 for Packet ID: 7
-0.0140 >> Server: ACK received from Client 64300 for Packet ID: 7
-0.0140 >> Server: Data sent to Client 61742, Packet ID: 8
-0.0140 >> Client 61742: Received packet with ID: 8
-0.0140 >> Client 61742: ACK sent for Packet ID: 8
-0.0140 >> Server: Data sent to Client 64300, Packet ID: 8
-0.0140 >> Client 64300: Received packet with ID: 8
-0.0140 >> Client 64300: ACK sent for Packet ID: 8
-0.0150 >> Server: ACK received from Client 61742 for Packet ID: 8
-0.0150 >> Server: ACK received from Client 64300 for Packet ID: 8
-0.0150 >> Server: Data sent to Client 61742, Packet ID: 9
-0.0160 >> Server: Data sent to Client 64300, Packet ID: 9
-0.0160 >> Client 61742: Received packet with ID: 9
-0.0160 >> Client 61742: ACK sent for Packet ID: 9
-0.0160 >> Client 64300: Received packet with ID: 9
-0.0160 >> Client 64300: ACK sent for Packet ID: 9
-0.0160 >> Server: ACK received from Client 61742 for Packet ID: 9
-0.0160 >> Server: ACK received from Client 64300 for Packet ID: 9
-0.0160 >> Server: Data sent to Client 61742, Packet ID: 10
-0.0170 >> Client 64300: Received packet with ID: 10
-0.0170 >> Client 64300: ACK sent for Packet ID: 10
-0.0160 >> Client 61742: Received packet with ID: 10
-0.0160 >> Client 61742: ACK sent for Packet ID: 10
-0.0160 >> Server: Data sent to Client 64300, Packet ID: 10
-0.0170 >> Server: ACK received from Client 61742 for Packet ID: 10
-0.0170 >> Server: ACK received from Client 64300 for Packet ID: 10
-0.0170 >> Server: Data sent to Client 61742, Packet ID: 11
-0.0180 >> Server: Data sent to Client 64300, Packet ID: 11
-0.0180 >> Client 61742: Received packet with ID: 11
-0.0180 >> Client 61742: ACK sent for Packet ID: 11
-0.0180 >> Client 64300: Received packet with ID: 11
-0.0180 >> Client 64300: ACK sent for Packet ID: 11
-0.0180 >> Server: ACK received from Client 61742 for Packet ID: 11
-0.0180 >> Server: ACK received from Client 64300 for Packet ID: 11
-0.0180 >> Server: Data sent to Client 61742, Packet ID: 12
-0.0180 >> Server: Data sent to Client 64300, Packet ID: 12
-0.0180 >> Client 61742: Received packet with ID: 12
-0.0180 >> Client 61742: ACK sent for Packet ID: 12
-0.0190 >> Client 64300: Received packet with ID: 12
-0.0190 >> Client 64300: ACK sent for Packet ID: 12
-0.0190 >> Server: ACK received from Client 61742 for Packet ID: 12
-0.0190 >> Server: ACK received from Client 64300 for Packet ID: 12
-0.0190 >> Client 61742: Received packet with ID: 13
-0.0190 >> Client 61742: ACK sent for Packet ID: 13
-0.0190 >> Server: Data sent to Client 61742, Packet ID: 13
-0.0200 >> Server: ACK received from Client 61742 for Packet ID: 13
-0.0200 >> Server: Data sent to Client 64300, Packet ID: 13
-0.0200 >> Client 64300: Received packet with ID: 13
-0.0200 >> Client 64300: ACK sent for Packet ID: 13
-0.0210 >> Server: ACK received from Client 64300 for Packet ID: 13
-Server: Packet lost for Client 61742 with ID 14
-Server: Packet lost for Client 64300 with ID 14
-Server: Wait for ACK Timeout over: ACK not received from Client 61742 for Packet ID 14. Retransmitting packet...
-0.5250 >> Server: Retransmission to Client 61742 for Packet ID 14 will be sent.
-0.5270 >> Server: Data sent to Client 61742, Packet ID: 14
-0.5270 >> Client 61742: Received packet with ID: 14
-0.5270 >> Client 61742: ACK sent for Packet ID: 14
-0.5280 >> Server: ACK received from Client 64300 for Packet ID: 14
-0.5290 >> Server: Data sent to Client 64300, Packet ID: 15
-0.5290 >> Client 64300: Received packet with ID: 15
-0.5290 >> Client 64300: ACK sent for Packet ID: 15
-0.5300 >> Server: ACK received from Client 61742 for Packet ID: 15
-0.5300 >> Server: Data sent to Client 61742, Packet ID: 15
-0.5300 >> Client 61742: Received packet with ID: 15
-0.5300 >> Client 61742: ACK sent for Packet ID: 15
-0.5310 >> Server: ACK received from Client 64300 for Packet ID: 15
-0.5310 >> Server: Data sent to Client 64300, Packet ID: 16
-0.5320 >> Client 64300: Received packet with ID: 16
-0.5320 >> Client 64300: ACK sent for Packet ID: 16
-0.5320 >> Server: ACK received from Client 61742 for Packet ID: 16
-0.5330 >> Server: Data sent to Client 61742, Packet ID: 16
-0.5330 >> Client 61742: Received packet with ID: 16
-0.5330 >> Client 61742: ACK sent for Packet ID: 16
-0.5340 >> Server: ACK received from Client 64300 for Packet ID: 16
-0.5340 >> Server: Data sent to Client 64300, Packet ID: 17
-0.5340 >> Client 64300: Received packet with ID: 17
-0.5340 >> Client 64300: ACK sent for Packet ID: 17
-0.5350 >> Server: ACK received from Client 61742 for Packet ID: 17
-0.5350 >> Server: Data sent to Client 61742, Packet ID: 17
-0.5350 >> Client 61742: Received packet with ID: 17
-0.5350 >> Client 61742: ACK sent for Packet ID: 17
-0.5360 >> Server: ACK received from Client 64300 for Packet ID: 17
-0.5360 >> Server: Data sent to Client 64300, Packet ID: 18
-0.5360 >> Client 64300: Received packet with ID: 18
-0.5360 >> Client 64300: ACK sent for Packet ID: 18
-0.5370 >> Server: ACK received from Client 61742 for Packet ID: 18
-0.5370 >> Server: Data sent to Client 61742, Packet ID: 18
-0.5370 >> Client 61742: Received packet with ID: 18
-0.5370 >> Client 61742: ACK sent for Packet ID: 18
-0.5380 >> Server: ACK received from Client 64300 for Packet ID: 18
-0.5380 >> Server: Data sent to Client 64300, Packet ID: 19
-0.5380 >> Client 64300: Received packet with ID: 19
-0.5380 >> Client 64300: ACK sent for Packet ID: 19
-0.5390 >> Server: ACK received from Client 61742 for Packet ID: 19
-Server: Packet lost for Client 61742 with ID 19
-Server: Wait for ACK Timeout over: ACK not received from Client 64300 for Packet ID 19. Retransmitting packet...
-1.0390 >> Server: Retransmission to Client 64300 for Packet ID 19 will be sent.
-1.0400 >> Server: Data sent to Client 64300, Packet ID: 19
-1.0400 >> Client 64300: Received packet with ID: 19
-1.0400 >> Client 64300: ACK sent for Packet ID: 19
-1.0410 >> Server: ACK received from Client 61742 for Packet ID: 19
-1.0410 >> Server: Data sent to Client 61742, Packet ID: 20
-1.0410 >> Client 61742: Received packet with ID: 20
-1.0410 >> Client 61742: ACK sent for Packet ID: 20
-1.0420 >> Server: ACK received from Client 64300 for Packet ID: 20
-1.0420 >> Server: Data sent to Client 64300, Packet ID: 20
-1.0420 >> Client 64300: Received packet with ID: 20
-1.0420 >> Client 64300: ACK sent for Packet ID: 20
-1.0430 >> Server: ACK received from Client 61742 for Packet ID: 20
-1.0430 >> Server: Data sent to Client 61742, Packet ID: 21
-1.0430 >> Client 61742: Received packet with ID: 21
-1.0430 >> Client 61742: ACK sent for Packet ID: 21
-1.0430 >> Server: ACK received from Client 64300 for Packet ID: 21
-1.0440 >> Server: Data sent to Client 64300, Packet ID: 21
-1.0440 >> Client 64300: Received packet with ID: 21
-1.0440 >> Client 64300: ACK sent for Packet ID: 21
-1.0440 >> Server: ACK received from Client 61742 for Packet ID: 21
-1.0450 >> Server: Data sent to Client 61742, Packet ID: 22
-1.0450 >> Client 61742: Received packet with ID: 22
-1.0450 >> Client 61742: ACK sent for Packet ID: 22
-1.0460 >> Server: ACK received from Client 61742 for Packet ID: 22
-Server: Thread for client 61742 finished.
-Server: Wait for ACK Timeout over: ACK not received from Client 64300 for Packet ID 21. Retransmitting packet...
-1.5470 >> Server: Retransmission to Client 64300 for Packet ID 21 will be sent.
-1.5480 >> Server: Data sent to Client 64300, Packet ID: 21
-1.5480 >> Client 64300: Received packet with ID: 21
-1.5480 >> Client 64300: ACK sent for Packet ID: 21
-1.5480 >> Server: ACK received from Client 64300 for Packet ID: 21
-1.5490 >> Server: Data sent to Client 64300, Packet ID: 22
-1.5490 >> Client 64300: Received packet with ID: 22
-1.5490 >> Client 64300: ACK sent for Packet ID: 22
-1.5500 >> Server: ACK received from Client 64300 for Packet ID: 22
-Server: Thread for client 64300 finished.
+Server: Start time sent to client 56721
+Server: Thread for Client with Port 56721 started.
+Server: Start time sent to client 65406
+Server: Thread for Client with Port 65406 started.
+0.0030 >>> Server: Data sent to Client 65406, Packet ID: 0
+0.0030 >>> Server: Data sent to Client 56721, Packet ID: 0
+0.0030 >>> Client 65406: Received packet with ID: 0
+0.0030 >>> Client 65406: ACK sent for Packet ID: 0
+0.0030 >>> Client 56721: Received packet with ID: 0
+0.0030 >>> Client 56721: ACK sent for Packet ID: 0
+0.0040 >>> Server: ACK received from Client 65406 for Packet ID: 0
+0.0040 >>> Server: ACK received from Client 56721 for Packet ID: 0
+0.0050 >>> Server: Data sent to Client 65406, Packet ID: 1
+0.0050 >>> Server: Data sent to Client 56721, Packet ID: 1
+0.0050 >>> Client 56721: Received packet with ID: 1
+0.0050 >>> Client 56721: ACK sent for Packet ID: 1
+0.0050 >>> Client 65406: Received packet with ID: 1
+0.0050 >>> Server: ACK received from Client 65406 for Packet ID: 1
+0.0050 >>> Client 65406: ACK sent for Packet ID: 1
+0.0050 >>> Server: Data sent to Client 65406, Packet ID: 2
+0.0060 >>> Server: ACK received from Client 56721 for Packet ID: 1
+0.0060 >>> Client 65406: Received packet with ID: 2
+0.0060 >>> Client 65406: ACK sent for Packet ID: 2
+0.0060 >>> Server: Data sent to Client 56721, Packet ID: 2
+0.0060 >>> Client 56721: Received packet with ID: 2
+0.0060 >>> Client 56721: ACK sent for Packet ID: 2
+0.0060 >>> Server: ACK received from Client 65406 for Packet ID: 2
+0.0070 >>> Server: ACK received from Client 56721 for Packet ID: 2
+0.0070 >>> Server: Data sent to Client 65406, Packet ID: 3
+0.0070 >>> Server: Data sent to Client 56721, Packet ID: 3
+0.0070 >>> Client 56721: Received packet with ID: 3
+0.0070 >>> Client 56721: ACK sent for Packet ID: 3
+0.0070 >>> Client 65406: Received packet with ID: 3
+0.0070 >>> Client 65406: ACK sent for Packet ID: 3
+0.0070 >>> Server: ACK received from Client 65406 for Packet ID: 3
+0.0070 >>> Server: ACK received from Client 56721 for Packet ID: 3
+0.0080 >>> Server: Data sent to Client 65406, Packet ID: 4
+0.0080 >>> Server: Data sent to Client 56721, Packet ID: 4
+0.0080 >>> Client 56721: Received packet with ID: 4
+0.0080 >>> Client 56721: ACK sent for Packet ID: 4
+0.0080 >>> Client 65406: Received packet with ID: 4
+0.0080 >>> Client 65406: ACK sent for Packet ID: 4
+0.0080 >>> Server: ACK received from Client 65406 for Packet ID: 4
+0.0080 >>> Server: ACK received from Client 56721 for Packet ID: 4
+0.0080 >>> Server: Data sent to Client 65406, Packet ID: 5
+0.0090 >>> Server: Data sent to Client 56721, Packet ID: 5
+0.0090 >>> Client 65406: Received packet with ID: 5
+0.0090 >>> Client 65406: ACK sent for Packet ID: 5
+0.0090 >>> Client 56721: Received packet with ID: 5
+0.0090 >>> Client 56721: ACK sent for Packet ID: 5
+0.0090 >>> Server: ACK received from Client 65406 for Packet ID: 5
+0.0090 >>> Server: ACK received from Client 56721 for Packet ID: 5
+0.0090 >>> Server: Data sent to Client 65406, Packet ID: 6
+0.0090 >>> Client 65406: Received packet with ID: 6
+0.0090 >>> Client 65406: ACK sent for Packet ID: 6
+0.0100 >>> Server: ACK received from Client 65406 for Packet ID: 6
+0.0100 >>> Server: Data sent to Client 65406, Packet ID: 7
+0.0100 >>> Client 65406: Received packet with ID: 7
+0.0100 >>> Client 65406: ACK sent for Packet ID: 7
+0.0100 >>> Server: ACK received from Client 65406 for Packet ID: 7
+0.0110 >>> Server: Data sent to Client 65406, Packet ID: 8
+0.0110 >>> Client 65406: Received packet with ID: 8
+0.0110 >>> Client 65406: ACK sent for Packet ID: 8
+0.0110 >>> Server: ACK received from Client 65406 for Packet ID: 8
+0.0110 >>> Server: Data sent to Client 65406, Packet ID: 9
+0.0110 >>> Client 65406: Received packet with ID: 9
+0.0110 >>> Client 65406: ACK sent for Packet ID: 9
+0.0110 >>> Server: ACK received from Client 65406 for Packet ID: 9
+0.0120 >>> Server: Data sent to Client 65406, Packet ID: 10
+0.0120 >>> Client 65406: Received packet with ID: 10
+0.0120 >>> Client 65406: ACK sent for Packet ID: 10
+0.0120 >>> Server: ACK received from Client 65406 for Packet ID: 10
+0.0120 >>> Server: Data sent to Client 65406, Packet ID: 11
+Server: Packet lost for Client 56721 with ID 6
+0.0120 >>> Client 65406: Received packet with ID: 11
+0.0120 >>> Client 65406: ACK sent for Packet ID: 11
+0.0120 >>> Server: ACK received from Client 65406 for Packet ID: 11
+0.0130 >>> Server: Data sent to Client 65406, Packet ID: 12
+0.0130 >>> Client 65406: Received packet with ID: 12
+0.0130 >>> Client 65406: ACK sent for Packet ID: 12
+0.0130 >>> Server: ACK received from Client 56721 for Packet ID: 6
+0.0130 >>> Server: Data sent to Client 56721, Packet ID: 7
+0.0130 >>> Client 56721: Received packet with ID: 7
+0.0130 >>> Client 56721: ACK sent for Packet ID: 7
+0.0140 >>> Server: ACK received from Client 65406 for Packet ID: 12
+0.0140 >>> Server: Data sent to Client 65406, Packet ID: 13
+0.0140 >>> Client 65406: Received packet with ID: 13
+0.0140 >>> Client 65406: ACK sent for Packet ID: 13
+0.0150 >>> Server: ACK received from Client 56721 for Packet ID: 7
+0.0150 >>> Server: Data sent to Client 56721, Packet ID: 8
+0.0150 >>> Client 56721: Received packet with ID: 8
+0.0150 >>> Client 56721: ACK sent for Packet ID: 8
+0.0150 >>> Server: ACK received from Client 65406 for Packet ID: 13
+0.0150 >>> Server: Data sent to Client 65406, Packet ID: 14
+0.0150 >>> Client 65406: Received packet with ID: 14
+0.0150 >>> Client 65406: ACK sent for Packet ID: 14
+0.0160 >>> Server: ACK received from Client 56721 for Packet ID: 8
+0.0160 >>> Server: Data sent to Client 56721, Packet ID: 9
+0.0160 >>> Client 56721: Received packet with ID: 9
+0.0160 >>> Client 56721: ACK sent for Packet ID: 9
+0.0170 >>> Server: ACK received from Client 65406 for Packet ID: 14
+0.0170 >>> Server: Data sent to Client 65406, Packet ID: 15
+0.0170 >>> Client 65406: Received packet with ID: 15
+0.0170 >>> Client 65406: ACK sent for Packet ID: 15
+0.0170 >>> Server: ACK received from Client 56721 for Packet ID: 9
+0.0170 >>> Server: Data sent to Client 56721, Packet ID: 10
+0.0170 >>> Client 56721: Received packet with ID: 10
+0.0170 >>> Client 56721: ACK sent for Packet ID: 10
+0.0180 >>> Server: ACK received from Client 65406 for Packet ID: 15
+0.0180 >>> Server: Data sent to Client 65406, Packet ID: 16
+0.0180 >>> Client 65406: Received packet with ID: 16
+0.0180 >>> Client 65406: ACK sent for Packet ID: 16
+0.0180 >>> Server: ACK received from Client 56721 for Packet ID: 10
+0.0180 >>> Server: Data sent to Client 56721, Packet ID: 11
+0.0180 >>> Client 56721: Received packet with ID: 11
+0.0180 >>> Client 56721: ACK sent for Packet ID: 11
+0.0190 >>> Server: ACK received from Client 65406 for Packet ID: 16
+0.0190 >>> Server: Data sent to Client 65406, Packet ID: 17
+0.0190 >>> Client 65406: Received packet with ID: 17
+0.0190 >>> Client 65406: ACK sent for Packet ID: 17
+0.0190 >>> Server: ACK received from Client 56721 for Packet ID: 11
+0.0190 >>> Server: Data sent to Client 56721, Packet ID: 12
+0.0200 >>> Client 56721: Received packet with ID: 12
+0.0200 >>> Client 56721: ACK sent for Packet ID: 12
+0.0200 >>> Server: ACK received from Client 65406 for Packet ID: 17
+0.0200 >>> Server: Data sent to Client 65406, Packet ID: 18
+0.0200 >>> Client 65406: Received packet with ID: 18
+0.0200 >>> Client 65406: ACK sent for Packet ID: 18
+0.0200 >>> Server: ACK received from Client 56721 for Packet ID: 12
+0.0210 >>> Server: Data sent to Client 56721, Packet ID: 13
+0.0210 >>> Client 56721: Received packet with ID: 13
+0.0210 >>> Client 56721: ACK sent for Packet ID: 13
+0.0210 >>> Server: ACK received from Client 65406 for Packet ID: 18
+0.0210 >>> Server: Data sent to Client 65406, Packet ID: 19
+0.0210 >>> Client 65406: Received packet with ID: 19
+0.0210 >>> Client 65406: ACK sent for Packet ID: 19
+0.0210 >>> Server: ACK received from Client 56721 for Packet ID: 13
+0.0210 >>> Server: Data sent to Client 56721, Packet ID: 14
+0.0220 >>> Client 56721: Received packet with ID: 14
+0.0220 >>> Client 56721: ACK sent for Packet ID: 14
+0.0220 >>> Server: ACK received from Client 65406 for Packet ID: 19
+0.0220 >>> Server: Data sent to Client 65406, Packet ID: 20
+0.0220 >>> Client 65406: Received packet with ID: 20
+0.0220 >>> Client 65406: ACK sent for Packet ID: 20
+0.0220 >>> Server: ACK received from Client 56721 for Packet ID: 14
+0.0220 >>> Server: Data sent to Client 56721, Packet ID: 15
+0.0220 >>> Client 56721: Received packet with ID: 15
+0.0220 >>> Client 56721: ACK sent for Packet ID: 15
+0.0230 >>> Server: ACK received from Client 65406 for Packet ID: 20
+0.0230 >>> Server: Data sent to Client 65406, Packet ID: 21
+0.0230 >>> Client 65406: Received packet with ID: 21
+0.0230 >>> Client 65406: ACK sent for Packet ID: 21
+0.0230 >>> Server: ACK received from Client 56721 for Packet ID: 15
+0.0230 >>> Server: Data sent to Client 56721, Packet ID: 16
+0.0230 >>> Client 56721: Received packet with ID: 16
+0.0230 >>> Client 56721: ACK sent for Packet ID: 16
+0.0230 >>> Server: ACK received from Client 65406 for Packet ID: 21
+0.0240 >>> Server: Data sent to Client 65406, Packet ID: 22
+0.0240 >>> Client 65406: Received packet with ID: 22
+0.0240 >>> Client 65406: ACK sent for Packet ID: 22
+0.0240 >>> Server: ACK received from Client 56721 for Packet ID: 16
+Server: Packet lost for Client 56721 with ID 17
+Server: Wait for ACK Timeout over: ACK not received from Client 65406 for Packet ID 22. Retransmitting packet...
+0.5240 >>> Server: Retransmission to Client 65406 for Packet ID 22 will be sent.
+0.5240 >>> Server: Data sent to Client 65406, Packet ID: 22
+0.5250 >>> Client 65406: Received packet with ID: 22
+0.5250 >>> Client 65406: ACK sent for Packet ID: 22
+0.5250 >>> Server: ACK received from Client 56721 for Packet ID: 17
+0.5250 >>> Server: Data sent to Client 56721, Packet ID: 18
+0.5250 >>> Client 56721: Received packet with ID: 18
+0.5250 >>> Client 56721: ACK sent for Packet ID: 18
+0.5250 >>> Server: ACK received from Client 65406 for Packet ID: 22
+Server: Thread for client 65406 finished.
+Server: Wait for ACK Timeout over: ACK not received from Client 56721 for Packet ID 18. Retransmitting packet...
+1.0250 >>> Server: Retransmission to Client 56721 for Packet ID 18 will be sent.
+Server: Packet lost for Client 56721 with ID 18
+Server: Wait for ACK Timeout over: ACK not received from Client 56721 for Packet ID 18. Retransmitting packet...
+1.5260 >>> Server: Retransmission to Client 56721 for Packet ID 18 will be sent.
+1.5270 >>> Server: Data sent to Client 56721, Packet ID: 18
+1.5280 >>> Client 56721: Received packet with ID: 18
+1.5280 >>> Client 56721: ACK sent for Packet ID: 18
+1.5280 >>> Server: ACK received from Client 56721 for Packet ID: 18
+1.5290 >>> Server: Data sent to Client 56721, Packet ID: 19
+1.5290 >>> Client 56721: Received packet with ID: 19
+1.5290 >>> Client 56721: ACK sent for Packet ID: 19
+1.5290 >>> Server: ACK received from Client 56721 for Packet ID: 19
+1.5300 >>> Server: Data sent to Client 56721, Packet ID: 20
+1.5300 >>> Client 56721: Received packet with ID: 20
+1.5300 >>> Client 56721: ACK sent for Packet ID: 20
+1.5300 >>> Server: ACK received from Client 56721 for Packet ID: 20
+1.5310 >>> Server: Data sent to Client 56721, Packet ID: 21
+1.5310 >>> Client 56721: Received packet with ID: 21
+1.5310 >>> Client 56721: ACK sent for Packet ID: 21
+1.5310 >>> Server: ACK received from Client 56721 for Packet ID: 21
+1.5320 >>> Server: Data sent to Client 56721, Packet ID: 22
+1.5320 >>> Client 56721: Received packet with ID: 22
+1.5320 >>> Client 56721: ACK sent for Packet ID: 22
+1.5330 >>> Server: ACK received from Client 56721 for Packet ID: 22
+Server: Thread for client 56721 finished.
 Server: No more data to send.
 Server: All packets sent and acknowledged. Transfer finished.
 Server: Total Bytes Sent: 94484
 Server: Total Retransmissions Sent: 3
-Server: Total Time Spent: 1.5500 seconds
-Client 61742: Transfer finished
-Client 64300: Transfer finished
+Server: Total Time Spent: 1.5330 seconds
+Client 65406: Transfer finished
+Client 56721: Transfer finished

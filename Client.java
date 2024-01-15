@@ -19,8 +19,8 @@ class Client {
     private double synchronizedTimeSec;
 
     private List<Integer> list_ack;
-    private int total_bytes_received;
-    // private int retransmissions_received;
+    private int total_bytes_received = 0;
+    private int retransmissions_received = 0;
     
     // Constructor to initialize the Client
     public Client(String server_IP, AtomicInteger serverPort, int bufferSize) throws SocketException {
@@ -102,6 +102,10 @@ class Client {
             // Update the total bytes received
             total_bytes_received += received_data.length();
         }
+
+        // Print total bytes received and retransmissions received
+        System.out.printf("Client %d: Total Bytes Received: %d%n", client_ID, total_bytes_received);
+        //System.out.printf("Client %d: Total Retransmissions Received: %d%n", client_ID, retransmissions_received); //TODO: not handled
 
         // Close the socket after the transfer is finished
         clientSocket.close();
