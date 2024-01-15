@@ -89,10 +89,10 @@ class Server {
 
     public void sendFile_goBackN(int numberOfClients) throws InterruptedException, IOException{
         // Create a FileSender instance
-        GoBackNFileSender fileSender = new GoBackNFileSender(serverSocket, clientAddresses, filename, window_size, probability, bufferSize);
+        SenderLogic_GoBackN senderLogic = new SenderLogic_GoBackN(serverSocket, clientAddresses, filename, window_size, probability, bufferSize);
 
         // Send the file
-        fileSender.sendFile(numberOfClients);
+        senderLogic.sendFile(numberOfClients);
         
         // Send a finish signal to all connected clients
         sendFinishSignal();
