@@ -69,7 +69,7 @@ class Server {
             // Copy data from 'receivedData' to 'actualData' to ensure that only the actual received data is considered
             System.arraycopy(buffer, 0, actualData, 0, dataSize);
     
-            // Convert the data into a string if necessary
+            // Convert the data into a string 
             String messageString = new String(actualData);
     
             // Check if the received message is a connection request (e.g., "1")
