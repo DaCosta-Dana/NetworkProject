@@ -26,7 +26,7 @@ Sliding Window for Client 60581: [1, 4), Next Packet to be sent: 1
 0.5080 >>> Client 53362: Received packet with ID: 0
 0.5080 >>> Client 53362: ACK sent for Packet ID: 0
 Sliding Window for Client 53362: [0, 3), Next Packet to be sent: 1
-0.5090 >>> Server: ACK ID 0 received from Client 60581 for Packet ID: 1
+0.5090 >>> Server: ACK ID 0 received from Client 60581 for Packet ID: 1  # ACK ID ≠ Packet ID?? 
 Sliding Window for Client 60581: [2, 5), Next Packet to be sent: 2
 0.5100 >>> Server: Data sent to Client 53362, Packet ID: 1
 0.5110 >>> Server: Data sent to Client 60581, Packet ID: 2

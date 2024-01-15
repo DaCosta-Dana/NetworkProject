@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 class SenderLogic_GoBackN {
     private DatagramSocket serverSocket;
@@ -229,6 +227,8 @@ class SenderLogic_GoBackN {
                 // Retransmit all packets from send_Base to nextSeqNum-1
                 for (int ID = send_baseIDMap.get(client_ID); ID < nextSeqIDMap.get(client_ID); ID++) {
                     sendPacketWithLoss_UDP(clientAddress, ID);
+                     // Increment the total retransmissions count
+                    totalRetransmissionsSent++;
                 }
             // } finally {
   
@@ -428,7 +428,10 @@ class SenderLogic_GoBackN {
             // Retransmit all packets from send_Base to nextSeqNum-1
             for (int ID = send_baseIDMap.get(clientAddress.getPort()); ID < nextSeqIDMap.get(clientAddress.getPort()); ID++) {
                 sendPacketWithLoss_UDP(clientAddress, ID);
+                // Increment the total retransmissions count
+                totalRetransmissionsSent++;
             }
+            
             return false; 
 
         } catch (IOException e) {
